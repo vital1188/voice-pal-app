@@ -3,8 +3,8 @@
 // Server URL - will be overridden by environment variables in production
 const SERVER_URL = 
   window.VOICE_PAL_SERVER_URL || // Can be set by Netlify environment variables
-  'https://voice-pal-app.onrender.com' || // Default production server
-  'http://localhost:3000'; // Fallback for local development
+  'http://localhost:3000' || // Local development server
+  'https://voice-pal-app.onrender.com'; // Production server
 
 // Export configuration
 window.CONFIG = {
