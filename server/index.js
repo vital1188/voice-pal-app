@@ -29,6 +29,16 @@ app.use((req, res, next) => {
 // Also use the cors middleware as a fallback
 app.use(cors());
 
+// Add a simple test endpoint
+app.get("/", (req, res) => {
+  res.json({ message: "Voice Pal Server is running!" });
+});
+
+// Add a health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", message: "Server is healthy" });
+});
+
 app.get("/session", async (req, res) => {
   try {
     // Get voice parameter from query string, default to "alloy"
