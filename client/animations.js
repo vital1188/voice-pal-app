@@ -94,22 +94,79 @@ document.addEventListener('DOMContentLoaded', () => {
       window.updateRobotAudioLevel(average);
     }
     
-    // Change robot expressions based on audio intensity
-    // We'll use this for AI speech patterns
-    if (average > 0.6 && Math.random() < 0.1) {
-      // When AI is speaking loudly, occasionally show surprised expression
-      if (window.setRobotExpression) {
-        window.setRobotExpression('surprised');
+    // Get the selected mood
+    const moodSelect = document.getElementById('mood-select');
+    const selectedMood = moodSelect ? moodSelect.value : 'sarcastic';
+    
+    // Change robot expressions based on audio intensity and selected mood
+    if (average > 0.6) {
+      // When AI is speaking loudly
+      if (Math.random() < 0.1) {
+        if (window.setRobotExpression) {
+          // Different expressions based on mood
+          switch(selectedMood) {
+            case 'excited':
+              window.setRobotExpression('happy'); // More happy expressions for excited mood
+              break;
+            case 'philosophical':
+              window.setRobotExpression('thinking'); // More thinking for philosophical mood
+              break;
+            case 'dramatic':
+              window.setRobotExpression('surprised'); // More surprised for dramatic mood
+              break;
+            case 'deadpan':
+              window.setRobotExpression('neutral'); // More neutral for deadpan mood
+              break;
+            default: // sarcastic
+              window.setRobotExpression('surprised');
+          }
+        }
       }
-    } else if (average > 0.4 && Math.random() < 0.05) {
-      // When AI is speaking moderately, occasionally show happy expression
-      if (window.setRobotExpression) {
-        window.setRobotExpression('happy');
+    } else if (average > 0.4) {
+      // When AI is speaking moderately
+      if (Math.random() < 0.05) {
+        if (window.setRobotExpression) {
+          // Different expressions based on mood
+          switch(selectedMood) {
+            case 'excited':
+              window.setRobotExpression('happy'); // Happy for excited mood
+              break;
+            case 'philosophical':
+              Math.random() > 0.5 ? window.setRobotExpression('thinking') : window.setRobotExpression('neutral');
+              break;
+            case 'dramatic':
+              Math.random() > 0.5 ? window.setRobotExpression('happy') : window.setRobotExpression('surprised');
+              break;
+            case 'deadpan':
+              window.setRobotExpression('neutral'); // Always neutral for deadpan
+              break;
+            default: // sarcastic
+              window.setRobotExpression('happy');
+          }
+        }
       }
-    } else if (average < 0.1 && Math.random() < 0.01) {
-      // When AI is quiet, occasionally show thinking expression
-      if (window.setRobotExpression) {
-        window.setRobotExpression('thinking');
+    } else if (average < 0.1) {
+      // When AI is quiet
+      if (Math.random() < 0.01) {
+        if (window.setRobotExpression) {
+          // Different expressions based on mood
+          switch(selectedMood) {
+            case 'excited':
+              window.setRobotExpression('happy'); // Still happy when quiet for excited mood
+              break;
+            case 'philosophical':
+              window.setRobotExpression('thinking'); // Deep in thought for philosophical
+              break;
+            case 'dramatic':
+              window.setRobotExpression('thinking'); // Contemplative for dramatic
+              break;
+            case 'deadpan':
+              window.setRobotExpression('neutral'); // Always neutral for deadpan
+              break;
+            default: // sarcastic
+              window.setRobotExpression('thinking');
+          }
+        }
       }
     }
     
@@ -151,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add subtle pulse animation to the button ring
   const btnRings = document.querySelectorAll('.btn-ring');
   btnRings.forEach(ring => {
-    let pulseTime = 0;
+    let pulseTime = 0; 
     
     function pulseAnimation() {
       pulseTime += 0.02;
@@ -166,8 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
     pulseAnimation();
   });
   
-  // Add voice selector animation
+  // Add voice and mood selector animations
   const voiceSelect = document.getElementById('voice-select');
+  const moodSelect = document.getElementById('mood-select');
+  
+  // Voice selector animation
   if (voiceSelect) {
     // Add change event listener
     voiceSelect.addEventListener('change', function() {
@@ -205,6 +265,94 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           voiceLabel.textContent = "Choose AI Voice:";
         }, 3000);
+      }
+      
+      // Set robot expression based on voice
+      if (window.setRobotExpression) {
+        // Different initial expressions based on voice
+        switch(voiceName) {
+          case 'Echo':
+            window.setRobotExpression('neutral');
+            break;
+          case 'Shimmer':
+            window.setRobotExpression('happy');
+            break;
+          case 'Ash':
+            window.setRobotExpression('thinking');
+            break;
+          default:
+            window.setRobotExpression('neutral');
+        }
+        
+        // Reset after 1 second
+        setTimeout(() => {
+          window.setRobotExpression('neutral');
+        }, 1000);
+      }
+    });
+  }
+  
+  // Mood selector animation
+  if (moodSelect) {
+    // Add change event listener
+    moodSelect.addEventListener('change', function() {
+      // Add a subtle flash effect with mood-specific color
+      this.style.borderColor = 'rgba(180, 150, 230, 0.8)';
+      this.style.backgroundColor = 'rgba(64, 60, 120, 0.4)';
+      
+      // Reset after animation
+      setTimeout(() => {
+        this.style.borderColor = 'rgba(180, 150, 230, 0.2)';
+        this.style.backgroundColor = 'rgba(30, 40, 60, 0.3)';
+      }, 300);
+      
+      // Update the mood description with a message
+      const moodLabel = document.querySelector('.mood-selector label');
+      const selectedMood = this.value;
+      
+      // Messages for each mood
+      const moodMessages = {
+        'sarcastic': "Sarcasm: because being nice is overrated.",
+        'excited': "Excitement: like caffeine, but more annoying!",
+        'philosophical': "Philosophy: making simple things needlessly complex.",
+        'dramatic': "Drama: because everything is LITERALLY THE END OF THE WORLD!",
+        'deadpan': "Deadpan. It's humor. Supposedly."
+      };
+      
+      if (moodMessages[selectedMood]) {
+        moodLabel.textContent = moodMessages[selectedMood];
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          moodLabel.textContent = "AI Mood:";
+        }, 3000);
+      }
+      
+      // Set robot expression based on mood
+      if (window.setRobotExpression) {
+        // Different expressions based on mood
+        switch(selectedMood) {
+          case 'sarcastic':
+            window.setRobotExpression('happy');
+            break;
+          case 'excited':
+            window.setRobotExpression('surprised');
+            break;
+          case 'philosophical':
+            window.setRobotExpression('thinking');
+            break;
+          case 'dramatic':
+            window.setRobotExpression('surprised');
+            break;
+          case 'deadpan':
+            window.setRobotExpression('neutral');
+            break;
+        }
+        
+        // Reset after 1.5 seconds
+        setTimeout(() => {
+          window.setRobotExpression('neutral');
+        }, 1500);
       }
     });
   }

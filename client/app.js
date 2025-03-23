@@ -66,12 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
       startBtn.disabled = true;
       updateStatus('Connecting...', false);
       
-      // Get selected voice
+      // Get selected voice and mood
       const voiceSelect = document.getElementById('voice-select');
+      const moodSelect = document.getElementById('mood-select');
       const selectedVoice = voiceSelect.value;
+      const selectedMood = moodSelect.value;
       
-      // Get ephemeral token from our server with selected voice
-      const tokenResponse = await fetch(`${window.CONFIG.SERVER_URL}/session?voice=${selectedVoice}`);
+      // Get ephemeral token from our server with selected voice and mood
+      const tokenResponse = await fetch(`${window.CONFIG.SERVER_URL}/session?voice=${selectedVoice}&mood=${selectedMood}`);
       
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();

@@ -288,14 +288,16 @@
       transform: scale(0.95);
     }
     
-    /* Voice selector */
-    .voice-selector {
+    /* Voice and Mood selectors */
+    .voice-selector,
+    .mood-selector {
       margin-top: 1.5rem;
       position: relative;
       width: 100%;
     }
     
-    .voice-selector label {
+    .voice-selector label,
+    .mood-selector label {
       display: block;
       margin-bottom: 0.5rem;
       font-size: 0.8rem;
@@ -304,7 +306,8 @@
       color: rgba(240, 245, 255, 0.7);
     }
     
-    .voice-selector::before {
+    .voice-selector::before,
+    .mood-selector::before {
       content: '';
       position: absolute;
       left: 50%;
@@ -316,7 +319,8 @@
       opacity: 0.3;
     }
     
-    .voice-selector select {
+    .voice-selector select,
+    .mood-selector select {
       width: 100%;
       padding: 8px 12px;
       background-color: rgba(30, 40, 60, 0.3);
@@ -332,12 +336,14 @@
       transition: all var(--transition-speed) ease;
     }
     
-    .voice-selector select:focus {
+    .voice-selector select:focus,
+    .mood-selector select:focus {
       outline: none;
       border-color: var(--primary-color);
     }
     
-    .voice-selector::after {
+    .voice-selector::after,
+    .mood-selector::after {
       content: '';
       position: absolute;
       right: 12px;
@@ -351,9 +357,27 @@
       opacity: 0.6;
     }
     
-    .voice-selector select option {
+    .voice-selector select option,
+    .mood-selector select option {
       background-color: rgb(30, 40, 60);
       color: var(--text-color);
+    }
+    
+    /* Mood selector specific styles */
+    .mood-selector {
+      margin-top: 1rem;
+    }
+    
+    .mood-selector select {
+      border-color: rgba(180, 150, 230, 0.2);
+    }
+    
+    .mood-selector select:focus {
+      border-color: rgba(180, 150, 230, 0.8);
+    }
+    
+    .mood-selector::after {
+      border-color: rgba(180, 150, 230, 0.8);
     }
     
     /* Audio visualizer */
@@ -409,6 +433,17 @@
         <option value="coral">Coral (Neutral)</option>
         <option value="sage">Sage (Neutral)</option>
         <option value="verse">Verse (Neutral)</option>
+      </select>
+    </div>
+    
+    <div class="mood-selector">
+      <label for="mood-select">AI Mood:</label>
+      <select id="mood-select">
+        <option value="sarcastic">Sarcastic (Default)</option>
+        <option value="excited">Excited & Energetic</option>
+        <option value="philosophical">Deep & Philosophical</option>
+        <option value="dramatic">Overly Dramatic</option>
+        <option value="deadpan">Deadpan Humor</option>
       </select>
     </div>
   </div>
