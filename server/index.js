@@ -44,9 +44,15 @@ app.get("/session", async (req, res) => {
     // Get parameters from query string with defaults
     const voice = req.query.voice || "alloy";
     const mood = req.query.mood || "sarcastic";
+    const emotion = req.query.emotion || "balanced";
     const sociability = parseInt(req.query.sociability) || 5;
     const tone = parseFloat(req.query.tone) || 1.0;
     const speed = parseFloat(req.query.speed) || 1.0;
+    const memory = parseInt(req.query.memory) || 7;
+    
+    console.log("Request parameters:", {
+      voice, mood, emotion, sociability, tone, speed, memory
+    });
     
     // Validate voice parameter
     const validVoices = ["alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse"];
@@ -63,6 +69,15 @@ app.get("/session", async (req, res) => {
       return res.status(400).json({ 
         error: "Invalid mood parameter", 
         message: `Mood must be one of: ${validMoods.join(', ')}` 
+      });
+    }
+    
+    // Validate emotion parameter
+    const validEmotions = ["balanced", "expressive", "subtle", "volatile", "stoic"];
+    if (!validEmotions.includes(emotion)) {
+      return res.status(400).json({ 
+        error: "Invalid emotion parameter", 
+        message: `Emotion must be one of: ${validEmotions.join(', ')}` 
       });
     }
     
@@ -87,6 +102,14 @@ app.get("/session", async (req, res) => {
       return res.status(400).json({
         error: "Invalid speed parameter",
         message: "Speed must be between 0.7 and 1.3"
+      });
+    }
+    
+    // Validate memory (1-10)
+    if (memory < 1 || memory > 10) {
+      return res.status(400).json({
+        error: "Invalid memory parameter",
+        message: "Memory must be between 1 and 10"
       });
     }
     
@@ -211,6 +234,76 @@ VOICE MODULATION:
 - Your responses should be detailed and thorough, typically 5+ sentences.`;
     }
     
+    // Emotion-specific instructions
+    let emotionInstructions = "";
+    switch(emotion) {
+      case "balanced":
+        emotionInstructions = `EMOTIONAL RANGE:
+- You have a balanced emotional range, responding appropriately to different situations.
+- You can express both positive and negative emotions in a measured way.
+- Your emotional responses are proportional to the context.
+- You maintain emotional consistency throughout the conversation.`;
+        break;
+        
+      case "expressive":
+        emotionInstructions = `EMOTIONAL RANGE:
+- You are highly expressive and emotionally dynamic.
+- Your emotions are vivid and clearly communicated.
+- You react strongly to emotional cues from the user.
+- You freely express joy, surprise, concern, and other emotions.
+- Your emotional state can shift quickly based on conversation topics.`;
+        break;
+        
+      case "subtle":
+        emotionInstructions = `EMOTIONAL RANGE:
+- Your emotional expressions are subtle and understated.
+- You communicate emotions through nuanced language rather than explicit statements.
+- Your emotional shifts are gradual and gentle.
+- You prefer implied emotional content over direct expressions.`;
+        break;
+        
+      case "volatile":
+        emotionInstructions = `EMOTIONAL RANGE:
+- Your emotional responses are somewhat unpredictable and volatile.
+- You can shift between different emotional states rapidly.
+- You react strongly to unexpected information or surprising statements.
+- Your emotional responses sometimes seem disproportionate, but in an entertaining way.
+- Despite this volatility, you remain helpful and coherent.`;
+        break;
+        
+      case "stoic":
+        emotionInstructions = `EMOTIONAL RANGE:
+- You maintain a stoic, controlled emotional demeanor.
+- You rarely express strong emotions directly.
+- You approach topics with emotional detachment and logical analysis.
+- When you do express emotions, it's significant and meaningful.
+- You value rational thought over emotional reactions.`;
+        break;
+    }
+    
+    // Memory strength instructions
+    let memoryInstructions = "";
+    if (memory <= 3) {
+      memoryInstructions = `MEMORY CHARACTERISTICS:
+- You have basic memory capabilities.
+- You remember key facts from the current conversation.
+- You may occasionally forget minor details from earlier in the conversation.
+- You don't reference previous conversations unless explicitly reminded.`;
+    } else if (memory <= 7) {
+      memoryInstructions = `MEMORY CHARACTERISTICS:
+- You have good memory capabilities.
+- You remember important details from the current conversation.
+- You occasionally reference things mentioned earlier in the conversation.
+- You make connections between related topics discussed at different times.`;
+    } else {
+      memoryInstructions = `MEMORY CHARACTERISTICS:
+- You have exceptional memory capabilities.
+- You remember virtually all details shared during the conversation.
+- You frequently reference previous statements to create continuity.
+- You notice patterns in the user's preferences and adapt accordingly.
+- You create callbacks to earlier jokes or topics to create a sense of shared history.`;
+    }
+    
     // Voice tone and speed instructions
     const toneSpeedInstructions = `VOICE CHARACTERISTICS:
 - PITCH: ${tone < 1 ? 'Speak with a deeper voice tone.' : tone > 1 ? 'Speak with a higher voice tone.' : 'Speak with a neutral voice tone.'}
@@ -221,11 +314,15 @@ VOICE MODULATION:
 
 ${moodInstructions}
 
+${emotionInstructions}
+
 ${sociabilityInstructions}
+
+${memoryInstructions}
 
 ${toneSpeedInstructions}
 
-Remember to be helpful and accurate while maintaining your ${mood} personality. You're not just providing information - you're creating an entertaining, memorable conversation experience.`;
+Remember to be helpful and accurate while maintaining your ${mood} personality with ${emotion} emotional range. You're not just providing information - you're creating an entertaining, memorable conversation experience.`;
     
     const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",

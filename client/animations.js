@@ -433,6 +433,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
   
+  // Emotion selector animation
+  const emotionSelect = document.getElementById('emotion-select');
+  if (emotionSelect) {
+    // Add change event listener
+    emotionSelect.addEventListener('change', function() {
+      // Add a subtle flash effect with emotion-specific color
+      this.style.borderColor = 'rgba(230, 150, 180, 0.8)';
+      this.style.backgroundColor = 'rgba(64, 50, 60, 0.4)';
+      
+      // Reset after animation
+      setTimeout(() => {
+        this.style.borderColor = 'rgba(230, 150, 180, 0.3)';
+        this.style.backgroundColor = 'rgba(30, 40, 60, 0.4)';
+      }, 300);
+      
+      // Update the emotion description with a message
+      const emotionLabel = document.querySelector('.emotion-selector label');
+      const selectedEmotion = this.value;
+      
+      // Messages for each emotion
+      const emotionMessages = {
+        'balanced': "Balanced: Emotionally stable, like a therapist who's actually listening.",
+        'expressive': "Expressive: Every emotion dialed up to 11!",
+        'subtle': "Subtle: Emotions so nuanced you'll need a microscope.",
+        'volatile': "Volatile: Emotional rollercoaster with no seatbelts.",
+        'stoic': "Stoic: Emotions? Never heard of them."
+      };
+      
+      if (emotionMessages[selectedEmotion]) {
+        emotionLabel.textContent = emotionMessages[selectedEmotion];
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          emotionLabel.textContent = "Emotional Range:";
+        }, 3000);
+      }
+      
+      // Set robot expression based on emotion
+      if (window.setRobotExpression) {
+        // Different expressions based on emotion
+        switch(selectedEmotion) {
+          case 'balanced':
+            window.setRobotExpression('neutral');
+            break;
+          case 'expressive':
+            window.setRobotExpression('surprised');
+            break;
+          case 'subtle':
+            window.setRobotExpression('thinking');
+            break;
+          case 'volatile':
+            Math.random() > 0.5 ? window.setRobotExpression('surprised') : window.setRobotExpression('happy');
+            break;
+          case 'stoic':
+            window.setRobotExpression('neutral');
+            break;
+        }
+        
+        // Reset after 1.5 seconds
+        setTimeout(() => {
+          window.setRobotExpression('neutral');
+        }, 1500);
+      }
+    });
+  }
+  
   // Set up each slider with custom colors and expressions
   if (sociabilitySlider) {
     setupSliderAnimation(sociabilitySlider, 'rgba(180, 150, 230, 0.8)', 'happy');
@@ -444,5 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   if (speedSlider) {
     setupSliderAnimation(speedSlider, 'rgba(200, 150, 150, 0.8)', 'thinking');
+  }
+  
+  if (memorySlider) {
+    setupSliderAnimation(memorySlider, 'rgba(150, 180, 230, 0.8)', 'thinking');
   }
 });

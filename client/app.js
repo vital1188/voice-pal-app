@@ -69,24 +69,33 @@ document.addEventListener('DOMContentLoaded', () => {
       // Get all selected options
       const voiceSelect = document.getElementById('voice-select');
       const moodSelect = document.getElementById('mood-select');
+      const emotionSelect = document.getElementById('emotion-select');
       const sociabilitySlider = document.getElementById('sociability-slider');
       const toneSlider = document.getElementById('tone-slider');
       const speedSlider = document.getElementById('speed-slider');
+      const memorySlider = document.getElementById('memory-slider');
       
       const selectedVoice = voiceSelect.value;
       const selectedMood = moodSelect.value;
+      const selectedEmotion = emotionSelect.value;
       const sociabilityLevel = sociabilitySlider.value;
       const toneLevel = toneSlider.value;
       const speedLevel = speedSlider.value;
+      const memoryLevel = memorySlider.value;
+      
+      // Update status with more detailed message
+      updateStatus(`Connecting with ${selectedVoice} voice in ${selectedMood} mood...`, false);
       
       // Get ephemeral token from our server with all parameters
       const tokenResponse = await fetch(
         `${window.CONFIG.SERVER_URL}/session?` + 
         `voice=${selectedVoice}&` +
         `mood=${selectedMood}&` +
+        `emotion=${selectedEmotion}&` +
         `sociability=${sociabilityLevel}&` +
         `tone=${toneLevel}&` +
-        `speed=${speedLevel}`
+        `speed=${speedLevel}&` +
+        `memory=${memoryLevel}`
       );
       
       if (!tokenResponse.ok) {
