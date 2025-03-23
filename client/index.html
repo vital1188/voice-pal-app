@@ -44,6 +44,7 @@
       overflow: hidden;
       position: relative;
       background-color: rgb(20, 30, 48);
+      padding: 20px 0;
     }
     
     canvas {
@@ -62,10 +63,31 @@
       box-shadow: var(--shadow);
       max-width: 380px;
       width: 90%;
+      max-height: 70vh;
       transition: all var(--transition-speed) ease;
       border: var(--border-width) solid rgba(120, 180, 255, 0.15);
       position: relative;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-color) rgba(30, 40, 60, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .container::-webkit-scrollbar-track {
+      background: rgba(30, 40, 60, 0.3);
+      border-radius: 3px;
+    }
+    
+    .container::-webkit-scrollbar-thumb {
+      background-color: var(--primary-color);
+      border-radius: 3px;
     }
     
     h1 {
@@ -418,6 +440,7 @@
     .voice-controls {
       margin-top: 1.5rem;
       position: relative;
+      width: 100%;
     }
     
     .voice-controls::before {
@@ -534,6 +557,14 @@
     
     #speed-slider::-moz-range-thumb {
       background: rgba(200, 150, 150, 0.8);
+    }
+    
+    #memory-slider::-webkit-slider-thumb {
+      background: rgba(150, 180, 230, 0.8);
+    }
+    
+    #memory-slider::-moz-range-thumb {
+      background: rgba(150, 180, 230, 0.8);
     }
     
     /* Audio visualizer */
