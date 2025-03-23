@@ -223,12 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
     pulseAnimation();
   });
   
-  // Add voice, mood, and slider animations
+  // Add voice, mood, emotion, and slider animations
   const voiceSelect = document.getElementById('voice-select');
   const moodSelect = document.getElementById('mood-select');
+  const emotionSelect = document.getElementById('emotion-select');
   const sociabilitySlider = document.getElementById('sociability-slider');
   const toneSlider = document.getElementById('tone-slider');
   const speedSlider = document.getElementById('speed-slider');
+  const memorySlider = document.getElementById('memory-slider');
   
   // Voice selector animation
   if (voiceSelect) {
@@ -434,7 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   
   // Emotion selector animation
-  const emotionSelect = document.getElementById('emotion-select');
   if (emotionSelect) {
     // Add change event listener
     emotionSelect.addEventListener('change', function() {
