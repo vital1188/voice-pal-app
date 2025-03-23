@@ -223,9 +223,12 @@ document.addEventListener('DOMContentLoaded', () => {
     pulseAnimation();
   });
   
-  // Add voice and mood selector animations
+  // Add voice, mood, and slider animations
   const voiceSelect = document.getElementById('voice-select');
   const moodSelect = document.getElementById('mood-select');
+  const sociabilitySlider = document.getElementById('sociability-slider');
+  const toneSlider = document.getElementById('tone-slider');
+  const speedSlider = document.getElementById('speed-slider');
   
   // Voice selector animation
   if (voiceSelect) {
@@ -355,5 +358,91 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
       }
     });
+  }
+  
+  // Slider animations
+  const setupSliderAnimation = (slider, color, robotExpression) => {
+    if (!slider) return;
+    
+    // Add input event listener for real-time updates
+    slider.addEventListener('input', function() {
+      // Visual feedback while dragging
+      this.style.accentColor = color;
+      
+      // Get the thumb position as a percentage
+      const percent = (this.value - this.min) / (this.max - this.min);
+      
+      // Update the track color with a gradient
+      this.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${percent * 100}%, rgba(150, 180, 230, 0.2) ${percent * 100}%, rgba(150, 180, 230, 0.2) 100%)`;
+      
+      // Show the current value
+      const sliderContainer = this.closest('.slider-container');
+      const valueDisplay = document.createElement('div');
+      
+      // Remove any existing value display
+      const existingDisplay = sliderContainer.querySelector('.value-display');
+      if (existingDisplay) {
+        existingDisplay.remove();
+      }
+      
+      // Create and add new value display
+      valueDisplay.className = 'value-display';
+      valueDisplay.style.position = 'absolute';
+      valueDisplay.style.top = '-20px';
+      valueDisplay.style.left = `calc(${percent * 100}% - 10px)`;
+      valueDisplay.style.backgroundColor = 'rgba(30, 40, 60, 0.8)';
+      valueDisplay.style.color = color;
+      valueDisplay.style.padding = '2px 6px';
+      valueDisplay.style.borderRadius = '4px';
+      valueDisplay.style.fontSize = '0.7rem';
+      valueDisplay.style.fontWeight = 'bold';
+      valueDisplay.style.transition = 'all 0.1s ease';
+      valueDisplay.textContent = this.value;
+      
+      sliderContainer.style.position = 'relative';
+      sliderContainer.appendChild(valueDisplay);
+      
+      // Set robot expression based on slider
+      if (window.setRobotExpression && robotExpression) {
+        window.setRobotExpression(robotExpression);
+        
+        // Reset after 0.5 seconds
+        setTimeout(() => {
+          window.setRobotExpression('neutral');
+        }, 500);
+      }
+    });
+    
+    // Remove value display when done dragging
+    slider.addEventListener('change', function() {
+      const sliderContainer = this.closest('.slider-container');
+      const valueDisplay = sliderContainer.querySelector('.value-display');
+      
+      // Fade out the value display
+      if (valueDisplay) {
+        valueDisplay.style.opacity = '0';
+        setTimeout(() => {
+          valueDisplay.remove();
+        }, 300);
+      }
+      
+      // Reset the track color after a delay
+      setTimeout(() => {
+        this.style.background = 'rgba(150, 180, 230, 0.2)';
+      }, 1000);
+    });
+  };
+  
+  // Set up each slider with custom colors and expressions
+  if (sociabilitySlider) {
+    setupSliderAnimation(sociabilitySlider, 'rgba(180, 150, 230, 0.8)', 'happy');
+  }
+  
+  if (toneSlider) {
+    setupSliderAnimation(toneSlider, 'rgba(150, 200, 180, 0.8)', 'surprised');
+  }
+  
+  if (speedSlider) {
+    setupSliderAnimation(speedSlider, 'rgba(200, 150, 150, 0.8)', 'thinking');
   }
 });
