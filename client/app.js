@@ -86,7 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const memoryLevel = memorySlider.value;
       
       // Update status with more detailed message
-      updateStatus(`Connecting with ${selectedVoice} voice in ${selectedMood} mood...`, false);
+      console.log(`Selected language: ${selectedLanguage}`);
+      updateStatus(`Connecting with ${selectedVoice} voice in ${selectedMood} mood (${selectedLanguage})...`, false);
       
       // Get ephemeral token from our server with all parameters
       const tokenResponse = await fetch(
