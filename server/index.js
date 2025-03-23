@@ -12,16 +12,22 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Configure CORS to allow requests from specific origins
-app.use(cors({
-  origin: [
-    'https://voicepal.netlify.app',
-    'http://localhost:8080',
-    'http://127.0.0.1:8080'
-  ],
-  methods: ['GET', 'POST'],
-  credentials: true
-}));
+// Configure CORS to allow all origins
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
+
+// Also use the cors middleware as a fallback
+app.use(cors());
 
 app.get("/session", async (req, res) => {
   try {
