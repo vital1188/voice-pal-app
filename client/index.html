@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Voice Pal</title>
+  <title>Nicanor - Multilingual AI Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -436,6 +436,24 @@
       border-color: var(--emotion-color);
     }
     
+    /* Language selector specific styles */
+    .language-selector {
+      margin-top: 1.2rem;
+    }
+    
+    .language-selector select {
+      border-color: rgba(150, 230, 180, 0.3);
+    }
+    
+    .language-selector select:focus {
+      border-color: rgba(150, 230, 180, 0.8);
+      box-shadow: 0 0 0 2px rgba(150, 230, 180, 0.2);
+    }
+    
+    .language-selector::after {
+      border-color: rgba(150, 230, 180, 0.8);
+    }
+    
     /* Voice controls */
     .voice-controls {
       margin-top: 1.5rem;
@@ -597,8 +615,8 @@
   </div>
 
   <div class="container">
-    <h1>Voice Pal</h1>
-    <p>Your sarcastic AI friend is ready to judge... I mean chat with you!</p>
+    <h1>Nicanor</h1>
+    <p>Your multilingual AI friend is ready to judge... I mean chat with you!</p>
     
     <div class="btn-container">
       <div class="btn-ring"></div>
@@ -642,6 +660,24 @@
         <option value="subtle">Subtle Emotions</option>
         <option value="volatile">Volatile & Reactive</option>
         <option value="stoic">Stoic & Controlled</option>
+      </select>
+    </div>
+    
+    <div class="language-selector selector">
+      <label for="language-select">Language:</label>
+      <select id="language-select">
+        <option value="english">English</option>
+        <option value="spanish">Spanish (Español)</option>
+        <option value="german">German (Deutsch)</option>
+        <option value="french">French (Français)</option>
+        <option value="italian">Italian (Italiano)</option>
+        <option value="romanian">Romanian (Română)</option>
+        <option value="russian">Russian (Русский)</option>
+        <option value="ukrainian">Ukrainian (Українська)</option>
+        <option value="portuguese">Portuguese (Português)</option>
+        <option value="polish">Polish (Polski)</option>
+        <option value="chinese">Chinese (中文)</option>
+        <option value="japanese">Japanese (日本語)</option>
       </select>
     </div>
     

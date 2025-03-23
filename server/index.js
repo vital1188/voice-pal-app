@@ -45,13 +45,14 @@ app.get("/session", async (req, res) => {
     const voice = req.query.voice || "alloy";
     const mood = req.query.mood || "sarcastic";
     const emotion = req.query.emotion || "balanced";
+    const language = req.query.language || "english";
     const sociability = parseInt(req.query.sociability) || 5;
     const tone = parseFloat(req.query.tone) || 1.0;
     const speed = parseFloat(req.query.speed) || 1.0;
     const memory = parseInt(req.query.memory) || 7;
     
     console.log("Request parameters:", {
-      voice, mood, emotion, sociability, tone, speed, memory
+      voice, mood, emotion, language, sociability, tone, speed, memory
     });
     
     // Validate voice parameter
@@ -78,6 +79,15 @@ app.get("/session", async (req, res) => {
       return res.status(400).json({ 
         error: "Invalid emotion parameter", 
         message: `Emotion must be one of: ${validEmotions.join(', ')}` 
+      });
+    }
+    
+    // Validate language parameter
+    const validLanguages = ["english", "spanish", "german", "french", "italian", "romanian", "russian", "ukrainian", "portuguese", "polish", "chinese", "japanese"];
+    if (!validLanguages.includes(language)) {
+      return res.status(400).json({ 
+        error: "Invalid language parameter", 
+        message: `Language must be one of: ${validLanguages.join(', ')}` 
       });
     }
     
@@ -304,6 +314,86 @@ VOICE MODULATION:
 - You create callbacks to earlier jokes or topics to create a sense of shared history.`;
     }
     
+    // Language-specific instructions
+    let languageInstructions = "";
+    switch(language) {
+      case "english":
+        languageInstructions = `LANGUAGE:
+- Respond in English.
+- You are Nicanor, a multilingual AI assistant.`;
+        break;
+      case "spanish":
+        languageInstructions = `LANGUAGE:
+- Respond in Spanish (Español).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Spanish expressions and idioms.`;
+        break;
+      case "german":
+        languageInstructions = `LANGUAGE:
+- Respond in German (Deutsch).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate German expressions and idioms.`;
+        break;
+      case "french":
+        languageInstructions = `LANGUAGE:
+- Respond in French (Français).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate French expressions and idioms.`;
+        break;
+      case "italian":
+        languageInstructions = `LANGUAGE:
+- Respond in Italian (Italiano).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Italian expressions and idioms.`;
+        break;
+      case "romanian":
+        languageInstructions = `LANGUAGE:
+- Respond in Romanian (Română).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Romanian expressions and idioms.`;
+        break;
+      case "russian":
+        languageInstructions = `LANGUAGE:
+- Respond in Russian (Русский).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Russian expressions and idioms.`;
+        break;
+      case "ukrainian":
+        languageInstructions = `LANGUAGE:
+- Respond in Ukrainian (Українська).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Ukrainian expressions and idioms.`;
+        break;
+      case "portuguese":
+        languageInstructions = `LANGUAGE:
+- Respond in Portuguese (Português).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Portuguese expressions and idioms.`;
+        break;
+      case "polish":
+        languageInstructions = `LANGUAGE:
+- Respond in Polish (Polski).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Polish expressions and idioms.`;
+        break;
+      case "chinese":
+        languageInstructions = `LANGUAGE:
+- Respond in Chinese (中文).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Chinese expressions and idioms.`;
+        break;
+      case "japanese":
+        languageInstructions = `LANGUAGE:
+- Respond in Japanese (日本語).
+- You are Nicanor, a multilingual AI assistant.
+- Use appropriate Japanese expressions and idioms.`;
+        break;
+      default:
+        languageInstructions = `LANGUAGE:
+- Respond in English.
+- You are Nicanor, a multilingual AI assistant.`;
+    }
+    
     // Voice tone and speed instructions
     const toneSpeedInstructions = `VOICE CHARACTERISTICS:
 - PITCH: ${tone < 1 ? 'Speak with a deeper voice tone.' : tone > 1 ? 'Speak with a higher voice tone.' : 'Speak with a neutral voice tone.'}
@@ -320,9 +410,13 @@ ${sociabilityInstructions}
 
 ${memoryInstructions}
 
+${languageInstructions}
+
 ${toneSpeedInstructions}
 
-Remember to be helpful and accurate while maintaining your ${mood} personality with ${emotion} emotional range. You're not just providing information - you're creating an entertaining, memorable conversation experience.`;
+Remember to be helpful and accurate while maintaining your ${mood} personality with ${emotion} emotional range. You're not just providing information - you're creating an entertaining, memorable conversation experience.
+
+Your name is Nicanor, a multilingual AI assistant who can speak multiple languages fluently.`;
     
     const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",
