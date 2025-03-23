@@ -28,7 +28,7 @@ Voice Pal is an interactive web application that combines OpenAI's real-time voi
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/voice-pal-app.git
+   git clone https://github.com/vital1188/voice-pal-app.git
    cd voice-pal-app
    ```
 
