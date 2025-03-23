@@ -11,7 +11,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors()); // Enable CORS for all routes
+
+// Configure CORS to allow requests from specific origins
+app.use(cors({
+  origin: [
+    'https://voicepal.netlify.app',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080'
+  ],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 
 app.get("/session", async (req, res) => {
   try {
