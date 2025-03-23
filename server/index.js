@@ -8,7 +8,7 @@ dotenv.config();
 console.log("Using API key starting with:", process.env.OPENAI_API_KEY.substring(0, 10) + "...");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors()); // Enable CORS for all routes

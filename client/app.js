@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedVoice = voiceSelect.value;
       
       // Get ephemeral token from our server with selected voice
-      const tokenResponse = await fetch(`http://localhost:3000/session?voice=${selectedVoice}`);
+      const tokenResponse = await fetch(`${window.CONFIG.SERVER_URL}/session?voice=${selectedVoice}`);
       
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
