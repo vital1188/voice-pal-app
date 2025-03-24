@@ -1,6 +1,6 @@
-# Voice Pal - Interactive AI Chat with Neon Robot Face
+# Nicanor - Multilingual AI Assistant with Neon Robot Face
 
-Voice Pal is an interactive web application that combines OpenAI's real-time voice API with a dynamic, animated neon robot face. The robot's expressions and mouth movements react to the AI's speech, creating an immersive and entertaining conversation experience.
+Nicanor is an interactive web application that combines OpenAI's real-time voice API with a dynamic, animated neon robot face. The robot's expressions and mouth movements react to the AI's speech, creating an immersive and entertaining conversation experience in multiple languages.
 
 ![Voice Pal Demo](demo-screenshot.png)
 
@@ -8,9 +8,11 @@ Voice Pal is an interactive web application that combines OpenAI's real-time voi
 
 - **Interactive Neon Robot Face**: A digital robot with glowing neon eyes and mouth that reacts to AI speech
 - **Multiple Voice Options**: Choose from 8 different AI voices, each with its own personality
+- **Multilingual Support**: Communicate in 12 different languages including English, Spanish, German, French, Italian, Romanian, Russian, Ukrainian, Portuguese, Polish, Chinese, and Japanese
+- **Customizable AI Personality**: Choose from 5 different moods (Sarcastic, Excited, Philosophical, Dramatic, Deadpan)
+- **Adjustable Emotional Range**: Select from 5 emotional styles (Balanced, Expressive, Subtle, Volatile, Stoic)
 - **Fullscreen Experience**: Interface transforms to fullscreen when conversation starts
 - **Dynamic Expressions**: Robot shows different emotions based on AI speech patterns
-- **Sarcastic AI Personality**: Witty, ironic AI responses with a dry sense of humor
 
 ## Tech Stack
 
@@ -63,15 +65,18 @@ Voice Pal is an interactive web application that combines OpenAI's real-time voi
 
 1. Open the client URL in your browser
 2. Select your preferred AI voice from the dropdown
-3. Click the diamond-shaped button to connect
-4. Allow microphone access when prompted
-5. Start speaking with your sarcastic AI friend
-6. Watch the robot's face animate as the AI responds:
+3. Choose your desired AI mood and emotional range
+4. Select your preferred language from the 12 available options
+5. Adjust sociability, voice tone, speech rate, and memory strength using the sliders
+6. Click the diamond-shaped button to connect
+7. Allow microphone access when prompted
+8. Start speaking with Nicanor in your selected language
+9. Watch the robot's face animate as the AI responds:
    - Eyes follow your mouse movements
    - Mouth opens and closes with the AI's speech
    - Face shows different expressions based on speech patterns
-7. Try clicking on the robot's eyes or mouth to trigger different expressions
-8. Click the X button to end the conversation
+10. Try clicking on the robot's eyes or mouth to trigger different expressions
+11. Click the X button to end the conversation
 
 ## Robot Face Interactions
 
@@ -90,6 +95,25 @@ Voice Pal is an interactive web application that combines OpenAI's real-time voi
 - **Coral**: Neutral voice with a warm tone
 - **Sage**: Neutral voice with a wise character
 - **Verse**: Neutral voice with a poetic style
+
+## Language Options
+
+Nicanor supports 12 languages, allowing you to have conversations in:
+
+- English
+- Spanish (Español)
+- German (Deutsch)
+- French (Français)
+- Italian (Italiano)
+- Romanian (Română)
+- Russian (Русский)
+- Ukrainian (Українська)
+- Portuguese (Português)
+- Polish (Polski)
+- Chinese (中文)
+- Japanese (日本語)
+
+When you select a language, Nicanor will immediately respond in that language and use appropriate expressions and idioms native to that language.
 
 ## Project Structure
 
