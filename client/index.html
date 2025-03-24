@@ -108,9 +108,9 @@
     /* Interactive button */
     .btn-container {
       position: relative;
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 2rem;
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 2.5rem;
     }
     
     .btn-ring {
@@ -120,32 +120,33 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: var(--border-width) solid var(--primary-color);
-      opacity: 0.3;
+      border: 2px solid var(--primary-color);
+      opacity: 0.4;
+      box-shadow: 0 0 15px rgba(120, 180, 255, 0.3);
     }
     
     .btn-ring::before {
       content: '';
       position: absolute;
-      top: -5px;
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
       border-radius: 50%;
-      border: var(--border-width) solid var(--primary-color);
-      opacity: 0.1;
+      border: 1px solid var(--primary-color);
+      opacity: 0.2;
     }
     
     .btn-ring::after {
       content: '';
       position: absolute;
-      top: 5px;
-      left: 5px;
-      right: 5px;
-      bottom: 5px;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
       border-radius: 50%;
-      border: var(--border-width) solid var(--primary-color);
-      opacity: 0.2;
+      border: 1px solid var(--primary-color);
+      opacity: 0.3;
     }
     
     #start-btn {
@@ -154,9 +155,9 @@
       left: 10px;
       width: calc(100% - 20px);
       height: calc(100% - 20px);
-      background-color: rgba(64, 80, 120, 0.2);
+      background: linear-gradient(135deg, rgba(64, 80, 120, 0.3), rgba(80, 120, 180, 0.3));
       color: transparent;
-      border: var(--border-width) solid var(--primary-color);
+      border: 2px solid var(--primary-color);
       border-radius: 50%;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -165,58 +166,88 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 2px 5px rgba(255, 255, 255, 0.1);
     }
     
     #start-btn::before {
       content: '';
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       background-color: var(--primary-color);
       clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
       transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
     }
     
     #start-btn:hover {
-      background-color: rgba(64, 80, 120, 0.3);
+      background: linear-gradient(135deg, rgba(70, 90, 140, 0.4), rgba(90, 140, 200, 0.4));
       border-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 2px 5px rgba(255, 255, 255, 0.2);
     }
     
     #start-btn:hover::before {
-      transform: scale(1.2);
+      transform: scale(1.25);
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
     }
     
     #start-btn:active {
       transform: scale(0.95);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15), inset 0 1px 3px rgba(255, 255, 255, 0.1);
     }
     
     #start-btn:disabled {
-      background-color: rgba(64, 80, 120, 0.1);
+      background: linear-gradient(135deg, rgba(50, 60, 80, 0.2), rgba(60, 80, 120, 0.2));
       border-color: rgba(150, 180, 230, 0.3);
       cursor: not-allowed;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: none;
     }
     
     #start-btn:disabled::before {
       background-color: rgba(150, 180, 230, 0.3);
+      transform: none;
+      filter: none;
     }
     
     /* Button animation */
     @keyframes pulse-ring {
       0% {
         transform: scale(1);
-        opacity: 0.3;
+        opacity: 0.4;
+        box-shadow: 0 0 15px rgba(120, 180, 255, 0.3);
       }
       50% {
-        opacity: 0.1;
+        opacity: 0.2;
+        box-shadow: 0 0 25px rgba(120, 180, 255, 0.5);
       }
       100% {
         transform: scale(1);
-        opacity: 0.3;
+        opacity: 0.4;
+        box-shadow: 0 0 15px rgba(120, 180, 255, 0.3);
       }
     }
     
     .btn-container .btn-ring {
       animation: pulse-ring 3s infinite;
+    }
+    
+    /* Add a subtle glow effect to the button */
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 5px rgba(120, 180, 255, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 15px rgba(120, 180, 255, 0.5);
+      }
+      100% {
+        box-shadow: 0 0 5px rgba(120, 180, 255, 0.3);
+      }
+    }
+    
+    #start-btn {
+      animation: glow 3s infinite;
     }
     
     .status {
@@ -326,9 +357,9 @@
       display: block;
       margin-bottom: 0.5rem;
       font-size: 0.8rem;
-      font-weight: 400;
+      font-weight: 500;
       letter-spacing: 0.5px;
-      color: rgba(240, 245, 255, 0.8);
+      color: rgba(240, 245, 255, 0.9);
     }
     
     .selector::before {
@@ -345,21 +376,21 @@
     
     .selector select {
       width: 100%;
-      padding: 10px 14px;
-      background-color: rgba(30, 40, 60, 0.4);
+      padding: 12px 16px;
+      background-color: rgba(30, 40, 60, 0.5);
       color: var(--text-color);
-      border: var(--border-width) solid rgba(150, 180, 230, 0.2);
+      border: var(--border-width) solid rgba(150, 180, 230, 0.3);
       border-radius: var(--border-radius);
       font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 300;
+      font-size: 0.9rem;
+      font-weight: 400;
       letter-spacing: 0.5px;
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
       cursor: pointer;
       transition: all var(--transition-speed) ease;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       position: relative;
       z-index: 1;
     }
@@ -367,16 +398,23 @@
     .selector select:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(120, 180, 255, 0.2);
+      box-shadow: 0 0 0 3px rgba(120, 180, 255, 0.25);
+      transform: translateY(-2px);
+    }
+    
+    .selector select:hover {
+      border-color: rgba(150, 180, 230, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
     
     .selector::after {
       content: '';
       position: absolute;
-      right: 14px;
+      right: 16px;
       top: 50%;
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-right: 3px solid var(--primary-color);
       border-bottom: 3px solid var(--primary-color);
       transform: translateY(-50%) rotate(45deg);
@@ -388,7 +426,8 @@
     .selector select option {
       background-color: rgb(25, 35, 55);
       color: var(--text-color);
-      padding: 8px;
+      padding: 10px;
+      font-size: 0.9rem;
     }
     
     /* Voice selector specific styles */
@@ -446,11 +485,19 @@
       margin-top: 1.5rem;
       position: relative;
       width: 100%;
-      padding: 1rem;
-      background-color: rgba(30, 50, 70, 0.3);
-      border: 1px solid rgba(150, 230, 180, 0.3);
+      padding: 1.2rem;
+      background: linear-gradient(135deg, rgba(30, 50, 70, 0.4), rgba(40, 70, 100, 0.4));
+      border: 1px solid rgba(150, 230, 180, 0.4);
       border-radius: var(--border-radius);
       text-align: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .language-info:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      border-color: rgba(150, 230, 180, 0.6);
     }
     
     .language-info::before {
@@ -459,31 +506,48 @@
       left: 50%;
       top: -10px;
       width: 40px;
-      height: 1px;
+      height: 2px;
       background-color: rgba(150, 230, 180, 0.8);
       transform: translateX(-50%);
-      opacity: 0.5;
+      opacity: 0.7;
+    }
+    
+    .language-info::after {
+      content: '🌍';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     
     .language-note {
-      color: rgba(150, 230, 180, 0.9);
-      font-weight: 500;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
+      color: rgba(150, 230, 180, 1);
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.7rem;
+      letter-spacing: 0.5px;
     }
     
     .supported-languages {
-      color: rgba(240, 245, 255, 0.7);
-      font-size: 0.75rem;
+      color: rgba(240, 245, 255, 0.8);
+      font-size: 0.8rem;
       margin-bottom: 0;
-      line-height: 1.4;
+      line-height: 1.5;
+      font-weight: 400;
     }
     
     /* Voice controls */
     .voice-controls {
-      margin-top: 1.5rem;
+      margin-top: 1.8rem;
       position: relative;
       width: 100%;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, rgba(30, 50, 70, 0.3), rgba(40, 60, 90, 0.3));
+      border: 1px solid rgba(120, 180, 255, 0.3);
+      border-radius: var(--border-radius);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
     
     .voice-controls::before {
@@ -492,27 +556,42 @@
       left: 50%;
       top: -10px;
       width: 40px;
-      height: 1px;
+      height: 2px;
       background-color: var(--primary-color);
       transform: translateX(-50%);
-      opacity: 0.3;
+      opacity: 0.5;
+    }
+    
+    .voice-controls::after {
+      content: '🎛️';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     
     .slider-control {
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
+      transition: all var(--transition-speed) ease;
     }
     
     .slider-control:last-child {
       margin-bottom: 0;
     }
     
+    .slider-control:hover input[type="range"] {
+      background: rgba(150, 180, 230, 0.3);
+    }
+    
     .slider-control label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.8rem;
-      font-weight: 300;
+      margin-bottom: 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 500;
       letter-spacing: 0.5px;
-      color: rgba(240, 245, 255, 0.7);
+      color: rgba(240, 245, 255, 0.9);
     }
     
     .slider-container {
@@ -523,58 +602,66 @@
     }
     
     .slider-label {
-      font-size: 0.7rem;
-      color: rgba(240, 245, 255, 0.5);
+      font-size: 0.75rem;
+      color: rgba(240, 245, 255, 0.6);
       width: 60px;
+      font-weight: 400;
     }
     
     .slider-label:first-child {
       text-align: right;
-      padding-right: 8px;
+      padding-right: 10px;
     }
     
     .slider-label:last-child {
       text-align: left;
-      padding-left: 8px;
+      padding-left: 10px;
     }
     
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
-      height: 4px;
+      height: 6px;
       background: rgba(150, 180, 230, 0.2);
-      border-radius: 2px;
+      border-radius: 3px;
       outline: none;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: all var(--transition-speed) ease;
     }
     
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: var(--primary-color);
       cursor: pointer;
       transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.5);
     }
     
     input[type="range"]::-webkit-slider-thumb:hover {
       background: var(--primary-hover);
-      transform: scale(1.1);
+      transform: scale(1.15);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
     
     input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 50%;
       background: var(--primary-color);
       cursor: pointer;
       transition: all 0.2s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
     
     input[type="range"]::-moz-range-thumb:hover {
       background: var(--primary-hover);
-      transform: scale(1.1);
+      transform: scale(1.15);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     }
     
     /* Customize each slider type */
