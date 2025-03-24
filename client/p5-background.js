@@ -1,4 +1,4 @@
-// Sleek AI Face with Particle Formation
+// Neon Robot Face using p5.js
 
 let sketch = function(p) {
   // Color palette - modern neon colors
@@ -14,30 +14,22 @@ let sketch = function(p) {
   // Robot face parameters
   let faceWidth, faceHeight;
   let leftEye, rightEye, mouth;
-  let faceParticles = []; // Particles that form the face
-  let backgroundParticles = []; // Background particles
+  let particles = [];
   let audioLevel = 0;
   let isListening = false;
   let blinkTimer = 0;
   let mouthMovement = 0;
   let expressionState = 'neutral'; // neutral, happy, thinking, surprised
   let expressionTimer = 0;
-  let faceOpacity = 0; // For fade-in effect
   
   // Audio visualization data
   let audioData = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 20; i++) {
     audioData.push(0);
   }
   
   // Flag to track if robot is in fullscreen mode
   let isFullscreen = false;
-  
-  // Face outline points for particle formation
-  let faceOutlinePoints = [];
-  let leftEyePoints = [];
-  let rightEyePoints = [];
-  let mouthPoints = [];
   
   p.setup = function() {
     // Create canvas that covers the entire window
@@ -53,9 +45,6 @@ let sketch = function(p) {
     const eyeSize = faceWidth * 0.15;
     const eyeY = p.height * 0.4;
     const eyeSpacing = faceWidth * 0.25;
-    
-    // Generate face outline points
-    generateFaceOutlinePoints();
     
     leftEye = {
       x: p.width / 2 - eyeSpacing / 2,
@@ -87,27 +76,20 @@ let sketch = function(p) {
       glowIntensity: 0.8
     };
     
-    // Create particles for face formation
-    createFaceParticles();
-    
     // Create particles for background effect
-    for (let i = 0; i < 80; i++) {
-      backgroundParticles.push({
+    for (let i = 0; i < 100; i++) {
+      particles.push({
         pos: p.createVector(p.random(p.width), p.random(p.height)),
-        vel: p.createVector(p.random(-0.3, 0.3), p.random(-0.3, 0.3)),
-        size: p.random(1, 2.5),
+        vel: p.createVector(p.random(-0.5, 0.5), p.random(-0.5, 0.5)),
+        size: p.random(1, 3),
         color: p.random([palette.primary, palette.accent1, palette.accent2, palette.accent3]),
-        alpha: p.random(40, 100),
-        pulse: p.random(0, p.TWO_PI) // For pulsing effect
+        alpha: p.random(100, 200)
       });
     }
     
     // Set up drawing parameters
     p.background(palette.dark);
     p.frameRate(60);
-    
-    // Start with face opacity at 0 for fade-in effect
-    faceOpacity = 0;
     
     // Make global function to update audio level
     window.updateRobotAudioLevel = function(level) {
@@ -117,18 +99,12 @@ let sketch = function(p) {
       // Update audio data array (simple simulation)
       audioData.shift();
       audioData.push(level * 5);
-      
-      // Make particles react to audio
-      reactParticlesToAudio(level);
     };
     
     // Make global function to set robot expression
     window.setRobotExpression = function(expression) {
       expressionState = expression;
       expressionTimer = 180; // 3 seconds at 60fps
-      
-      // Update face particles for new expression
-      updateFaceParticlesForExpression(expression);
     };
     
     // Make global function to make robot fullscreen
@@ -159,22 +135,14 @@ let sketch = function(p) {
       mouth.width = faceWidth * 0.35;
       mouth.height = eyeSize * 0.7;
       
-      // Regenerate face outline points for new dimensions
-      generateFaceOutlinePoints();
-      
-      // Recreate face particles for new dimensions
-      faceParticles = [];
-      createFaceParticles();
-      
-      // Add more background particles
-      for (let i = 0; i < 40; i++) {
-        backgroundParticles.push({
+      // Add more particles for a more dynamic background
+      for (let i = 0; i < 50; i++) {
+        particles.push({
           pos: p.createVector(p.random(p.width), p.random(p.height)),
-          vel: p.createVector(p.random(-0.4, 0.4), p.random(-0.4, 0.4)),
-          size: p.random(1.5, 3),
+          vel: p.createVector(p.random(-0.8, 0.8), p.random(-0.8, 0.8)),
+          size: p.random(1, 4),
           color: p.random([palette.primary, palette.accent1, palette.accent2, palette.accent3]),
-          alpha: p.random(40, 100),
-          pulse: p.random(0, p.TWO_PI)
+          alpha: p.random(100, 200)
         });
       }
       
@@ -183,203 +151,20 @@ let sketch = function(p) {
     };
   };
   
-  // Generate points that outline the face features
-  function generateFaceOutlinePoints() {
-    // Clear previous points
-    faceOutlinePoints = [];
-    leftEyePoints = [];
-    rightEyePoints = [];
-    mouthPoints = [];
-    
-    // Generate points for left eye (circle)
-    const leftEyePointCount = 20;
-    for (let i = 0; i < leftEyePointCount; i++) {
-      const angle = p.map(i, 0, leftEyePointCount, 0, p.TWO_PI);
-      const x = leftEye.x + p.cos(angle) * (leftEye.size / 2);
-      const y = leftEye.y + p.sin(angle) * (leftEye.size / 2);
-      leftEyePoints.push({x, y});
-    }
-    
-    // Generate points for right eye (circle)
-    const rightEyePointCount = 20;
-    for (let i = 0; i < rightEyePointCount; i++) {
-      const angle = p.map(i, 0, rightEyePointCount, 0, p.TWO_PI);
-      const x = rightEye.x + p.cos(angle) * (rightEye.size / 2);
-      const y = rightEye.y + p.sin(angle) * (rightEye.size / 2);
-      rightEyePoints.push({x, y});
-    }
-    
-    // Generate points for mouth (curved shape)
-    const mouthPointCount = 30;
-    const mouthHeight = mouth.height * 0.5; // Default open amount
-    const curveOffset = mouth.width * 0.1; // Default curve amount
-    
-    // Top curve of mouth
-    for (let i = 0; i <= mouthPointCount/2; i++) {
-      const t = p.map(i, 0, mouthPointCount/2, 0, 1);
-      const x = p.bezierPoint(
-        mouth.x - mouth.width / 2, 
-        mouth.x - mouth.width / 4, 
-        mouth.x + mouth.width / 4, 
-        mouth.x + mouth.width / 2, 
-        t
-      );
-      const y = p.bezierPoint(
-        mouth.y - mouthHeight / 2 + curveOffset,
-        mouth.y - mouthHeight / 2 - curveOffset,
-        mouth.y - mouthHeight / 2 - curveOffset,
-        mouth.y - mouthHeight / 2 + curveOffset,
-        t
-      );
-      mouthPoints.push({x, y});
-    }
-    
-    // Bottom curve of mouth (in reverse to connect properly)
-    for (let i = mouthPointCount/2; i >= 0; i--) {
-      const t = p.map(i, 0, mouthPointCount/2, 0, 1);
-      const x = p.bezierPoint(
-        mouth.x + mouth.width / 2,
-        mouth.x + mouth.width / 4,
-        mouth.x - mouth.width / 4,
-        mouth.x - mouth.width / 2,
-        t
-      );
-      const y = p.bezierPoint(
-        mouth.y + mouthHeight / 2 - curveOffset,
-        mouth.y + mouthHeight / 2 + curveOffset,
-        mouth.y + mouthHeight / 2 + curveOffset,
-        mouth.y + mouthHeight / 2 - curveOffset,
-        t
-      );
-      mouthPoints.push({x, y});
-    }
-    
-    // Combine all points for the face outline
-    faceOutlinePoints = [...leftEyePoints, ...rightEyePoints, ...mouthPoints];
-  }
-  
-  // Create particles that will form the face
-  function createFaceParticles() {
-    // Create particles for each point in the face outline
-    for (let point of faceOutlinePoints) {
-      // Add some randomness to initial positions
-      const randomOffset = 100; // Particles start from random positions and move to their targets
-      
-      faceParticles.push({
-        pos: p.createVector(
-          p.random(p.width), 
-          p.random(p.height)
-        ),
-        target: p.createVector(point.x, point.y),
-        vel: p.createVector(0, 0),
-        size: p.random(2, 3.5),
-        color: determineParticleColor(point),
-        alpha: p.random(180, 255),
-        arrived: false,
-        jitter: p.random(0.5, 2), // Random jitter amount
-        jitterPhase: p.random(p.TWO_PI) // Random phase for jitter
-      });
-    }
-  }
-  
-  // Determine particle color based on its position
-  function determineParticleColor(point) {
-    // Check if point is part of left eye
-    if (p.dist(point.x, point.y, leftEye.x, leftEye.y) <= leftEye.size/2 + 5) {
-      return palette.primary;
-    }
-    // Check if point is part of right eye
-    else if (p.dist(point.x, point.y, rightEye.x, rightEye.y) <= rightEye.size/2 + 5) {
-      return palette.primary;
-    }
-    // Check if point is part of mouth
-    else if (point.y > mouth.y - mouth.height && point.y < mouth.y + mouth.height &&
-             point.x > mouth.x - mouth.width/2 && point.x < mouth.x + mouth.width/2) {
-      return palette.accent2;
-    }
-    // Default color
-    else {
-      return p.random([palette.primary, palette.accent1]);
-    }
-  }
-  
-  // Make particles react to audio input
-  function reactParticlesToAudio(level) {
-    const energyFactor = level * 3; // Scale the effect
-    
-    // Make face particles react
-    for (let particle of faceParticles) {
-      // Add some velocity based on audio level
-      particle.vel.add(p.createVector(
-        p.random(-energyFactor, energyFactor),
-        p.random(-energyFactor, energyFactor)
-      ));
-    }
-    
-    // Make background particles react too
-    for (let particle of backgroundParticles) {
-      particle.vel.add(p.createVector(
-        p.random(-energyFactor * 0.5, energyFactor * 0.5),
-        p.random(-energyFactor * 0.5, energyFactor * 0.5)
-      ));
-      
-      // Increase size temporarily
-      particle.size += energyFactor * 0.5;
-      // Limit size
-      particle.size = p.constrain(particle.size, 1, 5);
-    }
-  }
-  
-  // Update face particles for different expressions
-  function updateFaceParticlesForExpression(expression) {
-    // Different particle behaviors for different expressions
-    switch(expression) {
-      case 'happy':
-        // Make particles more energetic
-        for (let particle of faceParticles) {
-          particle.jitter *= 1.5;
-        }
-        break;
-      case 'thinking':
-        // Make particles move more slowly and deliberately
-        for (let particle of faceParticles) {
-          particle.jitter *= 0.7;
-        }
-        break;
-      case 'surprised':
-        // Make particles scatter briefly then return
-        for (let particle of faceParticles) {
-          particle.vel.add(p.createVector(
-            p.random(-5, 5),
-            p.random(-5, 5)
-          ));
-        }
-        break;
-    }
-  }
-  
   p.draw = function() {
     // Create a fade effect
-    p.fill(palette.dark[0], palette.dark[1], palette.dark[2], 15);
+    p.fill(palette.dark[0], palette.dark[1], palette.dark[2], 20);
     p.noStroke();
     p.rect(0, 0, p.width, p.height);
     
-    // Update and draw background particles
-    updateBackgroundParticles();
+    // Update and draw particles
+    updateParticles();
     
-    // Update and draw face particles
-    updateFaceParticles();
-    
-    // Update robot face parameters
+    // Update robot face
     updateRobotFace();
     
-    // Draw robot face (this was missing!)
+    // Draw robot face
     drawRobotFace();
-    
-    // Gradually increase face opacity for fade-in effect
-    if (faceOpacity < 255) {
-      faceOpacity += 2;
-    }
     
     // Gradually reduce audio level if not actively listening
     if (!isListening) {
@@ -393,26 +178,16 @@ let sketch = function(p) {
       expressionTimer--;
       if (expressionTimer === 0) {
         expressionState = 'neutral';
-        updateFaceParticlesForExpression('neutral');
       }
     }
   };
   
-  function updateBackgroundParticles() {
-    for (let i = 0; i < backgroundParticles.length; i++) {
-      let particle = backgroundParticles[i];
-      
-      // Update pulse phase
-      particle.pulse += 0.02;
-      
-      // Pulsing size effect
-      const pulseFactor = 0.3 * p.sin(particle.pulse) + 1;
+  function updateParticles() {
+    for (let i = 0; i < particles.length; i++) {
+      let particle = particles[i];
       
       // Move particle
       particle.pos.add(particle.vel);
-      
-      // Add some drag to slow particles down
-      particle.vel.mult(0.98);
       
       // Edge wrapping
       if (particle.pos.x < 0) particle.pos.x = p.width;
@@ -420,75 +195,9 @@ let sketch = function(p) {
       if (particle.pos.y < 0) particle.pos.y = p.height;
       if (particle.pos.y > p.height) particle.pos.y = 0;
       
-      // Store original size if not already stored
-      if (!particle.originalSize) {
-        particle.originalSize = particle.size;
-      }
-      
-      // Gradually reduce size back to normal
-      if (particle.size > particle.originalSize) {
-        particle.size *= 0.95;
-      }
-      
-      // Draw particle with glow effect
+      // Draw particle
       p.noStroke();
-      
-      // Glow effect
-      p.fill(particle.color[0], particle.color[1], particle.color[2], particle.alpha * 0.3);
-      p.ellipse(particle.pos.x, particle.pos.y, particle.size * 2 * pulseFactor);
-      
-      // Core
       p.fill(particle.color[0], particle.color[1], particle.color[2], particle.alpha);
-      p.ellipse(particle.pos.x, particle.pos.y, particle.size * pulseFactor);
-    }
-  }
-  
-  function updateFaceParticles() {
-    for (let i = 0; i < faceParticles.length; i++) {
-      let particle = faceParticles[i];
-      
-      // Calculate direction to target
-      const direction = p.createVector(
-        particle.target.x - particle.pos.x,
-        particle.target.y - particle.pos.y
-      );
-      
-      // If particle is far from target, move towards it
-      if (direction.mag() > 5 && !particle.arrived) {
-        direction.normalize();
-        direction.mult(0.8); // Speed factor
-        particle.vel.add(direction);
-        particle.vel.limit(3); // Max speed
-      } else {
-        particle.arrived = true;
-        
-        // Add jitter to particles that have arrived
-        const time = p.frameCount * 0.05;
-        const jitterX = p.cos(time + particle.jitterPhase) * particle.jitter;
-        const jitterY = p.sin(time + particle.jitterPhase) * particle.jitter;
-        
-        particle.vel.x = jitterX * 0.2;
-        particle.vel.y = jitterY * 0.2;
-        
-        // Add audio reactivity
-        particle.vel.mult(1 + audioLevel);
-      }
-      
-      // Apply velocity
-      particle.pos.add(particle.vel);
-      
-      // Add some drag
-      particle.vel.mult(0.9);
-      
-      // Draw particle with glow effect
-      p.noStroke();
-      
-      // Glow effect
-      p.fill(particle.color[0], particle.color[1], particle.color[2], particle.alpha * 0.3 * (faceOpacity/255));
-      p.ellipse(particle.pos.x, particle.pos.y, particle.size * 2);
-      
-      // Core
-      p.fill(particle.color[0], particle.color[1], particle.color[2], particle.alpha * (faceOpacity/255));
       p.ellipse(particle.pos.x, particle.pos.y, particle.size);
     }
   }
