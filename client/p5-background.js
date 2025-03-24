@@ -1,17 +1,13 @@
 // Kubrick-inspired AI Interface using p5.js
 
 let sketch = function(p) {
-  // Color palette - Digital neon inspired colors
+  // Color palette - Kubrick-inspired stark contrasts
   const palette = {
     black: [0, 0, 0],
     white: [240, 240, 240],
-    neonBlue: [0, 195, 255],
-    neonPink: [255, 0, 153],
-    neonGreen: [57, 255, 20],
-    neonPurple: [187, 41, 255],
-    darkBlue: [5, 10, 25],
-    gridColor: [20, 40, 80],
-    glowColor: [100, 200, 255]
+    red: [220, 20, 60],
+    blue: [0, 149, 237],
+    gold: [212, 175, 55]
   };
   
   // Robot face parameters
@@ -252,201 +248,27 @@ let sketch = function(p) {
   }
   
   function drawGrid() {
-    // Draw digital neon grid background
-    p.background(palette.darkBlue[0], palette.darkBlue[1], palette.darkBlue[2], 10);
+    // Draw one-point perspective grid lines
+    p.stroke(palette.white[0], palette.white[1], palette.white[2], 20);
+    p.strokeWeight(1);
     
-    // Draw horizontal grid lines
-    const gridSpacing = 40;
-    const rows = Math.ceil(p.height / gridSpacing);
-    const cols = Math.ceil(p.width / gridSpacing);
-    
-    // Draw horizontal grid lines
-    for (let row = 0; row <= rows; row++) {
-      const y = row * gridSpacing;
-      const alpha = 30 + Math.sin(time * 0.5 + row * 0.1) * 10;
-      p.stroke(palette.gridColor[0], palette.gridColor[1], palette.gridColor[2], alpha);
-      p.strokeWeight(1);
-      p.line(0, y, p.width, y);
-    }
-    
-    // Draw vertical grid lines
-    for (let col = 0; col <= cols; col++) {
-      const x = col * gridSpacing;
-      const alpha = 30 + Math.sin(time * 0.5 + col * 0.1) * 10;
-      p.stroke(palette.gridColor[0], palette.gridColor[1], palette.gridColor[2], alpha);
-      p.strokeWeight(1);
-      p.line(x, 0, x, p.height);
-    }
-    
-    // Add some random glowing points at grid intersections
-    for (let row = 0; row <= rows; row++) {
-      for (let col = 0; col <= cols; col++) {
-        // Only draw some points (randomly)
-        if (Math.random() < 0.03) {
-          const x = col * gridSpacing;
-          const y = row * gridSpacing;
-          
-          // Choose a random neon color
-          const colors = [palette.neonBlue, palette.neonPink, palette.neonGreen, palette.neonPurple];
-          const color = colors[Math.floor(Math.random() * colors.length)];
-          
-          // Draw glowing point
-          const pulseSize = 3 + Math.sin(time * 2 + row * col * 0.1) * 2;
-          
-          // Outer glow
-          p.noStroke();
-          p.fill(color[0], color[1], color[2], 30);
-          p.ellipse(x, y, pulseSize * 3);
-          
-          // Inner glow
-          p.fill(color[0], color[1], color[2], 70);
-          p.ellipse(x, y, pulseSize * 1.5);
-          
-          // Core
-          p.fill(color[0], color[1], color[2], 200);
-          p.ellipse(x, y, pulseSize * 0.8);
-        }
-      }
-    }
-    
-    // Add some floating particles
-    for (let i = 0; i < 5; i++) {
-      const x = (Math.sin(time * 0.5 + i * 1.5) * 0.5 + 0.5) * p.width;
-      const y = (Math.cos(time * 0.3 + i * 2.1) * 0.5 + 0.5) * p.height;
-      
-      // Choose a random neon color
-      const colors = [palette.neonBlue, palette.neonPink, palette.neonGreen, palette.neonPurple];
-      const color = colors[i % colors.length];
-      
-      // Draw floating particle with glow
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], 20);
-      p.ellipse(x, y, 30);
-      p.fill(color[0], color[1], color[2], 40);
-      p.ellipse(x, y, 20);
-      p.fill(color[0], color[1], color[2], 100);
-      p.ellipse(x, y, 10);
-      p.fill(255);
-      p.ellipse(x, y, 3);
-    }
-    
-    // Add some horizontal scan lines for digital effect
-    for (let i = 0; i < p.height; i += 4) {
-      if (Math.random() < 0.7) {
-        p.stroke(255, 255, 255, 3);
-        p.line(0, i, p.width, i);
-      }
+    for (let i = 0; i < grid.length; i++) {
+      const line = grid[i];
+      p.line(line.x1, line.y1, line.x2, line.y2);
     }
   }
   
   function drawMonolith() {
-    // Draw digital circuit pattern in the background
+    // Draw monolith with slight rotation based on time
     p.push();
+    p.translate(monolith.x, monolith.y);
+    p.rotate(Math.sin(time * 0.2) * 0.05);
     
-    // Draw some digital circuit lines
-    const lineCount = 15;
-    const spacing = p.width / lineCount;
-    
-    for (let i = 0; i < lineCount; i++) {
-      // Choose a random neon color
-      const colors = [palette.neonBlue, palette.neonPink, palette.neonGreen, palette.neonPurple];
-      const color = colors[i % colors.length];
-      
-      // Starting position
-      const startX = i * spacing;
-      let currentX = startX;
-      let currentY = 0;
-      
-      // Draw a path with right angles (circuit-like)
-      p.stroke(color[0], color[1], color[2], 40);
-      p.strokeWeight(2);
-      p.noFill();
-      
-      p.beginShape();
-      p.vertex(currentX, currentY);
-      
-      // Create a series of right-angle turns
-      const segmentCount = Math.floor(Math.random() * 5) + 5;
-      for (let j = 0; j < segmentCount; j++) {
-        // Decide whether to go horizontal or vertical
-        if (j % 2 === 0) {
-          // Horizontal movement
-          currentX += (Math.random() - 0.5) * spacing * 2;
-          currentX = p.constrain(currentX, 0, p.width);
-        } else {
-          // Vertical movement
-          currentY += Math.random() * p.height / segmentCount;
-          currentY = p.constrain(currentY, 0, p.height);
-        }
-        
-        p.vertex(currentX, currentY);
-      }
-      
-      // Ensure the path reaches the bottom
-      p.vertex(currentX, p.height);
-      p.endShape();
-      
-      // Add some nodes at the vertices
-      const nodeSize = 4 + Math.sin(time * 2 + i) * 2;
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], 100);
-      
-      currentX = startX;
-      currentY = 0;
-      p.ellipse(currentX, currentY, nodeSize);
-      
-      for (let j = 0; j < segmentCount; j++) {
-        if (j % 2 === 0) {
-          currentX += (Math.random() - 0.5) * spacing * 2;
-          currentX = p.constrain(currentX, 0, p.width);
-        } else {
-          currentY += Math.random() * p.height / segmentCount;
-          currentY = p.constrain(currentY, 0, p.height);
-        }
-        
-        // Pulse the nodes
-        const pulseSize = nodeSize * (0.8 + Math.sin(time * 3 + i + j) * 0.2);
-        
-        // Draw node with glow
-        p.fill(color[0], color[1], color[2], 30);
-        p.ellipse(currentX, currentY, pulseSize * 3);
-        p.fill(color[0], color[1], color[2], 70);
-        p.ellipse(currentX, currentY, pulseSize * 1.5);
-        p.fill(color[0], color[1], color[2], 150);
-        p.ellipse(currentX, currentY, pulseSize);
-      }
-    }
-    
-    // Add some floating digital particles
-    for (let i = 0; i < 20; i++) {
-      const x = (Math.sin(time * 0.2 + i * 0.5) * 0.5 + 0.5) * p.width;
-      const y = (Math.cos(time * 0.3 + i * 0.7) * 0.5 + 0.5) * p.height;
-      
-      // Choose a random neon color
-      const colors = [palette.neonBlue, palette.neonPink, palette.neonGreen, palette.neonPurple];
-      const color = colors[i % colors.length];
-      
-      // Draw digital particle
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], 50);
-      
-      // Random shapes for particles
-      const shapeType = i % 3;
-      if (shapeType === 0) {
-        // Circle
-        p.ellipse(x, y, 8);
-      } else if (shapeType === 1) {
-        // Square
-        p.rect(x - 4, y - 4, 8, 8);
-      } else {
-        // Triangle
-        p.triangle(
-          x, y - 5,
-          x - 4, y + 3,
-          x + 4, y + 3
-        );
-      }
-    }
+    // Black rectangle with white outline
+    p.fill(0);
+    p.stroke(palette.white[0], palette.white[1], palette.white[2], 100);
+    p.strokeWeight(2);
+    p.rect(-monolith.width / 2, -monolith.height / 2, monolith.width, monolith.height);
     
     p.pop();
   }
@@ -525,12 +347,12 @@ let sketch = function(p) {
   function drawHALInterface() {
     p.push();
     
-    // Draw neon eyes with digital style
-    drawMinimalistEye(leftEye, palette.neonBlue);
-    drawMinimalistEye(rightEye, palette.neonGreen);
+    // Draw minimalist eyes with elegant style
+    drawMinimalistEye(leftEye, palette.red);
+    drawMinimalistEye(rightEye, palette.red);
     
-    // Draw neon mouth with digital accent
-    drawMinimalistMouth(mouth, palette.neonPink);
+    // Draw minimalist mouth with blue accent
+    drawMinimalistMouth(mouth, palette.blue);
     
     p.pop();
   }
@@ -890,24 +712,18 @@ let sketch = function(p) {
     
     p.push();
     
-    // Digital neon audio visualizer
+    // Kubrick-inspired symmetrical audio visualizer
+    // Using sharp geometric shapes and stark contrasts
     
-    // Draw visualizer container with neon glow
-    p.stroke(palette.neonPink[0], palette.neonPink[1], palette.neonPink[2], 120);
-    p.strokeWeight(2);
+    // Draw visualizer container
+    p.stroke(palette.white[0], palette.white[1], palette.white[2], 80);
+    p.strokeWeight(1);
     p.noFill();
     p.rect(mouth.x - visualizerWidth/2, mouth.y - visualizerHeight/2, 
            visualizerWidth, visualizerHeight);
     
-    // Add glow effect to container
-    p.noFill();
-    p.stroke(palette.neonPink[0], palette.neonPink[1], palette.neonPink[2], 40);
-    p.strokeWeight(4);
-    p.rect(mouth.x - visualizerWidth/2, mouth.y - visualizerHeight/2, 
-           visualizerWidth, visualizerHeight);
-    
-    // Draw audio bars with digital neon style
-    const barCount = 12; // More bars for digital look
+    // Draw audio bars with precise geometric style
+    const barCount = 10; // Fewer, more precise bars
     const barWidth = visualizerWidth / barCount;
     const barSpacing = 2;
     
@@ -927,42 +743,19 @@ let sketch = function(p) {
       const x = mouth.x - visualizerWidth/2 + i * barWidth + barSpacing/2;
       const y = mouth.y - barHeight/2;
       
-      // Choose alternating neon colors
-      const colors = [palette.neonBlue, palette.neonGreen, palette.neonPurple, palette.neonPink];
-      const color = colors[i % colors.length];
-      
-      // Draw bar with neon glow
-      // Outer glow
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], 40);
-      p.rect(x - 2, y - 2, barWidth - barSpacing + 4, barHeight + 4, 2);
-      
-      // Inner bar
-      p.fill(color[0], color[1], color[2], 180);
-      p.rect(x, y, barWidth - barSpacing, barHeight, 1);
-      
-      // Add horizontal scan lines for digital effect
-      for (let j = 0; j < barHeight; j += 4) {
-        if (Math.random() < 0.5) {
-          p.stroke(255, 255, 255, 30);
-          p.strokeWeight(1);
-          p.line(x, y + j, x + barWidth - barSpacing, y + j);
-        }
+      // Draw bar with HAL-inspired color
+      if (i % 2 === 0) {
+        p.fill(palette.red[0], palette.red[1], palette.red[2], 180);
+      } else {
+        p.fill(palette.blue[0], palette.blue[1], palette.blue[2], 180);
       }
-    }
-    
-    // Add digital data points along the center
-    p.stroke(255, 255, 255, 100);
-    p.strokeWeight(1);
-    p.line(mouth.x - visualizerWidth * 0.4, mouth.y, mouth.x + visualizerWidth * 0.4, mouth.y);
-    
-    for (let i = 0; i < 8; i++) {
-      const x = p.map(i, 0, 7, mouth.x - visualizerWidth * 0.4, mouth.x + visualizerWidth * 0.4);
-      
-      // Draw data point
       p.noStroke();
-      p.fill(255, 255, 255, 150);
-      p.ellipse(x, mouth.y, 3, 3);
+      p.rect(x, y, barWidth - barSpacing, barHeight);
+      
+      // Add horizontal line for computer-like appearance
+      p.stroke(palette.white[0], palette.white[1], palette.white[2], 100);
+      p.strokeWeight(1);
+      p.line(x, mouth.y, x + barWidth - barSpacing, mouth.y);
     }
     
     p.pop();
