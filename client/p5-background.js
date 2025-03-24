@@ -450,245 +450,596 @@ let sketch = function(p) {
     p.pop();
   }
   
-  // Draw the overall face shape
+  // Draw the overall face shape with improved proportions and details
   function drawFaceShape() {
     p.push();
     
-    // Soft glow around the face
-    p.noStroke();
+    // Calculate face dimensions based on golden ratio
+    const faceCenter = p.height * 0.45;
     const glowSize = faceWidth * 0.7;
-    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 10);
-    p.ellipse(p.width / 2, p.height * 0.45, glowSize * 1.1, glowSize * 1.3);
+    const faceHeight = glowSize * 1.3; // More natural face proportion
+    const faceWidth = glowSize * 0.9;
+    const jawWidth = faceWidth * 0.85;
     
-    // Face shape - slightly elongated oval
-    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 30);
-    p.ellipse(p.width / 2, p.height * 0.45, glowSize * 0.9, glowSize * 1.1);
+    // Soft ambient glow around the face
+    p.noStroke();
+    const glowGradient = p.drawingContext.createRadialGradient(
+      p.width / 2, faceCenter, 0,
+      p.width / 2, faceCenter, glowSize * 0.7
+    );
+    glowGradient.addColorStop(0, `rgba(${palette.skin[0]}, ${palette.skin[1]}, ${palette.skin[2]}, 0.15)`);
+    glowGradient.addColorStop(1, `rgba(${palette.skin[0]}, ${palette.skin[1]}, ${palette.skin[2]}, 0)`);
+    p.drawingContext.fillStyle = glowGradient;
+    p.ellipse(p.width / 2, faceCenter, glowSize * 1.2, glowSize * 1.4);
     
-    // Subtle face contours
+    // Face shape - more realistic oval with jaw
+    p.noStroke();
+    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 40);
+    
+    // Draw face using bezier curves for more natural shape
+    p.beginShape();
+    // Top of head
+    p.vertex(p.width / 2 - faceWidth/2, faceCenter - faceHeight * 0.35);
+    p.bezierVertex(
+      p.width / 2 - faceWidth/2, faceCenter - faceHeight * 0.5,
+      p.width / 2 + faceWidth/2, faceCenter - faceHeight * 0.5,
+      p.width / 2 + faceWidth/2, faceCenter - faceHeight * 0.35
+    );
+    
+    // Right side of face
+    p.bezierVertex(
+      p.width / 2 + faceWidth/2, faceCenter,
+      p.width / 2 + jawWidth/2, faceCenter + faceHeight * 0.3,
+      p.width / 2 + jawWidth/2 * 0.8, faceCenter + faceHeight * 0.45
+    );
+    
+    // Jaw and chin
+    p.bezierVertex(
+      p.width / 2 + jawWidth/2 * 0.4, faceCenter + faceHeight * 0.5,
+      p.width / 2 - jawWidth/2 * 0.4, faceCenter + faceHeight * 0.5,
+      p.width / 2 - jawWidth/2 * 0.8, faceCenter + faceHeight * 0.45
+    );
+    
+    // Left side of face
+    p.bezierVertex(
+      p.width / 2 - jawWidth/2, faceCenter + faceHeight * 0.3,
+      p.width / 2 - faceWidth/2, faceCenter,
+      p.width / 2 - faceWidth/2, faceCenter - faceHeight * 0.35
+    );
+    
+    p.endShape(p.CLOSE);
+    
+    // Subtle face contours and highlights for more dimension
     p.noFill();
+    
+    // Cheekbone highlights
+    p.stroke(palette.highlight[0], palette.highlight[1], palette.highlight[2], 25);
+    p.strokeWeight(3);
+    p.drawingContext.filter = 'blur(4px)';
+    
+    // Left cheekbone highlight
+    p.beginShape();
+    p.vertex(p.width / 2 - faceWidth * 0.35, faceCenter - faceHeight * 0.05);
+    p.bezierVertex(
+      p.width / 2 - faceWidth * 0.3, faceCenter + faceHeight * 0.05,
+      p.width / 2 - faceWidth * 0.2, faceCenter + faceHeight * 0.1,
+      p.width / 2 - faceWidth * 0.1, faceCenter + faceHeight * 0.15
+    );
+    p.endShape();
+    
+    // Right cheekbone highlight
+    p.beginShape();
+    p.vertex(p.width / 2 + faceWidth * 0.35, faceCenter - faceHeight * 0.05);
+    p.bezierVertex(
+      p.width / 2 + faceWidth * 0.3, faceCenter + faceHeight * 0.05,
+      p.width / 2 + faceWidth * 0.2, faceCenter + faceHeight * 0.1,
+      p.width / 2 + faceWidth * 0.1, faceCenter + faceHeight * 0.15
+    );
+    p.endShape();
+    
+    // Chin and jaw highlights
     p.stroke(palette.highlight[0], palette.highlight[1], palette.highlight[2], 20);
-    p.strokeWeight(2);
-    
-    // Left cheek highlight
     p.beginShape();
-    p.vertex(p.width / 2 - glowSize * 0.3, p.height * 0.45);
+    p.vertex(p.width / 2 - jawWidth * 0.2, faceCenter + faceHeight * 0.4);
     p.bezierVertex(
-      p.width / 2 - glowSize * 0.25, p.height * 0.5,
-      p.width / 2 - glowSize * 0.2, p.height * 0.55,
-      p.width / 2 - glowSize * 0.15, p.height * 0.6
+      p.width / 2 - jawWidth * 0.1, faceCenter + faceHeight * 0.45,
+      p.width / 2 + jawWidth * 0.1, faceCenter + faceHeight * 0.45,
+      p.width / 2 + jawWidth * 0.2, faceCenter + faceHeight * 0.4
     );
     p.endShape();
     
-    // Right cheek highlight
-    p.beginShape();
-    p.vertex(p.width / 2 + glowSize * 0.3, p.height * 0.45);
-    p.bezierVertex(
-      p.width / 2 + glowSize * 0.25, p.height * 0.5,
-      p.width / 2 + glowSize * 0.2, p.height * 0.55,
-      p.width / 2 + glowSize * 0.15, p.height * 0.6
-    );
-    p.endShape();
-    
-    // Chin highlight
+    // Forehead subtle highlight
     p.stroke(palette.highlight[0], palette.highlight[1], palette.highlight[2], 15);
     p.beginShape();
-    p.vertex(p.width / 2 - glowSize * 0.1, p.height * 0.65);
+    p.vertex(p.width / 2 - faceWidth * 0.25, faceCenter - faceHeight * 0.3);
     p.bezierVertex(
-      p.width / 2, p.height * 0.67,
-      p.width / 2, p.height * 0.67,
-      p.width / 2 + glowSize * 0.1, p.height * 0.65
+      p.width / 2 - faceWidth * 0.1, faceCenter - faceHeight * 0.35,
+      p.width / 2 + faceWidth * 0.1, faceCenter - faceHeight * 0.35,
+      p.width / 2 + faceWidth * 0.25, faceCenter - faceHeight * 0.3
     );
     p.endShape();
+    
+    // Reset blur filter
+    p.drawingContext.filter = 'none';
     
     p.pop();
   }
   
-  // Draw realistic eye with iris, pupil, eyelids, and reflections
+  // Draw highly realistic eye with detailed iris, pupil, eyelids, and reflections
   function drawRealisticEye(eye, irisColor) {
     p.push();
     
-    // Eye white (sclera)
+    // Perfect eye proportions based on human anatomy
     const eyeWidth = eye.size * 1.1;
-    const eyeHeight = eye.size * 0.5 * (1 - eye.blinkState * 0.9);
+    const eyeHeight = eye.size * 0.45 * (1 - eye.blinkState * 0.9); // More natural eye height ratio
     
-    // Eye socket shadow
+    // Eye socket and shadow with soft gradient
     p.noStroke();
+    p.drawingContext.shadowBlur = 10;
+    p.drawingContext.shadowColor = `rgba(${palette.shadow[0]}, ${palette.shadow[1]}, ${palette.shadow[2]}, 0.3)`;
     p.fill(palette.shadow[0], palette.shadow[1], palette.shadow[2], 40);
     p.ellipse(eye.x, eye.y, eyeWidth * 1.2, eyeHeight * 1.5);
+    p.drawingContext.shadowBlur = 0;
     
     if (eyeHeight > eye.size * 0.1) { // Only draw eye details if not mostly closed
-      // Eye white
-      p.fill(palette.white[0], palette.white[1], palette.white[2], 220);
+      // Create eye white (sclera) with subtle gradient for depth
+      const scleraGradient = p.drawingContext.createRadialGradient(
+        eye.x, eye.y, 0,
+        eye.x, eye.y, eyeWidth/2
+      );
+      scleraGradient.addColorStop(0, `rgba(${palette.white[0]}, ${palette.white[1]}, ${palette.white[2]}, 0.95)`);
+      scleraGradient.addColorStop(0.8, `rgba(${palette.white[0] - 5}, ${palette.white[1] - 5}, ${palette.white[2] - 5}, 0.9)`);
+      scleraGradient.addColorStop(1, `rgba(${palette.white[0] - 10}, ${palette.white[1] - 10}, ${palette.white[2] - 10}, 0.85)`);
+      p.drawingContext.fillStyle = scleraGradient;
       p.ellipse(eye.x, eye.y, eyeWidth, eyeHeight);
       
-      // Subtle veins in eye white
-      p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 10);
-      p.strokeWeight(0.5);
-      for (let i = 0; i < 3; i++) {
-        const angle = p.random(p.PI * 0.7, p.PI * 1.3);
-        const length = p.random(eye.size * 0.2, eye.size * 0.4);
-        const startX = eye.x - eye.size * 0.3;
-        const startY = eye.y;
-        p.line(
-          startX, 
-          startY,
-          startX + Math.cos(angle) * length,
-          startY + Math.sin(angle) * length
+      // Subtle veins in eye white for realism
+      p.stroke(200, 100, 100, 8); // Very subtle red for veins
+      p.strokeWeight(0.7);
+      p.drawingContext.filter = 'blur(1px)';
+      
+      // Create a more natural vein pattern
+      const veinCount = 5;
+      for (let i = 0; i < veinCount; i++) {
+        const angle = p.random(p.PI * 0.5, p.PI * 1.5); // Veins mostly on sides
+        const length = p.random(eye.size * 0.3, eye.size * 0.5);
+        const startX = eye.x - eye.size * 0.4 + p.random(-0.1, 0.1) * eye.size;
+        const startY = eye.y + p.random(-0.2, 0.2) * eyeHeight;
+        
+        // Draw branching veins
+        p.beginShape();
+        p.vertex(startX, startY);
+        
+        // Main vein
+        const endX = startX + Math.cos(angle) * length;
+        const endY = startY + Math.sin(angle) * length;
+        
+        // Add some curve to the vein
+        const ctrlX = startX + Math.cos(angle) * length * 0.5 + p.random(-10, 10);
+        const ctrlY = startY + Math.sin(angle) * length * 0.5 + p.random(-5, 5);
+        
+        p.bezierVertex(
+          startX + Math.cos(angle) * length * 0.3,
+          startY + Math.sin(angle) * length * 0.3,
+          ctrlX, ctrlY,
+          endX, endY
         );
+        p.endShape();
+        
+        // Add 1-2 branches to some veins
+        if (i % 2 === 0) {
+          const branchStartX = startX + Math.cos(angle) * length * 0.6;
+          const branchStartY = startY + Math.sin(angle) * length * 0.6;
+          const branchAngle = angle + p.random(-0.5, 0.5);
+          const branchLength = length * 0.4;
+          
+          p.line(
+            branchStartX, branchStartY,
+            branchStartX + Math.cos(branchAngle) * branchLength,
+            branchStartY + Math.sin(branchAngle) * branchLength
+          );
+        }
       }
       
-      // Iris
-      const irisSize = eye.size * 0.5;
+      p.drawingContext.filter = 'none';
+      
+      // Iris with detailed gradient and texture
+      const irisSize = eye.size * 0.45; // Slightly smaller for better proportion
       const irisX = eye.x + eye.pupilOffset.x;
       const irisY = eye.y + eye.pupilOffset.y;
       
-      // Iris gradient
-      for (let i = 0; i < 5; i++) {
-        const ratio = (5 - i) / 5;
-        p.noStroke();
-        p.fill(
-          irisColor[0] * ratio, 
-          irisColor[1] * ratio, 
-          irisColor[2] * ratio, 
-          200
-        );
-        p.ellipse(irisX, irisY, irisSize * ratio);
-      }
+      // Create realistic iris gradient
+      const irisGradient = p.drawingContext.createRadialGradient(
+        irisX, irisY, 0,
+        irisX, irisY, irisSize/2
+      );
       
-      // Iris detail lines (radial pattern)
-      p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 100);
-      p.strokeWeight(0.5);
-      for (let i = 0; i < 12; i++) {
-        const angle = i * p.PI / 6;
-        const innerRadius = irisSize * 0.2;
-        const outerRadius = irisSize * 0.45;
-        p.line(
-          irisX + Math.cos(angle) * innerRadius,
-          irisY + Math.sin(angle) * innerRadius,
-          irisX + Math.cos(angle) * outerRadius,
-          irisY + Math.sin(angle) * outerRadius
-        );
-      }
+      // Outer darker ring
+      irisGradient.addColorStop(0.7, `rgba(${irisColor[0] * 0.7}, ${irisColor[1] * 0.7}, ${irisColor[2] * 0.7}, 0.95)`);
+      // Middle tone
+      irisGradient.addColorStop(0.4, `rgba(${irisColor[0]}, ${irisColor[1]}, ${irisColor[2]}, 0.9)`);
+      // Inner lighter area
+      irisGradient.addColorStop(0, `rgba(${irisColor[0] * 1.2}, ${irisColor[1] * 1.2}, ${irisColor[2] * 1.2}, 0.85)`);
       
-      // Pupil
       p.noStroke();
-      p.fill(0, 0, 0, 220);
-      const pupilSize = irisSize * 0.6 * (1 + audioLevel * 0.3); // Pupil dilates with audio
+      p.drawingContext.fillStyle = irisGradient;
+      p.ellipse(irisX, irisY, irisSize, irisSize);
+      
+      // Iris texture - detailed radial pattern
+      p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 60);
+      p.strokeWeight(0.4);
+      
+      // Draw more natural iris fibers
+      const fiberCount = 60; // More fibers for realism
+      for (let i = 0; i < fiberCount; i++) {
+        const angle = i * p.TWO_PI / fiberCount;
+        const innerRadius = irisSize * 0.2;
+        const outerRadius = irisSize * 0.48;
+        
+        // Add slight variation to each fiber
+        const radiusVariation = p.random(0.95, 1.05);
+        
+        // Draw fiber with slight curve
+        p.beginShape();
+        p.vertex(
+          irisX + Math.cos(angle) * innerRadius,
+          irisY + Math.sin(angle) * innerRadius
+        );
+        
+        // Add control points for curve
+        const ctrlDist = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const ctrlAngleOffset = p.random(-0.05, 0.05);
+        
+        p.bezierVertex(
+          irisX + Math.cos(angle + ctrlAngleOffset) * ctrlDist,
+          irisY + Math.sin(angle + ctrlAngleOffset) * ctrlDist,
+          irisX + Math.cos(angle + ctrlAngleOffset * 2) * ctrlDist * 1.5,
+          irisY + Math.sin(angle + ctrlAngleOffset * 2) * ctrlDist * 1.5,
+          irisX + Math.cos(angle) * outerRadius * radiusVariation,
+          irisY + Math.sin(angle) * outerRadius * radiusVariation
+        );
+        p.endShape();
+      }
+      
+      // Iris outer ring - darker edge
+      p.noFill();
+      p.stroke(irisColor[0] * 0.6, irisColor[1] * 0.6, irisColor[2] * 0.6, 100);
+      p.strokeWeight(1.5);
+      p.ellipse(irisX, irisY, irisSize * 0.98);
+      
+      // Pupil with soft edge
+      p.noStroke();
+      const pupilGradient = p.drawingContext.createRadialGradient(
+        irisX, irisY, 0,
+        irisX, irisY, irisSize * 0.3
+      );
+      pupilGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+      pupilGradient.addColorStop(0.85, 'rgba(0, 0, 0, 1)');
+      pupilGradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+      
+      p.drawingContext.fillStyle = pupilGradient;
+      const pupilSize = irisSize * 0.55 * (1 + audioLevel * 0.4); // Pupil dilates with audio
       p.ellipse(irisX, irisY, pupilSize);
       
-      // Eye reflections (catchlights)
+      // Eye reflections (catchlights) - more natural with multiple highlights
       p.fill(palette.highlight[0], palette.highlight[1], palette.highlight[2], 230);
       
-      // Main catchlight
+      // Main catchlight - window reflection
       p.ellipse(
         irisX - irisSize * 0.15,
         irisY - irisSize * 0.1,
-        irisSize * 0.2
+        irisSize * 0.18
       );
       
-      // Secondary smaller catchlight
+      // Secondary smaller catchlight - second light source
+      p.fill(palette.highlight[0], palette.highlight[1], palette.highlight[2], 180);
       p.ellipse(
         irisX + irisSize * 0.2,
         irisY - irisSize * 0.2,
-        irisSize * 0.1
+        irisSize * 0.08
+      );
+      
+      // Tiny tertiary catchlight
+      p.fill(palette.highlight[0], palette.highlight[1], palette.highlight[2], 150);
+      p.ellipse(
+        irisX + irisSize * 0.1,
+        irisY + irisSize * 0.25,
+        irisSize * 0.05
       );
     }
     
-    // Upper eyelid
+    // Upper eyelid with more natural curve and shadow
     p.noStroke();
-    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 150);
+    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 180);
+    
+    // Add subtle eyelid shadow
+    p.drawingContext.shadowBlur = 5;
+    p.drawingContext.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    p.drawingContext.shadowOffsetY = 1;
+    
     p.beginShape();
+    // Left corner
     p.vertex(eye.x - eyeWidth * 0.6, eye.y);
+    
+    // Upper lid curve - more natural shape
     p.bezierVertex(
-      eye.x - eyeWidth * 0.3, eye.y - eyeHeight * (0.7 + eye.blinkState * 0.3),
-      eye.x + eyeWidth * 0.3, eye.y - eyeHeight * (0.7 + eye.blinkState * 0.3),
-      eye.x + eyeWidth * 0.6, eye.y
+      eye.x - eyeWidth * 0.4, eye.y - eyeHeight * (0.8 + eye.blinkState * 0.3),
+      eye.x, eye.y - eyeHeight * (1.0 + eye.blinkState * 0.3),
+      eye.x + eyeWidth * 0.4, eye.y - eyeHeight * (0.8 + eye.blinkState * 0.3)
     );
-    p.vertex(eye.x + eyeWidth * 0.6, eye.y - eyeHeight * 0.8);
-    p.vertex(eye.x - eyeWidth * 0.6, eye.y - eyeHeight * 0.8);
+    
+    // Right corner
+    p.vertex(eye.x + eyeWidth * 0.6, eye.y);
+    
+    // Complete the shape
+    p.vertex(eye.x + eyeWidth * 0.6, eye.y - eyeHeight * 0.9);
+    p.vertex(eye.x - eyeWidth * 0.6, eye.y - eyeHeight * 0.9);
     p.endShape(p.CLOSE);
     
-    // Lower eyelid
-    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 150);
+    // Reset shadow
+    p.drawingContext.shadowBlur = 0;
+    p.drawingContext.shadowOffsetY = 0;
+    
+    // Lower eyelid with more natural curve
+    p.fill(palette.skin[0], palette.skin[1], palette.skin[2], 160);
     p.beginShape();
+    // Left corner
     p.vertex(eye.x - eyeWidth * 0.6, eye.y);
+    
+    // Lower lid curve - more subtle
     p.bezierVertex(
-      eye.x - eyeWidth * 0.3, eye.y + eyeHeight * (0.5 + eye.blinkState * 0.5),
-      eye.x + eyeWidth * 0.3, eye.y + eyeHeight * (0.5 + eye.blinkState * 0.5),
+      eye.x - eyeWidth * 0.3, eye.y + eyeHeight * (0.4 + eye.blinkState * 0.6),
+      eye.x + eyeWidth * 0.3, eye.y + eyeHeight * (0.4 + eye.blinkState * 0.6),
       eye.x + eyeWidth * 0.6, eye.y
     );
-    p.vertex(eye.x + eyeWidth * 0.6, eye.y + eyeHeight * 0.6);
-    p.vertex(eye.x - eyeWidth * 0.6, eye.y + eyeHeight * 0.6);
+    
+    // Complete the shape
+    p.vertex(eye.x + eyeWidth * 0.6, eye.y + eyeHeight * 0.7);
+    p.vertex(eye.x - eyeWidth * 0.6, eye.y + eyeHeight * 0.7);
     p.endShape(p.CLOSE);
     
-    // Eyelid crease
+    // Eyelid crease - more subtle and natural
     if (eye.blinkState < 0.5) {
       p.noFill();
-      p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 30);
+      p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 25);
       p.strokeWeight(1);
+      p.drawingContext.filter = 'blur(1px)';
+      
       p.beginShape();
-      p.vertex(eye.x - eyeWidth * 0.5, eye.y - eyeHeight * 0.3);
+      p.vertex(eye.x - eyeWidth * 0.45, eye.y - eyeHeight * 0.3);
       p.bezierVertex(
-        eye.x - eyeWidth * 0.25, eye.y - eyeHeight * 0.8,
-        eye.x + eyeWidth * 0.25, eye.y - eyeHeight * 0.8,
-        eye.x + eyeWidth * 0.5, eye.y - eyeHeight * 0.3
+        eye.x - eyeWidth * 0.2, eye.y - eyeHeight * 0.9,
+        eye.x + eyeWidth * 0.2, eye.y - eyeHeight * 0.9,
+        eye.x + eyeWidth * 0.45, eye.y - eyeHeight * 0.3
       );
       p.endShape();
+      
+      p.drawingContext.filter = 'none';
+    }
+    
+    // Eyelashes for added realism (when eye is open enough)
+    if (eye.blinkState < 0.3) {
+      p.stroke(palette.shadow[0] * 0.5, palette.shadow[1] * 0.5, palette.shadow[2] * 0.5, 150);
+      p.strokeWeight(1);
+      
+      // Upper lashes
+      const lashCount = 7;
+      const lashLength = eyeHeight * 0.25;
+      
+      for (let i = 0; i < lashCount; i++) {
+        const x = p.map(i, 0, lashCount - 1, eye.x - eyeWidth * 0.4, eye.x + eyeWidth * 0.4);
+        const y = eye.y - eyeHeight * 0.7;
+        const angle = p.map(i, 0, lashCount - 1, -p.PI * 0.7, -p.PI * 0.3);
+        
+        // Draw curved lash
+        p.beginShape();
+        p.vertex(x, y);
+        p.bezierVertex(
+          x + Math.cos(angle) * lashLength * 0.5,
+          y + Math.sin(angle) * lashLength * 0.5,
+          x + Math.cos(angle) * lashLength * 0.8,
+          y + Math.sin(angle) * lashLength * 0.8,
+          x + Math.cos(angle) * lashLength,
+          y + Math.sin(angle) * lashLength
+        );
+        p.endShape();
+      }
+      
+      // Few lower lashes
+      const lowerLashCount = 4;
+      const lowerLashLength = eyeHeight * 0.15;
+      
+      for (let i = 0; i < lowerLashCount; i++) {
+        const x = p.map(i, 0, lowerLashCount - 1, eye.x - eyeWidth * 0.3, eye.x + eyeWidth * 0.3);
+        const y = eye.y + eyeHeight * 0.4;
+        const angle = p.map(i, 0, lowerLashCount - 1, p.PI * 0.6, p.PI * 0.4);
+        
+        p.line(
+          x, y,
+          x + Math.cos(angle) * lowerLashLength,
+          y + Math.sin(angle) * lowerLashLength
+        );
+      }
     }
     
     p.pop();
   }
   
-  // Draw eyebrows that respond to expressions
+  // Draw realistic eyebrows with detailed shape and natural expressions
   function drawEyebrows() {
     p.push();
     
-    const eyebrowLength = leftEye.size * 1.3;
-    const eyebrowHeight = leftEye.size * 0.15;
-    const eyebrowY = leftEye.y - leftEye.size * 0.8;
+    const eyebrowLength = leftEye.size * 1.4; // Slightly longer for better proportion
+    const eyebrowHeight = leftEye.size * 0.18; // Slightly thicker for more presence
+    const eyebrowY = leftEye.y - leftEye.size * 0.85; // Position slightly higher
     
-    // Determine eyebrow angles based on expression
+    // Determine eyebrow positions and shapes based on expression
     let leftAngle = 0;
     let rightAngle = 0;
+    let leftYOffset = 0;
+    let rightYOffset = 0;
+    let leftCurve = 0;
+    let rightCurve = 0;
+    let leftThickness = 1;
+    let rightThickness = 1;
     
+    // More nuanced expression mapping
     switch (expressionState) {
       case 'happy':
-        leftAngle = -0.1;
-        rightAngle = 0.1;
+        // Raised outer edges for happiness
+        leftAngle = -0.12;
+        rightAngle = 0.12;
+        leftYOffset = -5;
+        rightYOffset = -5;
+        leftCurve = 0.2;
+        rightCurve = 0.2;
         break;
       case 'thinking':
-        leftAngle = 0.2;
-        rightAngle = -0.05;
+        // One raised eyebrow, one slightly lowered for thinking/questioning
+        leftAngle = 0.25; // Raised eyebrow
+        rightAngle = -0.05; // Slightly lowered
+        leftYOffset = -8; // Raised position
+        rightYOffset = 2; // Slightly lowered
+        leftCurve = -0.1; // Straighter
+        rightCurve = 0.15; // More curved
+        leftThickness = 1.1; // Slightly thicker for emphasis
         break;
       case 'surprised':
-        leftAngle = -0.15;
-        rightAngle = -0.15;
+        // Both eyebrows raised high for surprise
+        leftAngle = -0.1;
+        rightAngle = -0.1;
+        leftYOffset = -12; // Raised significantly
+        rightYOffset = -12; // Raised significantly
+        leftCurve = 0.3; // More curved
+        rightCurve = 0.3; // More curved
         break;
       default: // neutral
-        leftAngle = 0.05;
-        rightAngle = -0.05;
+        // Slightly asymmetrical for natural look
+        leftAngle = 0.04;
+        rightAngle = -0.04;
+        leftCurve = 0.1;
+        rightCurve = 0.1;
     }
+    
+    // Add subtle shadow under eyebrows
+    p.drawingContext.shadowBlur = 4;
+    p.drawingContext.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    p.drawingContext.shadowOffsetY = 2;
+    
+    // Draw eyebrows with bezier curves for more natural shape
     
     // Left eyebrow
     p.noStroke();
-    p.fill(palette.shadow[0], palette.shadow[1], palette.shadow[2], 180);
+    p.fill(palette.shadow[0] * 0.7, palette.shadow[1] * 0.7, palette.shadow[2] * 0.7, 200);
+    
     p.push();
-    p.translate(leftEye.x, eyebrowY);
+    p.translate(leftEye.x, eyebrowY + leftYOffset);
     p.rotate(leftAngle);
-    p.ellipse(0, 0, eyebrowLength, eyebrowHeight);
+    
+    // Draw with bezier curve for more natural shape
+    p.beginShape();
+    // Bottom edge
+    p.vertex(-eyebrowLength/2, 0);
+    p.bezierVertex(
+      -eyebrowLength/4, eyebrowHeight * leftCurve,
+      eyebrowLength/4, eyebrowHeight * leftCurve,
+      eyebrowLength/2, 0
+    );
+    
+    // Top edge - thinner at ends, thicker in middle
+    p.bezierVertex(
+      eyebrowLength/4, -eyebrowHeight * leftThickness,
+      -eyebrowLength/4, -eyebrowHeight * leftThickness,
+      -eyebrowLength/2, 0
+    );
+    p.endShape(p.CLOSE);
+    
+    // Add eyebrow texture - subtle hair strokes
+    p.stroke(palette.shadow[0] * 0.6, palette.shadow[1] * 0.6, palette.shadow[2] * 0.6, 100);
+    p.strokeWeight(0.8);
+    
+    const hairCount = 12;
+    for (let i = 0; i < hairCount; i++) {
+      const x = p.map(i, 0, hairCount-1, -eyebrowLength/2 + 5, eyebrowLength/2 - 5);
+      const baseY = p.map(
+        Math.abs(x), 
+        0, eyebrowLength/2, 
+        -eyebrowHeight * 0.7 * leftThickness, 
+        -eyebrowHeight * 0.2
+      );
+      
+      // Vary hair length and angle slightly
+      const length = eyebrowHeight * p.random(0.8, 1.2);
+      const angle = p.PI/2 + p.random(-0.2, 0.2);
+      
+      p.line(
+        x, baseY,
+        x + Math.cos(angle) * length,
+        baseY + Math.sin(angle) * length
+      );
+    }
+    
     p.pop();
     
     // Right eyebrow
+    p.fill(palette.shadow[0] * 0.7, palette.shadow[1] * 0.7, palette.shadow[2] * 0.7, 200);
+    
     p.push();
-    p.translate(rightEye.x, eyebrowY);
+    p.translate(rightEye.x, eyebrowY + rightYOffset);
     p.rotate(rightAngle);
-    p.ellipse(0, 0, eyebrowLength, eyebrowHeight);
+    
+    // Draw with bezier curve for more natural shape
+    p.beginShape();
+    // Bottom edge
+    p.vertex(-eyebrowLength/2, 0);
+    p.bezierVertex(
+      -eyebrowLength/4, eyebrowHeight * rightCurve,
+      eyebrowLength/4, eyebrowHeight * rightCurve,
+      eyebrowLength/2, 0
+    );
+    
+    // Top edge - thinner at ends, thicker in middle
+    p.bezierVertex(
+      eyebrowLength/4, -eyebrowHeight * rightThickness,
+      -eyebrowLength/4, -eyebrowHeight * rightThickness,
+      -eyebrowLength/2, 0
+    );
+    p.endShape(p.CLOSE);
+    
+    // Add eyebrow texture - subtle hair strokes
+    p.stroke(palette.shadow[0] * 0.6, palette.shadow[1] * 0.6, palette.shadow[2] * 0.6, 100);
+    p.strokeWeight(0.8);
+    
+    for (let i = 0; i < hairCount; i++) {
+      const x = p.map(i, 0, hairCount-1, -eyebrowLength/2 + 5, eyebrowLength/2 - 5);
+      const baseY = p.map(
+        Math.abs(x), 
+        0, eyebrowLength/2, 
+        -eyebrowHeight * 0.7 * rightThickness, 
+        -eyebrowHeight * 0.2
+      );
+      
+      // Vary hair length and angle slightly
+      const length = eyebrowHeight * p.random(0.8, 1.2);
+      const angle = p.PI/2 + p.random(-0.2, 0.2);
+      
+      p.line(
+        x, baseY,
+        x + Math.cos(angle) * length,
+        baseY + Math.sin(angle) * length
+      );
+    }
+    
     p.pop();
+    
+    // Reset shadow
+    p.drawingContext.shadowBlur = 0;
+    p.drawingContext.shadowOffsetY = 0;
     
     p.pop();
   }
   
-  // Draw realistic mouth with lips and expressions
+  // Draw highly realistic mouth with detailed lips, teeth, and expressions
   function drawRealisticMouth(mouth, color) {
     p.push();
     
@@ -696,110 +1047,281 @@ let sketch = function(p) {
     const mouthHeight = mouth.height * mouth.openAmount;
     const curveAmount = mouth.curveAmount;
     
-    // Mouth opening (dark area)
+    // Add subtle shadow around mouth
+    p.drawingContext.shadowBlur = 8;
+    p.drawingContext.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    
+    // Mouth opening (dark area) with gradient for depth
     if (mouthHeight > 2) {
-      p.fill(20, 20, 30, 150);
-      p.noStroke();
-      p.ellipse(mouth.x, mouth.y, mouthWidth * 0.8 * mouth.openAmount, mouthHeight * 0.7);
+      // Create gradient for mouth interior
+      const mouthGradient = p.drawingContext.createLinearGradient(
+        mouth.x, mouth.y - mouthHeight * 0.3,
+        mouth.x, mouth.y + mouthHeight * 0.5
+      );
+      mouthGradient.addColorStop(0, 'rgba(20, 20, 30, 0.9)');
+      mouthGradient.addColorStop(0.7, 'rgba(40, 30, 50, 0.8)');
+      mouthGradient.addColorStop(1, 'rgba(20, 10, 20, 0.9)');
       
-      // Teeth (when mouth is open enough)
+      p.drawingContext.fillStyle = mouthGradient;
+      p.noStroke();
+      
+      // More natural mouth opening shape
+      p.beginShape();
+      // Top curve
+      p.vertex(mouth.x - mouthWidth * 0.4, mouth.y - mouthHeight * 0.3);
+      p.bezierVertex(
+        mouth.x - mouthWidth * 0.2, mouth.y - mouthHeight * 0.4,
+        mouth.x + mouthWidth * 0.2, mouth.y - mouthHeight * 0.4,
+        mouth.x + mouthWidth * 0.4, mouth.y - mouthHeight * 0.3
+      );
+      
+      // Right side
+      p.bezierVertex(
+        mouth.x + mouthWidth * 0.45, mouth.y - mouthHeight * 0.1,
+        mouth.x + mouthWidth * 0.45, mouth.y + mouthHeight * 0.3,
+        mouth.x + mouthWidth * 0.4, mouth.y + mouthHeight * 0.4
+      );
+      
+      // Bottom curve
+      p.bezierVertex(
+        mouth.x + mouthWidth * 0.2, mouth.y + mouthHeight * 0.5,
+        mouth.x - mouthWidth * 0.2, mouth.y + mouthHeight * 0.5,
+        mouth.x - mouthWidth * 0.4, mouth.y + mouthHeight * 0.4
+      );
+      
+      // Left side
+      p.bezierVertex(
+        mouth.x - mouthWidth * 0.45, mouth.y + mouthHeight * 0.3,
+        mouth.x - mouthWidth * 0.45, mouth.y - mouthHeight * 0.1,
+        mouth.x - mouthWidth * 0.4, mouth.y - mouthHeight * 0.3
+      );
+      
+      p.endShape(p.CLOSE);
+      
+      // Teeth (when mouth is open enough) with improved realism
       if (mouthHeight > mouth.height * 0.3) {
-        p.fill(palette.white[0], palette.white[1], palette.white[2], 200);
+        // Upper teeth with slight curve
+        p.fill(palette.white[0], palette.white[1], palette.white[2], 220);
+        p.beginShape();
+        p.vertex(mouth.x - mouthWidth * 0.35, mouth.y - mouthHeight * 0.25);
+        p.bezierVertex(
+          mouth.x - mouthWidth * 0.2, mouth.y - mouthHeight * 0.28,
+          mouth.x + mouthWidth * 0.2, mouth.y - mouthHeight * 0.28,
+          mouth.x + mouthWidth * 0.35, mouth.y - mouthHeight * 0.25
+        );
+        p.vertex(mouth.x + mouthWidth * 0.35, mouth.y - mouthHeight * 0.05);
+        p.vertex(mouth.x - mouthWidth * 0.35, mouth.y - mouthHeight * 0.05);
+        p.endShape(p.CLOSE);
+        
+        // Add subtle shadow to bottom of upper teeth
+        p.noStroke();
+        p.fill(palette.shadow[0], palette.shadow[1], palette.shadow[2], 30);
         p.rect(
-          mouth.x - mouthWidth * 0.3, 
-          mouth.y - mouthHeight * 0.25,
-          mouthWidth * 0.6,
-          mouthHeight * 0.2,
-          4
+          mouth.x - mouthWidth * 0.35, 
+          mouth.y - mouthHeight * 0.08,
+          mouthWidth * 0.7,
+          mouthHeight * 0.03
         );
         
-        // Teeth separation lines
-        p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 30);
-        p.strokeWeight(1);
-        const teethCount = 6;
-        const teethWidth = mouthWidth * 0.6 / teethCount;
+        // Lower teeth (visible when mouth is more open)
+        if (mouthHeight > mouth.height * 0.4) {
+          p.fill(palette.white[0], palette.white[1], palette.white[2], 220);
+          p.beginShape();
+          p.vertex(mouth.x - mouthWidth * 0.35, mouth.y + mouthHeight * 0.05);
+          p.vertex(mouth.x + mouthWidth * 0.35, mouth.y + mouthHeight * 0.05);
+          p.bezierVertex(
+            mouth.x + mouthWidth * 0.2, mouth.y + mouthHeight * 0.08,
+            mouth.x - mouthWidth * 0.2, mouth.y + mouthHeight * 0.08,
+            mouth.x - mouthWidth * 0.35, mouth.y + mouthHeight * 0.05
+          );
+          p.endShape(p.CLOSE);
+        }
+        
+        // Teeth separation lines - more natural with slight variations
+        p.stroke(palette.shadow[0], palette.shadow[1], palette.shadow[2], 25);
+        p.strokeWeight(0.8);
+        const teethCount = 8; // More teeth for realism
+        const teethWidth = mouthWidth * 0.7 / teethCount;
+        
+        // Upper teeth separations
         for (let i = 1; i < teethCount; i++) {
-          const x = mouth.x - mouthWidth * 0.3 + i * teethWidth;
+          const x = mouth.x - mouthWidth * 0.35 + i * teethWidth;
+          // Add slight variation to each line
+          const heightVariation = p.random(-0.02, 0.02) * mouthHeight;
+          
           p.line(
-            x, mouth.y - mouthHeight * 0.25,
+            x, mouth.y - mouthHeight * 0.25 + heightVariation,
             x, mouth.y - mouthHeight * 0.05
           );
         }
         
-        // Tongue (visible when mouth is very open)
+        // Lower teeth separations (when visible)
+        if (mouthHeight > mouth.height * 0.4) {
+          for (let i = 1; i < teethCount; i++) {
+            const x = mouth.x - mouthWidth * 0.35 + i * teethWidth;
+            const heightVariation = p.random(-0.01, 0.01) * mouthHeight;
+            
+            p.line(
+              x, mouth.y + mouthHeight * 0.05,
+              x, mouth.y + mouthHeight * 0.08 + heightVariation
+            );
+          }
+        }
+        
+        // Tongue (visible when mouth is very open) with more realistic shape and texture
         if (mouthHeight > mouth.height * 0.5) {
-          p.noStroke();
-          p.fill(200, 100, 100, 150);
-          p.ellipse(
-            mouth.x, 
-            mouth.y + mouthHeight * 0.1,
-            mouthWidth * 0.5 * mouth.openAmount,
-            mouthHeight * 0.4
+          // Create tongue gradient for more realism
+          const tongueGradient = p.drawingContext.createRadialGradient(
+            mouth.x, mouth.y + mouthHeight * 0.2, 0,
+            mouth.x, mouth.y + mouthHeight * 0.2, mouthWidth * 0.3
           );
+          tongueGradient.addColorStop(0, 'rgba(220, 100, 100, 0.9)');
+          tongueGradient.addColorStop(0.7, 'rgba(200, 80, 80, 0.85)');
+          tongueGradient.addColorStop(1, 'rgba(180, 70, 70, 0.8)');
+          
+          p.noStroke();
+          p.drawingContext.fillStyle = tongueGradient;
+          
+          // Draw tongue with more natural shape
+          p.beginShape();
+          p.vertex(mouth.x - mouthWidth * 0.25, mouth.y + mouthHeight * 0.05);
+          p.bezierVertex(
+            mouth.x - mouthWidth * 0.2, mouth.y + mouthHeight * 0.1,
+            mouth.x - mouthWidth * 0.15, mouth.y + mouthHeight * 0.25,
+            mouth.x, mouth.y + mouthHeight * 0.3
+          );
+          p.bezierVertex(
+            mouth.x + mouthWidth * 0.15, mouth.y + mouthHeight * 0.25,
+            mouth.x + mouthWidth * 0.2, mouth.y + mouthHeight * 0.1,
+            mouth.x + mouthWidth * 0.25, mouth.y + mouthHeight * 0.05
+          );
+          p.endShape(p.CLOSE);
+          
+          // Add tongue texture - subtle center line
+          p.stroke(180, 70, 70, 40);
+          p.strokeWeight(1);
+          p.line(
+            mouth.x, mouth.y + mouthHeight * 0.05,
+            mouth.x, mouth.y + mouthHeight * 0.3
+          );
+          
+          // Add subtle tongue surface texture
+          p.noStroke();
+          p.fill(230, 120, 120, 30);
+          for (let i = 0; i < 15; i++) {
+            const tx = mouth.x + p.random(-0.2, 0.2) * mouthWidth;
+            const ty = mouth.y + mouthHeight * (0.1 + p.random(0, 0.15));
+            const tSize = p.random(2, 4);
+            p.ellipse(tx, ty, tSize, tSize * 0.7);
+          }
         }
       }
       
-      // Audio visualization as voice waves
+      // Audio visualization as voice waves - more organic and responsive
       if (audioLevel > 0.1) {
-        p.stroke(palette.accent[0], palette.accent[1], palette.accent[2], 100);
-        p.strokeWeight(1);
+        p.stroke(palette.accent[0], palette.accent[1], palette.accent[2], 80);
+        p.strokeWeight(1.2);
         p.noFill();
         
-        const waveHeight = mouthHeight * 0.3 * audioLevel;
-        const waveWidth = mouthWidth * 0.6;
+        const waveHeight = mouthHeight * 0.35 * audioLevel;
+        const waveWidth = mouthWidth * 0.65;
         
-        p.beginShape();
-        for (let i = 0; i < 20; i++) {
-          const x = mouth.x - waveWidth/2 + (waveWidth/20) * i;
-          const dataIndex = i % audioData.length;
-          const y = mouth.y + Math.sin(i * 0.5 + p.frameCount * 0.2) * waveHeight * audioData[dataIndex];
-          p.vertex(x, y);
+        // Draw multiple wave layers for more depth
+        for (let layer = 0; layer < 3; layer++) {
+          const layerOpacity = 100 - layer * 20;
+          p.stroke(palette.accent[0], palette.accent[1], palette.accent[2], layerOpacity);
+          
+          p.beginShape();
+          for (let i = 0; i < 20; i++) {
+            const x = mouth.x - waveWidth/2 + (waveWidth/20) * i;
+            const dataIndex = i % audioData.length;
+            // Add variation between layers
+            const phaseOffset = layer * 0.3;
+            const y = mouth.y + Math.sin(i * 0.5 + p.frameCount * 0.2 + phaseOffset) * 
+                      waveHeight * audioData[dataIndex] * (1 - layer * 0.2);
+            p.vertex(x, y);
+          }
+          p.endShape();
         }
-        p.endShape();
       }
     }
     
-    // Upper lip
+    // Reset shadow for lips
+    p.drawingContext.shadowBlur = 3;
+    p.drawingContext.shadowColor = 'rgba(0, 0, 0, 0.15)';
+    
+    // Upper lip with more natural shape and subtle volume
     p.noStroke();
-    p.fill(palette.shadow[0], palette.shadow[1], palette.shadow[2], 150);
+    // Slightly darker color for upper lip (shadow effect)
+    p.fill(palette.shadow[0] * 0.95, palette.shadow[1] * 0.95, palette.shadow[2] * 0.95, 180);
+    
     p.beginShape();
-    // Lip shape with cupid's bow
+    // Lip shape with more defined cupid's bow
     p.vertex(mouth.x - mouthWidth/2, mouth.y - mouthHeight/2);
-    // Left side of upper lip
+    
+    // Left side of upper lip with more volume
     p.bezierVertex(
-      mouth.x - mouthWidth/3, mouth.y - mouthHeight/2 - curveAmount * 5,
-      mouth.x - mouthWidth/6, mouth.y - mouthHeight/2 - curveAmount * 10,
+      mouth.x - mouthWidth/3, mouth.y - mouthHeight/2 - curveAmount * 6,
+      mouth.x - mouthWidth/6, mouth.y - mouthHeight/2 - curveAmount * 12,
       mouth.x - mouthWidth/10, mouth.y - mouthHeight/2
     );
-    // Center dip (cupid's bow)
+    
+    // Center dip (cupid's bow) - more pronounced
     p.bezierVertex(
-      mouth.x - mouthWidth/15, mouth.y - mouthHeight/2 + curveAmount * 5,
-      mouth.x + mouthWidth/15, mouth.y - mouthHeight/2 + curveAmount * 5,
-      mouth.x + mouthWidth/10, mouth.y - mouthHeight/2
+      mouth.x - mouthWidth/15, mouth.y - mouthHeight/2 + curveAmount * 7,
+      mouth.x, mouth.y - mouthHeight/2 + curveAmount * 8, // Deeper center dip
+      mouth.x + mouthWidth/15, mouth.y - mouthHeight/2 + curveAmount * 7
     );
-    // Right side of upper lip
+    
+    // Right side of upper lip with more volume
     p.bezierVertex(
-      mouth.x + mouthWidth/6, mouth.y - mouthHeight/2 - curveAmount * 10,
-      mouth.x + mouthWidth/3, mouth.y - mouthHeight/2 - curveAmount * 5,
+      mouth.x + mouthWidth/6, mouth.y - mouthHeight/2 - curveAmount * 12,
+      mouth.x + mouthWidth/3, mouth.y - mouthHeight/2 - curveAmount * 6,
       mouth.x + mouthWidth/2, mouth.y - mouthHeight/2
     );
-    p.endShape();
     
-    // Lower lip
-    p.fill(palette.shadow[0], palette.shadow[1], palette.shadow[2], 120);
+    // Complete the shape by adding volume to the lip
+    p.bezierVertex(
+      mouth.x + mouthWidth/3, mouth.y - mouthHeight/2 + mouthHeight * 0.15,
+      mouth.x - mouthWidth/3, mouth.y - mouthHeight/2 + mouthHeight * 0.15,
+      mouth.x - mouthWidth/2, mouth.y - mouthHeight/2
+    );
+    
+    p.endShape(p.CLOSE);
+    
+    // Lower lip - fuller and more natural
+    // Slightly lighter color for lower lip (catches more light)
+    p.fill(palette.shadow[0] * 1.05, palette.shadow[1] * 1.05, palette.shadow[2] * 1.05, 160);
+    
     p.beginShape();
+    // Start at left corner
     p.vertex(mouth.x - mouthWidth/2, mouth.y - mouthHeight/2);
-    p.bezierVertex(
-      mouth.x - mouthWidth/3, mouth.y + mouthHeight/2 + curveAmount * 15,
-      mouth.x + mouthWidth/3, mouth.y + mouthHeight/2 + curveAmount * 15,
-      mouth.x + mouthWidth/2, mouth.y - mouthHeight/2
-    );
-    p.endShape();
     
-    // Lip highlight
-    p.stroke(palette.highlight[0], palette.highlight[1], palette.highlight[2], 100);
-    p.strokeWeight(1);
+    // Full curve of lower lip
+    p.bezierVertex(
+      mouth.x - mouthWidth/3, mouth.y + mouthHeight/2 + curveAmount * 18,
+      mouth.x, mouth.y + mouthHeight/2 + curveAmount * 20, // More pronounced center
+      mouth.x + mouthWidth/3, mouth.y + mouthHeight/2 + curveAmount * 18
+    );
+    
+    // End at right corner
+    p.vertex(mouth.x + mouthWidth/2, mouth.y - mouthHeight/2);
+    
+    // Complete the shape with volume
+    p.bezierVertex(
+      mouth.x + mouthWidth/3, mouth.y - mouthHeight/2 + mouthHeight * 0.1,
+      mouth.x - mouthWidth/3, mouth.y - mouthHeight/2 + mouthHeight * 0.1,
+      mouth.x - mouthWidth/2, mouth.y - mouthHeight/2
+    );
+    
+    p.endShape(p.CLOSE);
+    
+    // Lip highlights for dimension - upper lip
     p.noFill();
+    p.stroke(palette.highlight[0], palette.highlight[1], palette.highlight[2], 120);
+    p.strokeWeight(1);
+    p.drawingContext.filter = 'blur(1px)';
+    
     p.beginShape();
     p.vertex(mouth.x - mouthWidth/3, mouth.y - mouthHeight/2 + 2);
     p.bezierVertex(
@@ -808,6 +1330,41 @@ let sketch = function(p) {
       mouth.x + mouthWidth/3, mouth.y - mouthHeight/2 + 2
     );
     p.endShape();
+    
+    // Lower lip highlight - more subtle
+    p.stroke(palette.highlight[0], palette.highlight[1], palette.highlight[2], 150);
+    p.beginShape();
+    p.vertex(mouth.x - mouthWidth/4, mouth.y + mouthHeight/4);
+    p.bezierVertex(
+      mouth.x - mouthWidth/8, mouth.y + mouthHeight/3 + curveAmount * 5,
+      mouth.x + mouthWidth/8, mouth.y + mouthHeight/3 + curveAmount * 5,
+      mouth.x + mouthWidth/4, mouth.y + mouthHeight/4
+    );
+    p.endShape();
+    
+    // Reset filters
+    p.drawingContext.filter = 'none';
+    p.drawingContext.shadowBlur = 0;
+    
+    // Add subtle lip corners - where upper and lower lips meet
+    p.noStroke();
+    p.fill(palette.shadow[0] * 0.9, palette.shadow[1] * 0.9, palette.shadow[2] * 0.9, 100);
+    
+    // Left corner
+    p.ellipse(
+      mouth.x - mouthWidth/2, 
+      mouth.y - mouthHeight/2,
+      mouthWidth * 0.06,
+      mouthHeight * 0.15
+    );
+    
+    // Right corner
+    p.ellipse(
+      mouth.x + mouthWidth/2, 
+      mouth.y - mouthHeight/2,
+      mouthWidth * 0.06,
+      mouthHeight * 0.15
+    );
     
     p.pop();
   }
