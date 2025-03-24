@@ -373,6 +373,9 @@ let sketch = function(p) {
     // Update robot face parameters
     updateRobotFace();
     
+    // Draw robot face (this was missing!)
+    drawRobotFace();
+    
     // Gradually increase face opacity for fade-in effect
     if (faceOpacity < 255) {
       faceOpacity += 2;
@@ -445,7 +448,10 @@ let sketch = function(p) {
       let particle = faceParticles[i];
       
       // Calculate direction to target
-      const direction = p5.Vector.sub(particle.target, particle.pos);
+      const direction = p.createVector(
+        particle.target.x - particle.pos.x,
+        particle.target.y - particle.pos.y
+      );
       
       // If particle is far from target, move towards it
       if (direction.mag() > 5 && !particle.arrived) {
