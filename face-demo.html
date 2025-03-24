@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HAL 9000 Interface - Kubrick Style</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <title>Realistic AI Face Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
   <style>
     body {
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #000;
-      font-family: 'Space Mono', monospace;
+      background-color: #0f0f14;
+      font-family: 'Roboto', sans-serif;
       color: white;
-      perspective: 1000px;
     }
     
     .controls {
@@ -24,11 +23,13 @@
       transform: translateX(-50%);
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      gap: 15px;
       z-index: 100;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 25px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(15, 15, 20, 0.8);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
       width: 500px;
       max-width: 90vw;
     }
@@ -41,23 +42,23 @@
     }
     
     button {
-      background: rgba(220, 20, 60, 0.9);
+      background: rgba(70, 130, 180, 0.2);
       color: white;
-      border: none;
-      padding: 15px 20px;
+      border: 1px solid rgba(70, 130, 180, 0.5);
+      border-radius: 8px;
+      padding: 12px 20px;
       cursor: pointer;
-      font-family: 'Space Mono', monospace;
-      font-weight: bold;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
       flex: 1;
     }
     
     button:hover {
-      background: rgba(255, 40, 80, 1);
-      box-shadow: 0 0 20px rgba(255, 40, 80, 0.5);
+      background: rgba(70, 130, 180, 0.4);
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(70, 130, 180, 0.3);
     }
     
     .slider-container {
@@ -70,35 +71,37 @@
     .slider-container label {
       margin-bottom: 10px;
       font-size: 14px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      letter-spacing: 1px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     
     .slider-value {
-      background: rgba(0, 149, 237, 0.8);
+      background: rgba(70, 130, 180, 0.2);
       padding: 2px 8px;
       min-width: 30px;
       text-align: center;
+      border-radius: 4px;
     }
     
     input[type="range"] {
       width: 100%;
       height: 6px;
       -webkit-appearance: none;
-      background: linear-gradient(to right, rgba(0, 149, 237, 0.8) 0%, rgba(0, 149, 237, 0.8) 20%, rgba(30, 30, 30, 0.8) 20%);
+      background: linear-gradient(to right, rgba(70, 130, 180, 0.8) 0%, rgba(70, 130, 180, 0.8) 20%, rgba(30, 30, 40, 0.3) 20%);
+      border-radius: 3px;
       outline: none;
     }
     
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       background: white;
       cursor: pointer;
-      border: 2px solid rgba(0, 149, 237, 0.8);
+      border-radius: 50%;
+      border: 2px solid rgba(70, 130, 180, 0.8);
     }
     
     h1 {
@@ -107,118 +110,102 @@
       left: 0;
       right: 0;
       text-align: center;
-      font-size: 28px;
+      font-size: 24px;
+      font-weight: 300;
       z-index: 100;
       margin: 0;
       padding: 0;
-      letter-spacing: 6px;
-      text-transform: uppercase;
+      letter-spacing: 3px;
     }
     
     h1::after {
       content: '';
       display: block;
-      width: 100px;
+      width: 60px;
       height: 2px;
-      background-color: rgba(220, 20, 60, 1);
-      margin: 15px auto 0;
+      background-color: rgba(70, 130, 180, 0.8);
+      margin: 10px auto 0;
     }
     
-    .kubrick-info {
+    .info-panel {
       position: fixed;
       top: 100px;
       left: 30px;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(15, 15, 20, 0.7);
       padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      border: 1px solid rgba(70, 130, 180, 0.3);
       max-width: 300px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.6;
       z-index: 100;
+      backdrop-filter: blur(8px);
     }
     
-    .kubrick-info h2 {
+    .info-panel h2 {
       margin-top: 0;
       font-size: 16px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(220, 20, 60, 1);
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: rgba(70, 130, 180, 1);
     }
     
-    .kubrick-info ul {
+    .info-panel ul {
       padding-left: 20px;
       margin-bottom: 0;
     }
     
-    .kubrick-info li {
+    .info-panel li {
       margin-bottom: 8px;
+      opacity: 0.9;
     }
     
-    /* Scan line effect - Kubrick CRT monitor style */
-    body::after {
-      content: '';
+    /* Subtle ambient glow effect */
+    .ambient-glow {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        transparent 100%
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(70, 130, 180, 0.05) 0%,
+        transparent 70%
       );
-      background-size: 100% 4px;
       pointer-events: none;
-      z-index: 101;
-    }
-    
-    /* Time code display - Kubrick's attention to detail */
-    .timecode {
-      position: fixed;
-      top: 30px;
-      right: 30px;
-      font-family: 'Space Mono', monospace;
-      font-size: 14px;
-      letter-spacing: 2px;
-      color: rgba(0, 149, 237, 0.8);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 10px 15px;
-      border: 1px solid rgba(0, 149, 237, 0.4);
-      z-index: 100;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
-  <h1>HAL 9000 Interface</h1>
+  <div class="ambient-glow"></div>
+  <h1>Realistic AI Face Demo</h1>
   
-  <div class="kubrick-info">
-    <h2>Kubrick Design Elements</h2>
+  <div class="info-panel">
+    <h2>Realistic Design Elements</h2>
     <ul>
-      <li>Perfect symmetry and one-point perspective</li>
-      <li>Stark lighting contrasts with red HAL 9000 eye</li>
-      <li>Mechanical, deliberate movements</li>
-      <li>Computer terminal display for "mouth"</li>
-      <li>Precise geometric shapes and clinical precision</li>
-      <li>CRT monitor scan lines and technical readouts</li>
+      <li>Detailed facial structure with subtle contours</li>
+      <li>Realistic eyes with iris detail and reflections</li>
+      <li>Natural blinking and eye movement patterns</li>
+      <li>Expressive eyebrows that respond to emotions</li>
+      <li>Detailed mouth with lips, teeth and tongue</li>
+      <li>Audio-reactive expressions and movements</li>
     </ul>
   </div>
   
-  <div class="timecode" id="timecode">TC: 0000</div>
-  
   <div class="controls">
     <div class="control-group">
-      <button id="happy-btn">Operational</button>
-      <button id="thinking-btn">Processing</button>
+      <button id="happy-btn">Happy</button>
+      <button id="thinking-btn">Thinking</button>
     </div>
     <div class="control-group">
-      <button id="surprised-btn">Alert</button>
-      <button id="neutral-btn">Standby</button>
+      <button id="surprised-btn">Surprised</button>
+      <button id="neutral-btn">Neutral</button>
     </div>
     
     <div class="slider-container">
       <label>
-        Audio Input Level
+        Voice Level
         <span class="slider-value" id="audio-value">20%</span>
       </label>
       <input type="range" id="audio-level" min="0" max="1" step="0.01" value="0.2">
@@ -231,7 +218,7 @@
     window.updateRobotAudioLevel = null;
     
     document.addEventListener('DOMContentLoaded', () => {
-      // Set up button event listeners with Kubrick-inspired system states
+      // Set up button event listeners
       document.getElementById('happy-btn').addEventListener('click', () => {
         if (window.setRobotExpression) {
           window.setRobotExpression('happy');
@@ -256,7 +243,7 @@
         }
       });
       
-      // Set up audio level slider with Kubrick-inspired precision
+      // Set up audio level slider
       const audioLevelSlider = document.getElementById('audio-level');
       const audioValue = document.getElementById('audio-value');
       
@@ -266,22 +253,22 @@
           window.updateRobotAudioLevel(value);
         }
         
-        // Update slider appearance with precise percentage
+        // Update slider appearance with percentage
         const percent = Math.floor(value * 100);
         audioValue.textContent = `${percent}%`;
         audioLevelSlider.style.background = `linear-gradient(to right, 
-          rgba(0, 149, 237, 0.8) 0%, 
-          rgba(0, 149, 237, 0.8) ${percent}%, 
-          rgba(30, 30, 30, 0.8) ${percent}%
+          rgba(70, 130, 180, 0.8) 0%, 
+          rgba(70, 130, 180, 0.8) ${percent}%, 
+          rgba(30, 30, 40, 0.3) ${percent}%
         )`;
       });
       
-      // Simulate audio input with a sine wave - Kubrick's methodical pacing
+      // Simulate natural audio input with a sine wave
       let time = 0;
       function simulateAudio() {
-        time += 0.03; // Slower, more deliberate pace
+        time += 0.05; // Natural pace
         const baseValue = parseFloat(audioLevelSlider.value);
-        const oscillation = (Math.sin(time) + 1) / 2 * 0.2; // Subtle variation
+        const oscillation = (Math.sin(time) + 1) / 2 * 0.15; // Subtle natural variation
         const value = baseValue + oscillation;
         
         if (window.updateRobotAudioLevel) {
@@ -291,21 +278,36 @@
         requestAnimationFrame(simulateAudio);
       }
       
-      // Update timecode - Kubrick's attention to detail
-      const timecodeElement = document.getElementById('timecode');
-      let frameCount = 0;
-      
-      function updateTimecode() {
-        frameCount++;
-        const timeCode = Math.floor(frameCount / 60).toString().padStart(4, '0');
-        timecodeElement.textContent = `TC: ${timeCode}`;
-        requestAnimationFrame(updateTimecode);
+      // Create ambient background animation
+      function animateBackground() {
+        const glow = document.querySelector('.ambient-glow');
+        let glowTime = 0;
+        
+        function updateGlow() {
+          glowTime += 0.005;
+          const intensity = 0.05 + Math.sin(glowTime) * 0.02;
+          glow.style.background = `radial-gradient(
+            circle at 50% 50%,
+            rgba(70, 130, 180, ${intensity}) 0%,
+            transparent 70%
+          )`;
+          requestAnimationFrame(updateGlow);
+        }
+        
+        updateGlow();
       }
       
       // Start simulations after a short delay
       setTimeout(() => {
         simulateAudio();
-        updateTimecode();
+        animateBackground();
+        
+        // Start with a random expression
+        const expressions = ['happy', 'thinking', 'surprised', 'neutral'];
+        const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+        if (window.setRobotExpression) {
+          window.setRobotExpression(randomExpression);
+        }
       }, 1000);
     });
   </script>
