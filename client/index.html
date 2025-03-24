@@ -9,25 +9,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
   <style>
-    /* Kubrick-inspired color palette */
+    /* Kubrick-inspired color palette - enhanced for more authentic feel */
     :root {
-      --primary-color: rgba(220, 20, 60, 0.9); /* Crimson red */
-      --primary-hover: rgba(240, 40, 80, 0.95);
-      --secondary-color: rgba(0, 0, 0, 0.9); /* Deep black */
-      --tertiary-color: rgba(240, 240, 240, 0.95); /* Stark white */
-      --accent-color: rgba(0, 149, 237, 0.9); /* HAL 9000 blue */
-      --text-color: rgba(240, 240, 240, 0.95);
-      --success-color: rgba(16, 185, 129, 0.8);
-      --error-color: rgba(220, 20, 60, 0.9);
-      --info-color: rgba(0, 149, 237, 0.9);
-      --mood-color: rgba(220, 20, 60, 0.8);
-      --emotion-color: rgba(0, 149, 237, 0.8);
-      --voice-color: rgba(240, 240, 240, 0.8);
-      --transition-speed: 0.5s;
+      --primary-color: rgba(255, 0, 0, 1); /* Pure HAL 9000 red */
+      --primary-hover: rgba(255, 40, 40, 1);
+      --secondary-color: rgba(0, 0, 0, 1); /* Absolute black */
+      --tertiary-color: rgba(255, 255, 255, 1); /* Pure white */
+      --accent-color: rgba(0, 149, 237, 1); /* HAL 9000 blue */
+      --text-color: rgba(255, 255, 255, 1);
+      --success-color: rgba(0, 255, 0, 1); /* Pure green for computer displays */
+      --error-color: rgba(255, 0, 0, 1);
+      --info-color: rgba(0, 149, 237, 1);
+      --mood-color: rgba(255, 0, 0, 1);
+      --emotion-color: rgba(0, 149, 237, 1);
+      --voice-color: rgba(255, 255, 255, 1);
+      --transition-speed: 1s; /* Slower, more deliberate transitions */
       --border-width: 2px;
-      --border-radius: 0px; /* Sharp corners for geometric feel */
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      --monolith-black: rgba(0, 0, 0, 0.95);
+      --border-radius: 0px; /* Perfectly sharp corners */
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      --monolith-black: rgba(0, 0, 0, 1);
     }
     
     * {
@@ -63,31 +63,52 @@
     
     .container {
       text-align: center;
-      padding: 3rem;
+      padding: 4rem 3rem;
       background-color: var(--secondary-color);
       backdrop-filter: none;
-      border-radius: 0; /* Sharp corners for Kubrick's geometric style */
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      max-width: 600px;
+      border-radius: 0; /* Perfect sharp corners */
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+      max-width: 800px; /* Wider container for more dramatic symmetry */
       width: 90%;
       max-height: 90vh;
-      transition: all var(--transition-speed) cubic-bezier(0.23, 1, 0.32, 1); /* Slow, deliberate transitions */
-      border: 2px solid var(--primary-color);
+      transition: all var(--transition-speed) cubic-bezier(0.1, 0.7, 0.1, 1); /* Even slower, more deliberate transitions */
+      border: 3px solid var(--primary-color); /* Thicker border */
       position: relative;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: thin;
       scrollbar-color: var(--primary-color) var(--secondary-color);
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 30px;
+      grid-template-columns: 1fr 1fr; /* Perfect symmetry */
+      grid-gap: 40px; /* More dramatic spacing */
       align-items: start;
-      transform: translateZ(0); /* Subtle 3D effect */
+      transform: perspective(1500px) translateZ(0); /* Enhanced 3D effect */
     }
     
-    /* One-point perspective effect on hover */
+    /* One-point perspective effect on hover - more dramatic */
     .container:hover {
-      transform: rotateX(2deg) translateZ(10px);
+      transform: perspective(1500px) rotateX(3deg) translateZ(20px);
+    }
+    
+    /* Add corridor-like lines to container */
+    .container::before,
+    .container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: var(--primary-color);
+      z-index: 1;
+      transition: all var(--transition-speed) cubic-bezier(0.1, 0.7, 0.1, 1);
+    }
+    
+    .container::before {
+      left: 0;
+    }
+    
+    .container::after {
+      right: 0;
     }
     
     .container h1,
@@ -146,15 +167,16 @@
       margin-right: auto;
     }
     
-    /* HAL 9000 inspired start button */
+    /* HAL 9000 inspired start button - more authentic */
     .btn-container {
       position: relative;
-      width: 150px;
-      height: 150px;
-      margin: 0 auto 3rem;
-      perspective: 500px;
+      width: 180px; /* Larger button */
+      height: 180px;
+      margin: 0 auto 4rem;
+      perspective: 800px;
     }
     
+    /* Multiple concentric rings for HAL 9000 lens housing */
     .btn-ring {
       position: absolute;
       top: 0;
@@ -162,47 +184,74 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 3px solid var(--tertiary-color);
-      opacity: 0.8;
-      box-shadow: 0 0 30px rgba(240, 240, 240, 0.3);
+      border: 4px solid var(--tertiary-color); /* Thicker border */
+      opacity: 0.9;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
     }
     
     .btn-ring::before {
       content: '';
       position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
+      top: -15px;
+      left: -15px;
+      right: -15px;
+      bottom: -15px;
       border-radius: 50%;
-      border: 2px solid var(--tertiary-color);
-      opacity: 0.2;
+      border: 3px solid var(--tertiary-color);
+      opacity: 0.3;
     }
     
     .btn-ring::after {
       content: '';
       position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      bottom: 15px;
+      border-radius: 50%;
+      border: 3px solid var(--tertiary-color);
+      opacity: 0.5;
+    }
+    
+    /* Add more rings to create the HAL 9000 housing */
+    .btn-container::before {
+      content: '';
+      position: absolute;
+      top: -25px;
+      left: -25px;
+      right: -25px;
+      bottom: -25px;
       border-radius: 50%;
       border: 2px solid var(--tertiary-color);
-      opacity: 0.4;
+      opacity: 0.2;
+      z-index: 0;
+    }
+    
+    .btn-container::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      right: -40px;
+      bottom: -40px;
+      border-radius: 50%;
+      border: 1px solid var(--tertiary-color);
+      opacity: 0.1;
+      z-index: 0;
     }
     
     #start-btn {
       position: absolute;
-      top: 15px;
-      left: 15px;
-      width: calc(100% - 30px);
-      height: calc(100% - 30px);
-      background: radial-gradient(circle, rgba(220, 20, 60, 0.9) 0%, rgba(180, 0, 30, 0.95) 70%, rgba(120, 0, 20, 1) 100%);
+      top: 20px;
+      left: 20px;
+      width: calc(100% - 40px);
+      height: calc(100% - 40px);
+      background: radial-gradient(circle, rgba(255, 0, 0, 1) 0%, rgba(200, 0, 0, 1) 70%, rgba(150, 0, 0, 1) 100%); /* Pure red for HAL */
       color: var(--tertiary-color);
       border: none;
       border-radius: 50%;
       cursor: pointer;
-      transition: all var(--transition-speed) cubic-bezier(0.23, 1, 0.32, 1);
+      transition: all var(--transition-speed) cubic-bezier(0.1, 0.7, 0.1, 1); /* Slower transition */
       z-index: 1;
       display: flex;
       align-items: center;
@@ -211,41 +260,49 @@
       font-family: 'Space Mono', monospace;
       font-size: 1.2rem;
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       text-transform: uppercase;
       box-shadow: 
-        0 0 30px rgba(220, 20, 60, 0.5),
-        inset 0 0 20px rgba(0, 0, 0, 0.5);
+        0 0 50px rgba(255, 0, 0, 0.7),
+        inset 0 0 30px rgba(0, 0, 0, 0.7);
     }
     
+    /* HAL's "eye" effect */
     #start-btn::before {
+      content: '';
+      position: absolute;
+      width: 70%;
+      height: 70%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 0, 0, 0.7) 40%, rgba(150, 0, 0, 0.5) 70%, transparent 100%);
+      border-radius: 50%;
+      opacity: 0.7;
+      z-index: 2;
+    }
+    
+    /* Text overlay */
+    #start-btn::after {
       content: 'OPEN';
       position: absolute;
       color: var(--tertiary-color);
-      z-index: 2;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-    
-    #start-btn::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-      opacity: 0.5;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+      z-index: 3;
+      opacity: 0.9;
     }
     
     #start-btn:hover {
-      background: radial-gradient(circle, rgba(240, 40, 80, 0.95) 0%, rgba(200, 20, 50, 0.95) 70%, rgba(140, 10, 30, 1) 100%);
+      background: radial-gradient(circle, rgba(255, 30, 30, 1) 0%, rgba(220, 0, 0, 1) 70%, rgba(170, 0, 0, 1) 100%);
       box-shadow: 
-        0 0 40px rgba(220, 20, 60, 0.7),
-        inset 0 0 25px rgba(0, 0, 0, 0.5);
-      transform: scale(1.05) translateZ(10px);
+        0 0 60px rgba(255, 0, 0, 0.9),
+        inset 0 0 40px rgba(0, 0, 0, 0.7);
+      transform: scale(1.05) translateZ(20px);
     }
     
-    #start-btn:hover::before {
+    #start-btn:hover::after {
       content: 'OPEN';
-      animation: pulse-text 2s infinite;
+      animation: pulse-text 3s infinite; /* Slower pulse */
     }
     
     @keyframes pulse-text {
@@ -399,22 +456,44 @@
         inset 0 0 15px rgba(0, 0, 0, 0.7);
     }
     
-    /* Selectors (Voice, Mood, Emotion) - Kubrick style */
+    /* Selectors (Voice, Mood, Emotion) - Enhanced Kubrick style */
     .selector {
       margin-top: 0;
       position: relative;
       width: 100%;
-      padding: 20px;
+      padding: 30px; /* More padding for dramatic spacing */
       background: var(--secondary-color);
-      border-radius: 0; /* Sharp corners */
-      border: 2px solid var(--primary-color);
-      transition: all var(--transition-speed) cubic-bezier(0.23, 1, 0.32, 1); /* Slow, deliberate transitions */
+      border-radius: 0; /* Perfect sharp corners */
+      border: 3px solid var(--primary-color); /* Thicker border */
+      transition: all var(--transition-speed) cubic-bezier(0.1, 0.7, 0.1, 1); /* Even slower transitions */
+      transform-style: preserve-3d; /* For 3D effects */
     }
     
+    /* One-point perspective effect on hover */
     .selector:hover {
-      background: rgba(10, 10, 10, 0.95);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      background: rgba(5, 5, 5, 1);
+      transform: translateY(-5px) perspective(800px) rotateX(2deg);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Add horizontal lines to selectors for Kubrick's symmetrical style */
+    .selector::before,
+    .selector::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--primary-color);
+      opacity: 0.5;
+    }
+    
+    .selector::before {
+      top: 10px;
+    }
+    
+    .selector::after {
+      bottom: 10px;
     }
     
     .selector label {
@@ -556,48 +635,96 @@
       font-weight: 500;
     }
     
-    /* Voice controls - Kubrick style */
+    /* Voice controls - Enhanced Kubrick style */
     .voice-controls {
-      margin-top: 40px;
+      margin-top: 60px; /* More spacing */
       position: relative;
       width: 100%;
       grid-column: 1 / -1;
       background: var(--monolith-black);
-      border-radius: 0; /* Sharp corners */
-      border: 2px solid var(--accent-color);
-      padding: 30px;
+      border-radius: 0; /* Perfect sharp corners */
+      border: 3px solid var(--accent-color); /* Thicker border */
+      padding: 40px; /* More padding */
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-gap: 25px;
+      grid-gap: 30px; /* More spacing between controls */
+      transform-style: preserve-3d; /* For 3D effects */
+      transform: perspective(1500px) translateZ(0);
+      transition: all var(--transition-speed) cubic-bezier(0.1, 0.7, 0.1, 1);
     }
     
+    /* One-point perspective effect on hover */
+    .voice-controls:hover {
+      transform: perspective(1500px) rotateX(2deg) translateZ(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    }
+    
+    /* Add horizontal lines for Kubrick's symmetrical style */
     .voice-controls::before {
-      content: 'SYSTEM PARAMETERS';
+      content: 'HAL 9000 PARAMETERS';
       position: absolute;
-      top: -12px;
-      left: 30px;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
       background: var(--secondary-color);
-      padding: 0 15px;
-      font-size: 0.9rem;
+      padding: 0 20px;
+      font-size: 1rem;
       font-weight: 700;
       color: var(--accent-color);
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(0, 149, 237, 0.5);
+    }
+    
+    /* Add vertical lines for Kubrick's symmetrical style */
+    .voice-controls::after {
+      content: '';
+      position: absolute;
+      top: 40px;
+      bottom: 40px;
+      left: 50%;
+      width: 1px;
+      background-color: var(--accent-color);
+      opacity: 0.3;
+      transform: translateX(-50%);
     }
     
     .slider-control {
       margin-bottom: 0;
       background: var(--secondary-color);
-      border-radius: 0; /* Sharp corners */
-      padding: 20px;
-      border: 2px solid var(--accent-color);
-      transition: all var(--transition-speed) cubic-bezier(0.23, 1, 0.32, 1);
+      border-radius: 0; /* Perfect sharp corners */
+      padding: 25px; /* More padding */
+      border: 3px solid var(--accent-color); /* Thicker border */
+      transition: all var(--transition-speed) cubic-bezier(0.1, 0.7, 0.1, 1);
+      position: relative;
+      transform-style: preserve-3d;
     }
     
+    /* One-point perspective effect on hover */
     .slider-control:hover {
-      background: rgba(5, 5, 5, 0.95);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      background: rgba(5, 5, 5, 1);
+      transform: translateY(-5px) perspective(800px) rotateX(2deg);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Add horizontal lines to sliders for Kubrick's symmetrical style */
+    .slider-control::before,
+    .slider-control::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--accent-color);
+      opacity: 0.3;
+    }
+    
+    .slider-control::before {
+      top: 10px;
+    }
+    
+    .slider-control::after {
+      bottom: 10px;
     }
     
     .slider-control label {
