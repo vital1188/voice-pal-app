@@ -1,19 +1,19 @@
 // Kubrick-inspired AI Interface using p5.js
 
 let sketch = function(p) {
-  // Color palette - The Shining inspired colors
+  // Color palette - 2001: A Space Odyssey inspired colors
   const palette = {
     black: [0, 0, 0],
     white: [240, 240, 240],
     red: [220, 20, 60],
     blue: [0, 149, 237],
     gold: [212, 175, 55],
-    // The Shining specific colors
-    carpetRed: [153, 0, 0],
-    carpetOrange: [204, 85, 0],
-    carpetBrown: [102, 51, 0],
-    corridorBeige: [245, 222, 179],
-    elevatorRed: [180, 0, 0]
+    // 2001: A Space Odyssey specific colors
+    halRed: [255, 30, 30],
+    spacecraftWhite: [230, 230, 230],
+    computerBlue: [70, 130, 180],
+    spaceBlack: [5, 5, 15],
+    starlight: [255, 255, 220]
   };
   
   // Robot face parameters
@@ -254,37 +254,31 @@ let sketch = function(p) {
   }
   
   function drawGrid() {
-    // Draw The Shining inspired corridor
+    // Draw 2001: A Space Odyssey inspired environment
     
-    // First draw the basic one-point perspective grid for the corridor walls
-    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 30);
+    // First draw the basic one-point perspective grid for the spacecraft interior
+    p.stroke(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], 30);
     p.strokeWeight(1);
     
-    // Draw corridor walls
+    // Draw clean, geometric grid lines
     for (let i = 0; i < grid.length; i++) {
       const line = grid[i];
       p.line(line.x1, line.y1, line.x2, line.y2);
     }
     
-    // Draw The Shining carpet pattern - hexagonal pattern with alternating colors
-    const hexSize = 40; // Size of each hexagon
-    const hexHeight = hexSize * Math.sqrt(3);
-    const rows = Math.ceil(p.height / hexHeight) + 1;
-    const cols = Math.ceil(p.width / (hexSize * 1.5)) + 1;
+    // Draw the iconic white panels with geometric patterns from the spacecraft
+    const panelSize = 80; // Size of each panel
+    const rows = Math.ceil(p.height / panelSize) + 1;
+    const cols = Math.ceil(p.width / panelSize) + 1;
     
     // Calculate perspective scaling factor based on distance from vanishing point
     const vanishingPoint = { x: p.width / 2, y: p.height / 2 };
     
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        // Calculate base position of hexagon
-        let x = col * hexSize * 1.5;
-        let y = row * hexHeight;
-        
-        // Offset every other row
-        if (row % 2 === 1) {
-          x += hexSize * 0.75;
-        }
+        // Calculate base position of panel
+        let x = col * panelSize;
+        let y = row * panelSize;
         
         // Calculate distance from vanishing point
         const distX = x - vanishingPoint.x;
@@ -293,137 +287,185 @@ let sketch = function(p) {
         
         // Scale size based on distance (perspective effect)
         const perspectiveScale = p.map(dist, 0, p.width, 0.2, 1);
-        const scaledSize = hexSize * perspectiveScale;
+        const scaledSize = panelSize * perspectiveScale;
         
         // Calculate position with perspective (closer to vanishing point)
         const perspectiveX = vanishingPoint.x + distX * perspectiveScale;
         const perspectiveY = vanishingPoint.y + distY * perspectiveScale;
         
-        // Choose color based on pattern (alternating colors like The Shining carpet)
-        let fillColor;
-        if ((row + col) % 3 === 0) {
-          fillColor = palette.carpetRed;
-        } else if ((row + col) % 3 === 1) {
-          fillColor = palette.carpetOrange;
-        } else {
-          fillColor = palette.carpetBrown;
-        }
-        
-        // Draw hexagon
+        // Draw panel
         p.push();
         p.translate(perspectiveX, perspectiveY);
+        
+        // Panel background
         p.noStroke();
-        p.fill(fillColor[0], fillColor[1], fillColor[2], 15); // Low opacity to blend with background
-        p.beginShape();
-        for (let i = 0; i < 6; i++) {
-          const angle = i * Math.PI / 3;
-          const hx = scaledSize * Math.cos(angle);
-          const hy = scaledSize * Math.sin(angle);
-          p.vertex(hx, hy);
+        p.fill(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], 10);
+        p.rect(-scaledSize/2, -scaledSize/2, scaledSize, scaledSize);
+        
+        // Panel border
+        p.noFill();
+        p.stroke(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], 20);
+        p.strokeWeight(1);
+        p.rect(-scaledSize/2, -scaledSize/2, scaledSize, scaledSize);
+        
+        // Add geometric details to some panels (like the light panels in the spacecraft)
+        if ((row + col) % 4 === 0) {
+          // Light panel
+          p.noStroke();
+          p.fill(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], 15);
+          p.rect(-scaledSize/3, -scaledSize/3, scaledSize*2/3, scaledSize*2/3);
+          
+          // Add subtle glow effect
+          const glowIntensity = (Math.sin(time * 0.5 + row * 0.2 + col * 0.3) + 1) / 2 * 10 + 5;
+          p.fill(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], glowIntensity);
+          p.rect(-scaledSize/4, -scaledSize/4, scaledSize/2, scaledSize/2);
+        } else if ((row + col) % 4 === 1) {
+          // Computer panel with HAL-like details
+          p.stroke(palette.computerBlue[0], palette.computerBlue[1], palette.computerBlue[2], 20);
+          p.strokeWeight(0.5);
+          
+          // Draw computer lines
+          for (let i = 0; i < 3; i++) {
+            const lineY = -scaledSize/3 + (i * scaledSize/3);
+            p.line(-scaledSize/3, lineY, scaledSize/3, lineY);
+          }
+          
+          // Add a small HAL-like red dot
+          if (Math.random() < 0.3) {
+            p.fill(palette.halRed[0], palette.halRed[1], palette.halRed[2], 30);
+            p.noStroke();
+            p.ellipse(0, 0, scaledSize/10);
+          }
         }
-        p.endShape(p.CLOSE);
+        
         p.pop();
       }
     }
     
-    // Add door frames along the corridor for The Shining effect
-    const doorCount = 5;
-    const doorSpacing = p.width / (doorCount + 1);
-    const doorHeight = p.height * 0.4;
-    const doorWidth = p.width * 0.1;
+    // Add circular windows/portals like in the spacecraft
+    const portalCount = 3;
+    const portalSpacing = p.width / (portalCount + 1);
+    const portalRadius = p.width * 0.08;
     
-    for (let i = 1; i <= doorCount; i++) {
-      const x = i * doorSpacing;
+    for (let i = 1; i <= portalCount; i++) {
+      const x = i * portalSpacing;
       const distFromCenter = Math.abs(x - p.width / 2);
-      const perspectiveScale = p.map(distFromCenter, 0, p.width / 2, 0.5, 1);
+      const perspectiveScale = p.map(distFromCenter, 0, p.width / 2, 0.7, 1);
       
-      // Draw door frame
+      // Draw portal frame
       p.noFill();
-      p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 40);
-      p.strokeWeight(2);
-      p.rect(x - doorWidth * perspectiveScale / 2, 
-             p.height / 2 - doorHeight * perspectiveScale / 2,
-             doorWidth * perspectiveScale, 
-             doorHeight * perspectiveScale);
+      p.stroke(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], 40);
+      p.strokeWeight(3);
+      p.ellipse(x, p.height / 2, portalRadius * 2 * perspectiveScale);
+      
+      // Draw inner portal frame
+      p.stroke(palette.spacecraftWhite[0], palette.spacecraftWhite[1], palette.spacecraftWhite[2], 30);
+      p.strokeWeight(1);
+      p.ellipse(x, p.height / 2, portalRadius * 1.8 * perspectiveScale);
+      
+      // Draw space through the portal
+      p.fill(palette.spaceBlack[0], palette.spaceBlack[1], palette.spaceBlack[2], 40);
+      p.noStroke();
+      p.ellipse(x, p.height / 2, portalRadius * 1.7 * perspectiveScale);
+      
+      // Add a few stars in the portal
+      for (let j = 0; j < 5; j++) {
+        const starAngle = Math.random() * Math.PI * 2;
+        const starDist = Math.random() * portalRadius * 0.7 * perspectiveScale;
+        const starX = x + Math.cos(starAngle) * starDist;
+        const starY = p.height / 2 + Math.sin(starAngle) * starDist;
+        
+        p.fill(palette.starlight[0], palette.starlight[1], palette.starlight[2], 
+               100 + Math.sin(time * 2 + j) * 50);
+        p.ellipse(starX, starY, 1 + Math.random());
+      }
     }
   }
   
   function drawMonolith() {
-    // Draw The Shining elevator doors with blood effect
+    // Draw 2001: A Space Odyssey iconic monolith
     p.push();
     
     // Position in center of screen
     p.translate(p.width / 2, p.height / 2);
     
-    // Calculate door width and height
-    const doorWidth = p.width * 0.3;
-    const doorHeight = p.height * 0.5;
-    const doorX = -doorWidth / 2;
-    const doorY = -doorHeight / 2;
+    // Calculate monolith dimensions using the golden ratio (1:4:9)
+    const monolithWidth = p.width * 0.08;
+    const monolithHeight = monolithWidth * 4;
+    const monolithDepth = monolithWidth / 9;
     
-    // Draw elevator door frame
-    p.noFill();
-    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 100);
-    p.strokeWeight(3);
-    p.rect(doorX - 10, doorY - 10, doorWidth + 20, doorHeight + 20);
+    // Since we're not in WEBGL mode, simulate rotation by adjusting width
+    const rotationAmount = Math.sin(time * 0.1) * 0.2;
+    const adjustedWidth = monolithWidth * (1 + Math.abs(rotationAmount));
     
-    // Calculate door opening based on time
-    const doorOpenAmount = (Math.sin(time * 0.2) + 1) / 2 * 0.2; // 0-0.2 range
+    // Draw monolith with perfect black
+    p.fill(0, 0, 0);
+    p.noStroke();
+    p.rect(-adjustedWidth / 2, -monolithHeight / 2, adjustedWidth, monolithHeight);
     
-    // Left door
-    p.fill(20);
-    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 70);
+    // Add subtle edge highlight
+    p.stroke(255, 255, 255, 20);
     p.strokeWeight(1);
-    p.rect(doorX - doorOpenAmount * doorWidth, doorY, doorWidth / 2, doorHeight);
+    p.noFill();
+    p.rect(-adjustedWidth / 2, -monolithHeight / 2, adjustedWidth, monolithHeight);
     
-    // Right door
-    p.rect(doorX + doorWidth / 2 + doorOpenAmount * doorWidth, doorY, doorWidth / 2, doorHeight);
+    // Add mysterious glow effect around the monolith
+    const glowSize = 10;
+    p.noStroke();
+    for (let i = 0; i < glowSize; i++) {
+      const alpha = p.map(i, 0, glowSize, 15, 0);
+      p.fill(255, 255, 255, alpha);
+      p.rect(
+        -adjustedWidth / 2 - i, 
+        -monolithHeight / 2 - i, 
+        adjustedWidth + i * 2, 
+        monolithHeight + i * 2
+      );
+    }
     
-    // Draw blood effect when doors are slightly open
-    if (doorOpenAmount > 0.05) {
-      // Calculate blood flow amount based on door opening
-      const bloodAmount = p.map(doorOpenAmount, 0.05, 0.2, 0, 1);
+    // Add subtle star alignment effect
+    if (Math.sin(time * 0.5) > 0.9) {
+      // Rare alignment event
+      p.stroke(255, 255, 255, 50);
+      p.strokeWeight(1);
+      p.line(0, -monolithHeight, 0, -p.height);
       
-      // Draw blood flowing from elevator
+      // Add a bright star at the top
+      p.fill(255, 255, 255, 200);
       p.noStroke();
+      p.ellipse(0, -p.height * 0.4, 3, 3);
       
-      // Blood pool at bottom
-      const poolWidth = doorWidth * (0.5 + bloodAmount * 0.5);
-      const poolHeight = doorHeight * 0.1 * bloodAmount;
-      p.fill(palette.elevatorRed[0], palette.elevatorRed[1], palette.elevatorRed[2], 150);
-      p.ellipse(doorX + doorWidth / 2, doorY + doorHeight + poolHeight / 2, poolWidth, poolHeight);
-      
-      // Blood stream
-      p.beginShape();
-      p.vertex(doorX + doorWidth / 2 - 10, doorY + doorHeight);
-      p.vertex(doorX + doorWidth / 2 + 10, doorY + doorHeight);
-      p.vertex(doorX + doorWidth / 2 + poolWidth / 3, doorY + doorHeight + poolHeight);
-      p.vertex(doorX + doorWidth / 2 - poolWidth / 3, doorY + doorHeight + poolHeight);
-      p.endShape(p.CLOSE);
-      
-      // Blood drips
-      const dripCount = Math.floor(bloodAmount * 5) + 1;
-      for (let i = 0; i < dripCount; i++) {
-        const dripX = doorX + doorWidth / 2 + (Math.sin(i * 5.2 + time) * doorWidth * 0.3);
-        const dripLength = 10 + Math.sin(i * 3.7 + time * 2) * 15 * bloodAmount;
-        const dripWidth = 3 + Math.sin(i * 2.1) * 2;
-        
-        p.fill(palette.elevatorRed[0], palette.elevatorRed[1], palette.elevatorRed[2], 130);
-        p.ellipse(dripX, doorY + doorHeight + dripLength / 2, dripWidth, dripLength);
+      // Add subtle rays
+      p.stroke(255, 255, 255, 20);
+      p.strokeWeight(0.5);
+      for (let i = 0; i < 8; i++) {
+        const angle = i * Math.PI / 4;
+        const rayLength = 20 + Math.sin(time * 3) * 10;
+        p.line(
+          0, 
+          -p.height * 0.4, 
+          Math.cos(angle) * rayLength, 
+          -p.height * 0.4 + Math.sin(angle) * rayLength
+        );
       }
     }
     
-    // Add elevator button
-    p.fill(30);
-    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 100);
-    p.strokeWeight(1);
-    p.rect(doorX + doorWidth + 20, doorY + doorHeight / 2 - 15, 10, 30);
+    // Add HAL-like reflection on the monolith
+    const reflectionSize = monolithWidth * 0.3;
+    const reflectionY = -monolithHeight * 0.1;
     
-    // Button light
-    p.fill(palette.elevatorRed[0], palette.elevatorRed[1], palette.elevatorRed[2], 
-           150 + Math.sin(time * 3) * 50);
-    p.noStroke();
-    p.ellipse(doorX + doorWidth + 25, doorY + doorHeight / 2 - 5, 5, 5);
+    // Only show reflection occasionally
+    if (Math.sin(time * 0.3) > 0.7) {
+      // Red HAL eye reflection
+      const reflectionAlpha = p.map(Math.sin(time * 0.3), 0.7, 1, 0, 40);
+      p.fill(palette.halRed[0], palette.halRed[1], palette.halRed[2], reflectionAlpha);
+      p.noStroke();
+      p.ellipse(0, reflectionY, reflectionSize, reflectionSize);
+      
+      // Inner reflection
+      p.fill(255, 255, 255, reflectionAlpha * 0.7);
+      p.ellipse(0, reflectionY, reflectionSize * 0.6, reflectionSize * 0.6);
+    }
     
     p.pop();
   }
