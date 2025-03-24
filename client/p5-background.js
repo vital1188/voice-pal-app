@@ -347,319 +347,171 @@ let sketch = function(p) {
   function drawHALInterface() {
     p.push();
     
-    // Draw HAL-inspired eyes (red with subtle glow)
-    drawHALEye(leftEye, palette.red);
-    drawHALEye(rightEye, palette.red);
+    // Draw geometric eyes with stark colors
+    drawGeometricEye(leftEye, palette.red);
+    drawGeometricEye(rightEye, palette.red);
     
-    // Draw mouth with blue accent
-    drawHALMouth(mouth, palette.blue);
-    
-    // Draw audio visualizer inside mouth
-    drawAudioVisualizer();
+    // Draw geometric mouth with blue accent
+    drawGeometricMouth(mouth, palette.blue);
     
     p.pop();
   }
   
-  function drawHALEye(eye, color) {
+  // New abstract geometric face elements
+  function drawGeometricEye(eye, color) {
     p.push();
     
-    // Modern HAL 9000-inspired eye with digital enhancements
+    // Create a geometric eye with concentric squares instead of circles
+    const glowSize = eye.size * (1 + eye.glowIntensity * 0.3);
     
-    // Create depth effect with layered glows
-    for (let i = 5; i > 0; i--) {
-      const glowSize = eye.size * (1 + eye.glowIntensity * 0.4 * i/5);
-      const alpha = 10 * eye.glowIntensity * (6-i)/5;
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], alpha);
-      p.ellipse(eye.x, eye.y, glowSize);
-    }
+    // Outer glow - rotated square
+    p.push();
+    p.translate(eye.x, eye.y);
+    p.rotate(p.frameCount * 0.005); // Slow rotation
+    p.noStroke();
+    p.fill(color[0], color[1], color[2], 30 * eye.glowIntensity);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, glowSize * 1.5, glowSize * 1.5);
+    p.pop();
     
-    // Draw eye socket with precise geometric pattern
+    // Middle glow - opposite rotation
+    p.push();
+    p.translate(eye.x, eye.y);
+    p.rotate(-p.frameCount * 0.003); // Opposite rotation
+    p.noStroke();
+    p.fill(color[0], color[1], color[2], 50 * eye.glowIntensity);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, glowSize * 1.2, glowSize * 1.2);
+    p.pop();
+    
+    // Eye socket - precise square
+    p.push();
+    p.translate(eye.x, eye.y);
     p.stroke(color[0], color[1], color[2]);
     p.strokeWeight(2);
     p.noFill();
-    p.ellipse(eye.x, eye.y, eye.size);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, eye.size, eye.size);
+    p.pop();
     
-    // Add concentric rings for modern tech feel while maintaining Kubrick symmetry
-    p.stroke(color[0], color[1], color[2], 40);
-    p.strokeWeight(1);
-    for (let i = 1; i <= 3; i++) {
-      p.ellipse(eye.x, eye.y, eye.size * (0.7 + i * 0.2));
-    }
-    
-    // Draw eye (accounting for blink)
+    // Account for blinking with vertical scaling
     const eyeHeight = eye.size * (1 - eye.blinkState);
     if (eyeHeight > 1) {
-      // Main eye surface with subtle gradient
-      const gradient = p.drawingContext.createRadialGradient(
-        eye.x, eye.y, 0,
-        eye.x, eye.y, eye.size/2
-      );
-      gradient.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.9)`);
-      gradient.addColorStop(0.7, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7)`);
-      gradient.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.5)`);
-      
-      p.drawingContext.fillStyle = gradient;
+      // Inner eye - filled square
+      p.push();
+      p.translate(eye.x, eye.y);
       p.noStroke();
-      p.ellipse(eye.x, eye.y, eye.size, eyeHeight);
+      p.fill(color[0], color[1], color[2], 100);
+      p.rectMode(p.CENTER);
+      p.rect(0, 0, eye.size * 0.8, eyeHeight * 0.8);
+      p.pop();
       
-      // Draw iris with digital scan line effect
-      const irisSize = eye.pupilSize * 1.5;
-      p.stroke(255, 255, 255, 30);
+      // Pupil - smaller square with offset
+      p.push();
+      p.translate(eye.x + eye.pupilOffset.x, eye.y + eye.pupilOffset.y);
+      p.rotate(p.frameCount * 0.01); // Subtle rotation
+      p.fill(255);
+      p.rectMode(p.CENTER);
+      p.rect(0, 0, eye.pupilSize * 0.8, eye.pupilSize * 0.8);
+      
+      // Pupil highlight - even smaller square
+      p.fill(color[0], color[1], color[2], 200);
+      p.rect(eye.pupilSize * -0.1, eye.pupilSize * -0.1, eye.pupilSize * 0.3, eye.pupilSize * 0.3);
+      p.pop();
+      
+      // Add crosshair lines for a technical look
+      p.stroke(color[0], color[1], color[2], 150);
       p.strokeWeight(1);
-      p.fill(180, 0, 0, 150);
-      p.ellipse(
-        eye.x + eye.pupilOffset.x,
-        eye.y + eye.pupilOffset.y,
-        irisSize
-      );
-      
-      // Scan lines for digital effect
-      const scanLineCount = 5;
-      const scanLineSpacing = irisSize / scanLineCount;
-      p.stroke(255, 255, 255, 50);
-      p.strokeWeight(1);
-      
-      for (let i = 0; i < scanLineCount; i++) {
-        const y = eye.y + eye.pupilOffset.y - irisSize/2 + i * scanLineSpacing;
-        p.line(
-          eye.x + eye.pupilOffset.x - irisSize/2,
-          y,
-          eye.x + eye.pupilOffset.x + irisSize/2,
-          y
-        );
-      }
-      
-      // Draw pupil (larger, more HAL-like) with modern lens effect
-      const pupilGradient = p.drawingContext.createRadialGradient(
-        eye.x + eye.pupilOffset.x, 
-        eye.y + eye.pupilOffset.y, 
-        0,
-        eye.x + eye.pupilOffset.x, 
-        eye.y + eye.pupilOffset.y, 
-        eye.pupilSize/2
-      );
-      pupilGradient.addColorStop(0, 'rgba(255, 50, 50, 1)');
-      pupilGradient.addColorStop(0.7, 'rgba(200, 0, 0, 1)');
-      pupilGradient.addColorStop(1, 'rgba(120, 0, 0, 1)');
-      
-      p.drawingContext.fillStyle = pupilGradient;
-      p.ellipse(
-        eye.x + eye.pupilOffset.x,
-        eye.y + eye.pupilOffset.y,
-        eye.pupilSize
-      );
-      
-      // Add digital data visualization around pupil
-      p.stroke(255, 255, 255, 100);
-      p.strokeWeight(1);
-      p.noFill();
-      const dataPoints = 12;
-      const radius = eye.pupilSize * 0.7;
-      
-      p.beginShape();
-      for (let i = 0; i < dataPoints; i++) {
-        const angle = p.map(i, 0, dataPoints, 0, p.TWO_PI);
-        const r = radius * (0.8 + Math.sin(time * 3 + i) * 0.2);
-        const x = eye.x + eye.pupilOffset.x + r * Math.cos(angle);
-        const y = eye.y + eye.pupilOffset.y + r * Math.sin(angle);
-        p.vertex(x, y);
-      }
-      p.endShape(p.CLOSE);
-      
-      // Draw pupil highlight with lens flare effect
-      p.fill(255, 255, 255, 180);
-      p.noStroke();
-      p.ellipse(
-        eye.x + eye.pupilOffset.x - eye.pupilSize * 0.2,
-        eye.y + eye.pupilOffset.y - eye.pupilSize * 0.2,
-        eye.pupilSize * 0.3
-      );
-      
-      // Add small lens flare dots
-      for (let i = 0; i < 3; i++) {
-        const flareSize = eye.pupilSize * 0.1 * (3-i)/3;
-        const distance = eye.pupilSize * 0.4 * (i+1)/3;
-        const angle = p.PI/4;
-        
-        p.fill(255, 255, 255, 150 * (3-i)/3);
-        p.ellipse(
-          eye.x + eye.pupilOffset.x + Math.cos(angle) * distance,
-          eye.y + eye.pupilOffset.y + Math.sin(angle) * distance,
-          flareSize
-        );
-      }
+      p.line(eye.x - eye.size/2, eye.y, eye.x + eye.size/2, eye.y);
+      p.line(eye.x, eye.y - eye.size/2, eye.x, eye.y + eye.size/2);
     }
     
     p.pop();
   }
   
-  function drawHALMouth(mouth, color) {
+  function drawGeometricMouth(mouth, color) {
     p.push();
-    
-    // Modern Kubrick-inspired mouth with digital enhancements
-    
-    // Create layered glow effect for depth
-    for (let i = 4; i > 0; i--) {
-      const glowWidth = mouth.width * (1 + 0.05 * i);
-      const glowHeight = mouth.height * mouth.openAmount * (1 + 0.1 * i);
-      const alpha = 10 * mouth.glowIntensity * (5-i)/4;
-      
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], alpha);
-      p.rect(
-        mouth.x - glowWidth/2, 
-        mouth.y - glowHeight/2, 
-        glowWidth, 
-        glowHeight, 
-        2
-      );
-    }
     
     // Calculate mouth dimensions based on openAmount
     const mouthHeight = mouth.height * mouth.openAmount;
+    const mouthWidth = mouth.width;
     const curveOffset = mouth.width * mouth.curveAmount;
     
-    // Draw precise geometric frame around mouth
-    p.stroke(color[0], color[1], color[2], 80);
+    // Outer glow - rectangle
+    p.noStroke();
+    p.fill(color[0], color[1], color[2], 30 * mouth.glowIntensity);
+    p.rectMode(p.CENTER);
+    p.rect(mouth.x, mouth.y, mouthWidth + 10, mouthHeight + 10);
+    
+    // Inner glow
+    p.fill(color[0], color[1], color[2], 50 * mouth.glowIntensity);
+    p.rect(mouth.x, mouth.y, mouthWidth + 4, mouthHeight + 4);
+    
+    // Mouth outline - precise geometric shape
+    p.stroke(color[0], color[1], color[2]);
     p.strokeWeight(2);
     p.noFill();
-    p.rect(
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y - mouthHeight/2 - 2, 
-      mouth.width + 4, 
-      mouthHeight + 4, 
-      1
-    );
+    p.rectMode(p.CENTER);
     
-    // Add tech-inspired corner accents
-    const cornerSize = 6;
-    // Top-left corner
-    p.line(
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y - mouthHeight/2 - 2 + cornerSize,
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y - mouthHeight/2 - 2
-    );
-    p.line(
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y - mouthHeight/2 - 2,
-      mouth.x - mouth.width/2 - 2 + cornerSize, 
-      mouth.y - mouthHeight/2 - 2
-    );
+    // Draw mouth as a series of horizontal lines that respond to openAmount
+    const lineCount = Math.max(3, Math.floor(mouthHeight / 4));
+    const lineSpacing = mouthHeight / (lineCount - 1);
     
-    // Top-right corner
-    p.line(
-      mouth.x + mouth.width/2 + 2 - cornerSize, 
-      mouth.y - mouthHeight/2 - 2,
-      mouth.x + mouth.width/2 + 2, 
-      mouth.y - mouthHeight/2 - 2
-    );
-    p.line(
-      mouth.x + mouth.width/2 + 2, 
-      mouth.y - mouthHeight/2 - 2,
-      mouth.x + mouth.width/2 + 2, 
-      mouth.y - mouthHeight/2 - 2 + cornerSize
-    );
-    
-    // Bottom-left corner
-    p.line(
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y + mouthHeight/2 + 2 - cornerSize,
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y + mouthHeight/2 + 2
-    );
-    p.line(
-      mouth.x - mouth.width/2 - 2, 
-      mouth.y + mouthHeight/2 + 2,
-      mouth.x - mouth.width/2 - 2 + cornerSize, 
-      mouth.y + mouthHeight/2 + 2
-    );
-    
-    // Bottom-right corner
-    p.line(
-      mouth.x + mouth.width/2 + 2 - cornerSize, 
-      mouth.y + mouthHeight/2 + 2,
-      mouth.x + mouth.width/2 + 2, 
-      mouth.y + mouthHeight/2 + 2
-    );
-    p.line(
-      mouth.x + mouth.width/2 + 2, 
-      mouth.y + mouthHeight/2 + 2,
-      mouth.x + mouth.width/2 + 2, 
-      mouth.y + mouthHeight/2 + 2 - cornerSize
-    );
-    
-    // Draw mouth interior with gradient
-    const mouthGradient = p.drawingContext.createLinearGradient(
-      mouth.x, mouth.y - mouthHeight/2,
-      mouth.x, mouth.y + mouthHeight/2
-    );
-    mouthGradient.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.2)`);
-    mouthGradient.addColorStop(0.5, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.4)`);
-    mouthGradient.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.2)`);
-    
-    p.drawingContext.fillStyle = mouthGradient;
-    p.noStroke();
-    
-    // Draw mouth shape with precise bezier curves
-    p.beginShape();
-    p.vertex(mouth.x - mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset);
-    p.bezierVertex(
-      mouth.x - mouth.width / 4, mouth.y - mouthHeight / 2 - curveOffset,
-      mouth.x + mouth.width / 4, mouth.y - mouthHeight / 2 - curveOffset,
-      mouth.x + mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset
-    );
-    p.vertex(mouth.x + mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset);
-    p.bezierVertex(
-      mouth.x + mouth.width / 4, mouth.y + mouthHeight / 2 + curveOffset,
-      mouth.x - mouth.width / 4, mouth.y + mouthHeight / 2 + curveOffset,
-      mouth.x - mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset
-    );
-    p.endShape(p.CLOSE);
-    
-    // Add digital scan lines with subtle animation
-    p.stroke(color[0], color[1], color[2], 30);
-    p.strokeWeight(1);
-    const lineCount = 8;
-    const lineSpacing = mouthHeight / (lineCount + 1);
-    
-    for (let i = 1; i <= lineCount; i++) {
-      // Add subtle wave effect to scan lines
-      const waveOffset = Math.sin(time * 2 + i * 0.5) * 2;
-      const y = mouth.y - mouthHeight / 2 + i * lineSpacing;
+    for (let i = 0; i < lineCount; i++) {
+      // Calculate y position for each line
+      const y = mouth.y - mouthHeight/2 + i * lineSpacing;
       
-      p.line(
-        mouth.x - mouth.width / 2 + 4 + waveOffset, 
-        y, 
-        mouth.x + mouth.width / 2 - 4 + waveOffset, 
-        y
-      );
+      // Calculate line width based on expression (curveAmount)
+      // Center lines are longer for positive curveAmount (smile)
+      // Center lines are shorter for negative curveAmount (frown)
+      let lineWidthMultiplier;
+      
+      if (curveOffset > 0) { // Smile
+        lineWidthMultiplier = i === 0 || i === lineCount - 1 ? 
+          0.7 : // First and last lines are shorter
+          1 + (curveOffset / mouthWidth) * Math.sin(Math.PI * i / (lineCount - 1)); // Middle lines are longer
+      } else { // Neutral or frown
+        lineWidthMultiplier = i === 0 || i === lineCount - 1 ? 
+          1 : // First and last lines are full width
+          1 + (curveOffset / mouthWidth) * Math.sin(Math.PI * i / (lineCount - 1)); // Middle lines are shorter
+      }
+      
+      const lineWidth = mouthWidth * lineWidthMultiplier;
+      
+      // Draw the line
+      p.stroke(color[0], color[1], color[2], 150 + 105 * (i / lineCount)); // Varying opacity
+      p.line(mouth.x - lineWidth/2, y, mouth.x + lineWidth/2, y);
     }
     
-    // Add data points along the mouth perimeter for tech feel
-    p.stroke(255, 255, 255, 100);
-    p.strokeWeight(1);
-    const dataPointCount = 8;
-    const dataPointSpacing = mouth.width / dataPointCount;
-    
-    for (let i = 0; i <= dataPointCount; i++) {
-      const x = mouth.x - mouth.width / 2 + i * dataPointSpacing;
-      const topY = mouth.y - mouthHeight / 2;
-      const bottomY = mouth.y + mouthHeight / 2;
-      
-      // Top data points
-      p.line(x, topY - 2, x, topY - 6);
-      
-      // Bottom data points
-      p.line(x, bottomY + 2, x, bottomY + 6);
+    // Add vertical lines at the edges for a more structured look
+    if (mouthHeight > 5) {
+      p.stroke(color[0], color[1], color[2], 100);
+      p.line(mouth.x - mouthWidth/2, mouth.y - mouthHeight/2, mouth.x - mouthWidth/2, mouth.y + mouthHeight/2);
+      p.line(mouth.x + mouthWidth/2, mouth.y - mouthHeight/2, mouth.x + mouthWidth/2, mouth.y + mouthHeight/2);
     }
     
-    // Add subtle pulsing effect to mouth center
-    const pulseSize = 15 + Math.sin(time * 3) * 5;
-    p.noStroke();
-    p.fill(color[0], color[1], color[2], 20 + Math.sin(time * 3) * 10);
-    p.ellipse(mouth.x, mouth.y, pulseSize, pulseSize * 0.6);
+    // Add audio level visualization as vertical bars
+    if (mouth.openAmount > 0.1) {
+      const barCount = 7; // Odd number for symmetry
+      const barWidth = mouthWidth / (barCount * 2);
+      const maxBarHeight = mouthHeight * 0.7;
+      
+      p.noStroke();
+      p.fill(color[0], color[1], color[2], 180);
+      
+      for (let i = 0; i < barCount; i++) {
+        // Calculate audio level for this bar - center bars are taller
+        const centerFactor = 1 - Math.abs((i - (barCount-1)/2) / ((barCount-1)/2));
+        const barHeight = maxBarHeight * audioLevel * (0.3 + 0.7 * centerFactor);
+        
+        // Position bars symmetrically
+        const x = mouth.x - (barCount-1)/2 * barWidth * 2 + i * barWidth * 2;
+        
+        // Draw bar
+        p.rectMode(p.CORNER);
+        p.rect(x, mouth.y - barHeight/2, barWidth, barHeight);
+      }
+    }
     
     p.pop();
   }
