@@ -8,6 +8,7 @@ Nicanor is an interactive web application that combines OpenAI's real-time voice
 
 - **Interactive Neon Robot Face**: A digital robot with glowing neon eyes and mouth that reacts to AI speech
 - **Multiple Voice Options**: Choose from 8 different AI voices, each with its own personality
+- **Automatic Language Detection**: Nicanor automatically detects and responds in the language you speak
 - **Multilingual Support**: Communicate in 12 different languages including English, Spanish, German, French, Italian, Romanian, Russian, Ukrainian, Portuguese, Polish, Chinese, and Japanese
 - **Customizable AI Personality**: Choose from 5 different moods (Sarcastic, Excited, Philosophical, Dramatic, Deadpan)
 - **Adjustable Emotional Range**: Select from 5 emotional styles (Balanced, Expressive, Subtle, Volatile, Stoic)
@@ -66,11 +67,11 @@ Nicanor is an interactive web application that combines OpenAI's real-time voice
 1. Open the client URL in your browser
 2. Select your preferred AI voice from the dropdown
 3. Choose your desired AI mood and emotional range
-4. Select your preferred language from the 12 available options
-5. Adjust sociability, voice tone, speech rate, and memory strength using the sliders
-6. Click the diamond-shaped button to connect
-7. Allow microphone access when prompted
-8. Start speaking with Nicanor in your selected language
+4. Adjust sociability, voice tone, speech rate, and memory strength using the sliders
+5. Click the diamond-shaped button to connect
+6. Allow microphone access when prompted
+7. Start speaking with Nicanor in any of the 12 supported languages
+8. Nicanor will automatically detect your language and respond in the same language
 9. Watch the robot's face animate as the AI responds:
    - Eyes follow your mouse movements
    - Mouth opens and closes with the AI's speech
@@ -98,7 +99,7 @@ Nicanor is an interactive web application that combines OpenAI's real-time voice
 
 ## Language Options
 
-Nicanor supports 12 languages, allowing you to have conversations in:
+Nicanor automatically detects and supports 12 languages, allowing you to have conversations in:
 
 - English
 - Spanish (Español)
@@ -113,7 +114,7 @@ Nicanor supports 12 languages, allowing you to have conversations in:
 - Chinese (中文)
 - Japanese (日本語)
 
-When you select a language, Nicanor will immediately respond in that language and use appropriate expressions and idioms native to that language.
+Simply start speaking in any of these languages, and Nicanor will automatically detect and respond in the same language. It will use appropriate expressions and idioms native to that language. If you switch languages during the conversation, Nicanor will adapt and continue in your new language.
 
 ## Project Structure
 

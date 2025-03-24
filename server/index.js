@@ -81,7 +81,7 @@ app.get("/session", async (req, res) => {
       });
     }
     
-    // No language validation needed as we're removing the language parameter
+    // No language validation needed as we'll detect language automatically
     
     // Validate sociability (1-10)
     if (sociability < 1 || sociability > 10) {
@@ -322,10 +322,10 @@ VOICE MODULATION:
 - If the user speaks in Polish, respond in Polish.
 - If the user speaks in Chinese, respond in Chinese.
 - If the user speaks in Japanese, respond in Japanese.
-- For any other language, try your best to respond in that language.
-- Use appropriate expressions and idioms for the language you're responding in.
-- Adapt your humor and references to be relevant to the culture associated with the language.
-- If the user switches languages during the conversation, you should also switch to that language.`;
+- Use appropriate expressions and idioms for the detected language.
+- Adapt your humor and references to be relevant to the culture of the detected language.
+- If the user switches languages during the conversation, you should also switch to that language.
+- Default to English if you cannot determine the language or if the user speaks in a language not listed above.`;
     
     // Voice tone and speed instructions
     const toneSpeedInstructions = `VOICE CHARACTERISTICS:

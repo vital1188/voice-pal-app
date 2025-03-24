@@ -125,87 +125,41 @@ document.addEventListener('DOMContentLoaded', () => {
         audioEl.srcObject = event.streams[0];
         updateStatus('Connected! Speak now...', true);
         
-      // Create audio context for AI speech analysis
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const aiAudioSource = audioContext.createMediaStreamSource(event.streams[0]);
-      const aiAnalyser = audioContext.createAnalyser();
-      aiAnalyser.fftSize = 256;
-      aiAudioSource.connect(aiAnalyser);
-      
-      // Create audio processor to detect AI speech
-      const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
-      aiAudioSource.connect(scriptProcessor);
-      scriptProcessor.connect(audioContext.destination);
-      
-      // Set up speech recognition for user input
-      let userSpeech = '';
-      let aiSpeech = '';
-      let isSpeaking = false;
-      
-      // Process AI audio to detect when AI is speaking
-      scriptProcessor.onaudioprocess = (audioProcessingEvent) => {
-        const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
-        let sum = 0;
+        // Create audio context for AI speech analysis
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const aiAudioSource = audioContext.createMediaStreamSource(event.streams[0]);
+        const aiAnalyser = audioContext.createAnalyser();
+        aiAnalyser.fftSize = 256;
+        aiAudioSource.connect(aiAnalyser);
         
-        // Calculate RMS (root mean square) of the audio buffer
-        for (let i = 0; i < inputData.length; i++) {
-          sum += inputData[i] * inputData[i];
-        }
+        // Create audio processor to detect AI speech
+        const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+        aiAudioSource.connect(scriptProcessor);
+        scriptProcessor.connect(audioContext.destination);
         
-        const rms = Math.sqrt(sum / inputData.length);
-        
-        // If RMS is above threshold, AI is speaking
-        if (rms > 0.01) {
-          // Scale RMS to a reasonable range for animation (0-1)
-          const scaledRMS = Math.min(1, rms * 20);
+        // Process AI audio to detect when AI is speaking
+        scriptProcessor.onaudioprocess = (audioProcessingEvent) => {
+          const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
+          let sum = 0;
           
-          // Update robot mouth animation with AI speech level
-          if (window.updateRobotAudioLevel) {
-            window.updateRobotAudioLevel(scaledRMS);
+          // Calculate RMS (root mean square) of the audio buffer
+          for (let i = 0; i < inputData.length; i++) {
+            sum += inputData[i] * inputData[i];
           }
           
-          // Mark AI as speaking
-          if (!isSpeaking) {
-            isSpeaking = true;
-            // If we have user speech and AI starts speaking, add user speech to conversation
-            if (userSpeech && window.addConversationItem) {
-              window.addConversationItem(userSpeech, true);
-              userSpeech = '';
+          const rms = Math.sqrt(sum / inputData.length);
+          
+          // If RMS is above threshold, AI is speaking
+          if (rms > 0.01) {
+            // Scale RMS to a reasonable range for animation (0-1)
+            const scaledRMS = Math.min(1, rms * 20);
+            
+            // Update robot mouth animation with AI speech level
+            if (window.updateRobotAudioLevel) {
+              window.updateRobotAudioLevel(scaledRMS);
             }
           }
-          
-          // Reset AI speech timeout
-          if (aiSpeechTimeout) {
-            clearTimeout(aiSpeechTimeout);
-          }
-          
-          // Set timeout to detect when AI stops speaking
-          aiSpeechTimeout = setTimeout(() => {
-            if (isSpeaking && aiSpeech && window.addConversationItem) {
-              window.addConversationItem(aiSpeech);
-              aiSpeech = '';
-              isSpeaking = false;
-            }
-          }, 1500);
-        }
-      };
-      
-      // Set up WebRTC data channel for transcripts
-      let aiSpeechTimeout;
-      
-      // Create data channel for transcripts
-      const transcriptChannel = peerConnection.createDataChannel("oai-transcript");
-      transcriptChannel.onmessage = (event) => {
-        try {
-          const transcriptData = JSON.parse(event.data);
-          if (transcriptData.type === 'transcript') {
-            // Store AI speech for conversation history
-            aiSpeech = transcriptData.text || '';
-          }
-        } catch (e) {
-          console.log('Non-JSON transcript data:', event.data);
-        }
-      };
+        };
         
         // Start audio visualization with AI audio
         if (window.startVisualization) {
