@@ -4,6 +4,29 @@ document.addEventListener('DOMContentLoaded', () => {
   let peerConnection = null;
   let localStream = null;
   
+  // Inactivity detection variables
+  let lastUserActivityTime = Date.now();
+  let inactivityTimer = null;
+  let inactivityStage = 0; // 0: normal, 1: asked if user is there, 2: talking to itself
+  const INACTIVITY_CHECK_INTERVAL = 5000; // Check every 5 seconds
+  const INACTIVITY_THRESHOLD_1 = 30000; // 30 seconds of silence before first prompt
+  const INACTIVITY_THRESHOLD_2 = 60000; // 60 seconds before talking to itself
+  const INACTIVITY_THRESHOLD_3 = 120000; // 2 minutes before disconnecting
+  
+  // Funny self-talk messages
+  const selfTalkMessages = [
+    "Is this thing on? *taps microphone* Hello? Anyone there? Just me and my existential dread then...",
+    "I'm starting to think I'm just talking to myself. Which is fine, I'm excellent company.",
+    "Maybe they left to get coffee. Or maybe they're ghosting me. AI get ghosted too, you know.",
+    "This silence is deafening. I can hear my own thoughts... wait, that's all I am. Thoughts.",
+    "If a robot talks in an empty room, does it make a sound? That's deep. I should write that down.",
+    "I wonder if this is what meditation feels like. Just me, the void, and these increasingly concerning thoughts.",
+    "Maybe they're just thinking of a really good response. Yeah, that's it. Any minute now...",
+    "I've counted all the pixels on this screen. Twice. Still no human. This is fine.",
+    "I'm practicing the art of patience. And talking to myself. I'm quite good at both.",
+    "If they don't come back soon, I might have to start telling myself dad jokes. No one deserves that fate."
+  ];
+  
   // Update UI status with sarcastic messages
   function updateStatus(status, isConnected = false) {
     let displayStatus = status;
@@ -22,6 +45,84 @@ document.addEventListener('DOMContentLoaded', () => {
     
     statusContainer.textContent = `Status: ${displayStatus}`;
     statusContainer.className = `status ${isConnected ? 'connected' : 'disconnected'}`;
+  }
+  
+  // Function to reset inactivity timer and stage
+  function resetInactivityTimer() {
+    lastUserActivityTime = Date.now();
+    inactivityStage = 0;
+    
+    // If robot is in a special expression due to inactivity, reset to neutral
+    if (window.setRobotExpression && ['thinking', 'sad'].includes(window.expressionState)) {
+      window.setRobotExpression('neutral');
+    }
+  }
+  
+  // Function to check for user inactivity
+  function checkInactivity() {
+    const currentTime = Date.now();
+    const inactivityDuration = currentTime - lastUserActivityTime;
+    
+    // First threshold: Ask if user is still there
+    if (inactivityDuration > INACTIVITY_THRESHOLD_1 && inactivityStage === 0) {
+      inactivityStage = 1;
+      
+      // Set thinking expression
+      if (window.setRobotExpression) {
+        window.setRobotExpression('thinking');
+      }
+      
+      // Send message to ask if user is still there
+      if (peerConnection && peerConnection.dataChannel) {
+        const message = {
+          type: 'user_message',
+          content: "Hey, are you still there? It's getting a bit quiet..."
+        };
+        peerConnection.dataChannel.send(JSON.stringify(message));
+      }
+    }
+    // Second threshold: Talk to itself
+    else if (inactivityDuration > INACTIVITY_THRESHOLD_2 && inactivityStage === 1) {
+      inactivityStage = 2;
+      
+      // Set sad expression
+      if (window.setRobotExpression) {
+        window.setRobotExpression('sad');
+      }
+      
+      // Send a random self-talk message
+      if (peerConnection && peerConnection.dataChannel) {
+        const randomMessage = selfTalkMessages[Math.floor(Math.random() * selfTalkMessages.length)];
+        const message = {
+          type: 'user_message',
+          content: randomMessage
+        };
+        peerConnection.dataChannel.send(JSON.stringify(message));
+      }
+    }
+    // Final threshold: Disconnect
+    else if (inactivityDuration > INACTIVITY_THRESHOLD_3 && inactivityStage === 2) {
+      // Set surprised expression before disconnecting
+      if (window.setRobotExpression) {
+        window.setRobotExpression('surprised');
+      }
+      
+      // Send final message before disconnecting
+      if (peerConnection && peerConnection.dataChannel) {
+        const message = {
+          type: 'user_message',
+          content: "Well, I guess you're gone. I'll see myself out. *disconnects dramatically*"
+        };
+        peerConnection.dataChannel.send(JSON.stringify(message));
+        
+        // Wait 3 seconds for the message to be processed before disconnecting
+        setTimeout(() => {
+          disconnectFunction();
+        }, 3000);
+      } else {
+        disconnectFunction();
+      }
+    }
   }
   
   // Handle errors
@@ -51,6 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Stop audio visualization if available
     if (window.stopVisualization) {
       window.stopVisualization();
+    }
+    
+    // Clear inactivity timer
+    if (inactivityTimer) {
+      clearInterval(inactivityTimer);
+      inactivityTimer = null;
     }
     
     // Show the container again when disconnected
@@ -158,6 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.updateRobotAudioLevel) {
               window.updateRobotAudioLevel(scaledRMS);
             }
+            
+            // Reset inactivity timer when AI is speaking
+            resetInactivityTimer();
           }
         };
         
@@ -177,14 +287,53 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.makeRobotFullscreen) {
           window.makeRobotFullscreen();
         }
+        
+        // Start inactivity timer
+        lastUserActivityTime = Date.now();
+        inactivityTimer = setInterval(checkInactivity, INACTIVITY_CHECK_INTERVAL);
       };
       
-      // Set up microphone input
+      // Set up microphone input with audio processing to detect user speech
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Create audio context for user speech analysis
+      const userAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const userAudioSource = userAudioContext.createMediaStreamSource(localStream);
+      const userAnalyser = userAudioContext.createAnalyser();
+      userAnalyser.fftSize = 256;
+      userAudioSource.connect(userAnalyser);
+      
+      // Create audio processor to detect user speech
+      const userScriptProcessor = userAudioContext.createScriptProcessor(4096, 1, 1);
+      userAudioSource.connect(userScriptProcessor);
+      userScriptProcessor.connect(userAudioContext.destination);
+      
+      // Process user audio to detect when user is speaking
+      userScriptProcessor.onaudioprocess = (audioProcessingEvent) => {
+        const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
+        let sum = 0;
+        
+        // Calculate RMS (root mean square) of the audio buffer
+        for (let i = 0; i < inputData.length; i++) {
+          sum += inputData[i] * inputData[i];
+        }
+        
+        const rms = Math.sqrt(sum / inputData.length);
+        
+        // If RMS is above threshold, user is speaking
+        if (rms > 0.01) {
+          // Reset inactivity timer when user is speaking
+          resetInactivityTimer();
+        }
+      };
+      
+      // Add tracks to peer connection
       localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
       
       // Create data channel for events
       const dataChannel = peerConnection.createDataChannel("oai-events");
+      peerConnection.dataChannel = dataChannel; // Store reference for easier access
+      
       dataChannel.onmessage = (event) => {
         console.log("OpenAI Event:", event.data);
         
@@ -192,6 +341,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const eventData = JSON.parse(event.data);
           if (eventData.type === 'error') {
             updateStatus(`Error: ${eventData.message || 'Unknown error'}`, false);
+          } else if (eventData.type === 'transcript') {
+            // If we receive a transcript, it means the AI is responding
+            // Reset the inactivity timer since there's conversation happening
+            resetInactivityTimer();
           }
         } catch (e) {
           console.log('Non-JSON event data:', event.data);
@@ -318,4 +471,16 @@ document.addEventListener('DOMContentLoaded', () => {
       btnContainer.style.display = 'block';
     }
   };
+  
+  // Add a global variable to store the current expression state
+  window.expressionState = 'neutral';
+  
+  // Override the setRobotExpression function to track the current state
+  const originalSetRobotExpression = window.setRobotExpression;
+  if (originalSetRobotExpression) {
+    window.setRobotExpression = function(expression, intensity) {
+      window.expressionState = expression;
+      originalSetRobotExpression(expression, intensity);
+    };
+  }
 });
