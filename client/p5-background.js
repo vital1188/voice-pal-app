@@ -1,13 +1,13 @@
-// Neon Robot Face using p5.js
+// Kubrick-inspired AI Interface using p5.js
 
 let sketch = function(p) {
-  // Color palette - neon colors
+  // Color palette - Kubrick-inspired stark contrasts
   const palette = {
-    dark: [10, 15, 30],
-    neonBlue: [0, 200, 255],
-    neonPink: [255, 0, 150],
-    neonPurple: [180, 0, 255],
-    neonGreen: [0, 255, 150]
+    black: [0, 0, 0],
+    white: [240, 240, 240],
+    red: [220, 20, 60],
+    blue: [0, 149, 237],
+    gold: [212, 175, 55]
   };
   
   // Robot face parameters
@@ -30,6 +30,12 @@ let sketch = function(p) {
   // Flag to track if robot is in fullscreen mode
   let isFullscreen = false;
   
+  // Kubrick-inspired elements
+  let monolith;
+  let stars = [];
+  let grid = [];
+  let time = 0;
+  
   p.setup = function() {
     // Create canvas that covers the entire window
     let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
@@ -40,7 +46,7 @@ let sketch = function(p) {
     faceWidth = p.min(p.width * 0.8, 1200);
     faceHeight = p.min(p.height * 0.8, 800);
     
-    // Initialize eyes and mouth
+    // Initialize eyes and mouth with HAL 9000 inspired design
     const eyeSize = faceWidth * 0.15;
     const eyeY = p.height * 0.4;
     const eyeSpacing = faceWidth * 0.25;
@@ -49,7 +55,7 @@ let sketch = function(p) {
       x: p.width / 2 - eyeSpacing / 2,
       y: eyeY,
       size: eyeSize,
-      pupilSize: eyeSize * 0.4,
+      pupilSize: eyeSize * 0.6, // Larger pupil for HAL-like appearance
       pupilOffset: { x: 0, y: 0 },
       blinkState: 0, // 0 = open, 1 = closed
       glowIntensity: 0.8
@@ -59,7 +65,7 @@ let sketch = function(p) {
       x: p.width / 2 + eyeSpacing / 2,
       y: eyeY,
       size: eyeSize,
-      pupilSize: eyeSize * 0.4,
+      pupilSize: eyeSize * 0.6,
       pupilOffset: { x: 0, y: 0 },
       blinkState: 0,
       glowIntensity: 0.8
@@ -69,25 +75,61 @@ let sketch = function(p) {
       x: p.width / 2,
       y: eyeY + eyeSize * 1.8,
       width: faceWidth * 0.3,
-      height: eyeSize * 0.6,
+      height: eyeSize * 0.4, // Thinner mouth for more precise look
       openAmount: 0.2, // 0 = closed, 1 = fully open
-      curveAmount: 0.1, // positive = smile, negative = frown
+      curveAmount: 0, // Neutral expression
       glowIntensity: 0.8
     };
     
-    // Create particles for background effect
-    for (let i = 0; i < 100; i++) {
-      particles.push({
-        pos: p.createVector(p.random(p.width), p.random(p.height)),
-        vel: p.createVector(p.random(-0.5, 0.5), p.random(-0.5, 0.5)),
+    // Create monolith
+    monolith = {
+      x: p.width / 2,
+      y: p.height * 0.7,
+      width: p.width * 0.05,
+      height: p.height * 0.3,
+      rotation: 0
+    };
+    
+    // Create stars for space background
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: p.random(p.width),
+        y: p.random(p.height),
         size: p.random(1, 3),
-        color: p.random([palette.neonBlue, palette.neonPink, palette.neonPurple, palette.neonGreen]),
-        alpha: p.random(100, 200)
+        brightness: p.random(100, 255),
+        twinkleSpeed: p.random(0.01, 0.05)
+      });
+    }
+    
+    // Create grid for one-point perspective
+    const gridSize = 20;
+    const gridSpacing = p.width / gridSize;
+    
+    for (let i = 0; i <= gridSize; i++) {
+      grid.push({
+        x1: i * gridSpacing,
+        y1: 0,
+        x2: p.width / 2,
+        y2: p.height / 2
+      });
+      
+      grid.push({
+        x1: 0,
+        y1: i * gridSpacing,
+        x2: p.width / 2,
+        y2: p.height / 2
+      });
+      
+      grid.push({
+        x1: p.width,
+        y1: i * gridSpacing,
+        x2: p.width / 2,
+        y2: p.height / 2
       });
     }
     
     // Set up drawing parameters
-    p.background(palette.dark);
+    p.background(palette.black);
     p.frameRate(60);
     
     // Make global function to update audio level
@@ -151,19 +193,28 @@ let sketch = function(p) {
   };
   
   p.draw = function() {
-    // Create a fade effect
-    p.fill(palette.dark[0], palette.dark[1], palette.dark[2], 20);
+    // Create a fade effect for space background
+    p.fill(palette.black[0], palette.black[1], palette.black[2], 20);
     p.noStroke();
     p.rect(0, 0, p.width, p.height);
     
-    // Update and draw particles
-    updateParticles();
+    // Increment time
+    time += 0.01;
     
-    // Update robot face
-    updateRobotFace();
+    // Draw stars
+    drawStars();
     
-    // Draw robot face
-    drawRobotFace();
+    // Draw one-point perspective grid
+    drawGrid();
+    
+    // Draw monolith
+    drawMonolith();
+    
+    // Update HAL 9000 interface
+    updateHALInterface();
+    
+    // Draw HAL 9000 interface
+    drawHALInterface();
     
     // Gradually reduce audio level if not actively listening
     if (!isListening) {
@@ -181,24 +232,251 @@ let sketch = function(p) {
     }
   };
   
-  function updateParticles() {
-    for (let i = 0; i < particles.length; i++) {
-      let particle = particles[i];
+  function drawStars() {
+    p.noStroke();
+    
+    for (let i = 0; i < stars.length; i++) {
+      const star = stars[i];
       
-      // Move particle
-      particle.pos.add(particle.vel);
+      // Calculate twinkling effect
+      const brightness = star.brightness * (0.7 + 0.3 * Math.sin(time * star.twinkleSpeed * 10));
       
-      // Edge wrapping
-      if (particle.pos.x < 0) particle.pos.x = p.width;
-      if (particle.pos.x > p.width) particle.pos.x = 0;
-      if (particle.pos.y < 0) particle.pos.y = p.height;
-      if (particle.pos.y > p.height) particle.pos.y = 0;
-      
-      // Draw particle
-      p.noStroke();
-      p.fill(particle.color[0], particle.color[1], particle.color[2], particle.alpha);
-      p.ellipse(particle.pos.x, particle.pos.y, particle.size);
+      // Draw star
+      p.fill(brightness);
+      p.ellipse(star.x, star.y, star.size);
     }
+  }
+  
+  function drawGrid() {
+    // Draw one-point perspective grid lines
+    p.stroke(palette.white[0], palette.white[1], palette.white[2], 20);
+    p.strokeWeight(1);
+    
+    for (let i = 0; i < grid.length; i++) {
+      const line = grid[i];
+      p.line(line.x1, line.y1, line.x2, line.y2);
+    }
+  }
+  
+  function drawMonolith() {
+    // Draw monolith with slight rotation based on time
+    p.push();
+    p.translate(monolith.x, monolith.y);
+    p.rotate(Math.sin(time * 0.2) * 0.05);
+    
+    // Black rectangle with white outline
+    p.fill(0);
+    p.stroke(palette.white[0], palette.white[1], palette.white[2], 100);
+    p.strokeWeight(2);
+    p.rect(-monolith.width / 2, -monolith.height / 2, monolith.width, monolith.height);
+    
+    p.pop();
+  }
+  
+  function updateHALInterface() {
+    // This replaces the updateRobotFace function
+    // Update blink timer with some randomness
+    blinkTimer++;
+    const blinkThreshold = isFullscreen ? 120 + Math.random() * 60 : 180;
+    
+    if (blinkTimer > blinkThreshold) {
+      if (blinkTimer < blinkThreshold + 10) {
+        leftEye.blinkState = p.map(blinkTimer, blinkThreshold, blinkThreshold + 5, 0, 1);
+        if (blinkTimer > blinkThreshold + 5) {
+          leftEye.blinkState = p.map(blinkTimer, blinkThreshold + 5, blinkThreshold + 10, 1, 0);
+        }
+        rightEye.blinkState = leftEye.blinkState;
+      } else if (blinkTimer > blinkThreshold + 120) {
+        blinkTimer = 0;
+      }
+    }
+    
+    // Slow, deliberate eye movements (more mechanical)
+    const currentTime = Date.now();
+    if (currentTime - lastEyeMovementTime > eyeMovementInterval) {
+      targetEyeX = Math.random() * p.width;
+      targetEyeY = Math.random() * p.height;
+      lastEyeMovementTime = currentTime;
+      eyeMovementInterval = 2000 + Math.random() * 4000; // Slower movements
+    }
+    
+    // Update eye pupil position with slower, more deliberate movement
+    const maxPupilOffset = leftEye.size * 0.15;
+    const targetXOffset = p.map(p.mouseX, 0, p.width, -maxPupilOffset, maxPupilOffset);
+    const targetYOffset = p.map(p.mouseY, 0, p.height, -maxPupilOffset, maxPupilOffset);
+    
+    leftEye.pupilOffset.x = p.lerp(leftEye.pupilOffset.x, targetXOffset, 0.02);
+    leftEye.pupilOffset.y = p.lerp(leftEye.pupilOffset.y, targetYOffset, 0.02);
+    rightEye.pupilOffset.x = p.lerp(rightEye.pupilOffset.x, targetXOffset, 0.02);
+    rightEye.pupilOffset.y = p.lerp(rightEye.pupilOffset.y, targetYOffset, 0.02);
+    
+    // Update mouth based on audio level with more precise control
+    const targetOpenAmount = p.map(audioLevel, 0, 1, 0.05, 0.6);
+    mouth.openAmount = p.lerp(mouth.openAmount, targetOpenAmount, 0.1);
+    
+    // Update expression with more subtle changes
+    switch (expressionState) {
+      case 'happy':
+        mouth.curveAmount = p.lerp(mouth.curveAmount, 0.3, 0.05);
+        break;
+      case 'thinking':
+        leftEye.pupilOffset.y = p.lerp(leftEye.pupilOffset.y, -maxPupilOffset * 0.7, 0.05);
+        rightEye.pupilOffset.y = p.lerp(rightEye.pupilOffset.y, -maxPupilOffset * 0.7, 0.05);
+        mouth.curveAmount = p.lerp(mouth.curveAmount, -0.1, 0.05);
+        break;
+      case 'surprised':
+        leftEye.pupilSize = p.lerp(leftEye.pupilSize, leftEye.size * 0.7, 0.05);
+        rightEye.pupilSize = p.lerp(rightEye.pupilSize, rightEye.size * 0.7, 0.05);
+        mouth.openAmount = p.lerp(mouth.openAmount, 0.5, 0.05);
+        mouth.curveAmount = 0;
+        break;
+      default: // neutral
+        mouth.curveAmount = p.lerp(mouth.curveAmount, 0, 0.05);
+        leftEye.pupilSize = p.lerp(leftEye.pupilSize, leftEye.size * 0.6, 0.05);
+        rightEye.pupilSize = p.lerp(rightEye.pupilSize, rightEye.size * 0.6, 0.05);
+    }
+    
+    // Update glow intensity based on audio level
+    const baseGlow = 0.7;
+    const audioGlow = audioLevel * 0.3;
+    leftEye.glowIntensity = baseGlow + audioGlow;
+    rightEye.glowIntensity = baseGlow + audioGlow;
+    mouth.glowIntensity = baseGlow + audioGlow;
+  }
+  
+  function drawHALInterface() {
+    p.push();
+    
+    // Draw HAL-inspired eyes (red with subtle glow)
+    drawHALEye(leftEye, palette.red);
+    drawHALEye(rightEye, palette.red);
+    
+    // Draw mouth with blue accent
+    drawHALMouth(mouth, palette.blue);
+    
+    // Draw audio visualizer inside mouth
+    drawAudioVisualizer();
+    
+    p.pop();
+  }
+  
+  function drawHALEye(eye, color) {
+    // Draw eye glow
+    const glowSize = eye.size * (1 + eye.glowIntensity * 0.3);
+    p.noStroke();
+    p.fill(color[0], color[1], color[2], 30 * eye.glowIntensity);
+    p.ellipse(eye.x, eye.y, glowSize * 1.5);
+    p.fill(color[0], color[1], color[2], 50 * eye.glowIntensity);
+    p.ellipse(eye.x, eye.y, glowSize * 1.2);
+    
+    // Draw eye socket (more geometric for Kubrick style)
+    p.stroke(color[0], color[1], color[2]);
+    p.strokeWeight(2);
+    p.noFill();
+    p.ellipse(eye.x, eye.y, eye.size);
+    
+    // Draw eye (accounting for blink)
+    const eyeHeight = eye.size * (1 - eye.blinkState);
+    if (eyeHeight > 1) {
+      p.noStroke();
+      p.fill(color[0], color[1], color[2], 100);
+      p.ellipse(eye.x, eye.y, eye.size, eyeHeight);
+      
+      // Draw pupil (larger, more HAL-like)
+      p.fill(255, 50, 50);
+      p.ellipse(
+        eye.x + eye.pupilOffset.x,
+        eye.y + eye.pupilOffset.y,
+        eye.pupilSize
+      );
+      
+      // Draw pupil highlight
+      p.fill(255, 255, 255, 200);
+      p.ellipse(
+        eye.x + eye.pupilOffset.x - eye.pupilSize * 0.2,
+        eye.y + eye.pupilOffset.y - eye.pupilSize * 0.2,
+        eye.pupilSize * 0.3
+      );
+    }
+  }
+  
+  function drawHALMouth(mouth, color) {
+    p.push();
+    
+    // Draw mouth glow with more precise, geometric style
+    p.noStroke();
+    p.fill(color[0], color[1], color[2], 30 * mouth.glowIntensity);
+    p.rect(mouth.x - mouth.width/2 - 5, mouth.y - mouth.height/2 - 5, 
+           mouth.width + 10, mouth.height * mouth.openAmount + 10, 2);
+    
+    p.fill(color[0], color[1], color[2], 50 * mouth.glowIntensity);
+    p.rect(mouth.x - mouth.width/2 - 2, mouth.y - mouth.height/2 - 2, 
+           mouth.width + 4, mouth.height * mouth.openAmount + 4, 1);
+    
+    // Draw mouth outline with sharp corners
+    p.stroke(color[0], color[1], color[2]);
+    p.strokeWeight(2);
+    p.noFill();
+    
+    // Calculate mouth dimensions based on openAmount
+    const mouthHeight = mouth.height * mouth.openAmount;
+    const curveOffset = mouth.width * mouth.curveAmount;
+    
+    // Draw top line with slight curve for expression
+    p.beginShape();
+    p.vertex(mouth.x - mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset);
+    p.bezierVertex(
+      mouth.x - mouth.width / 4, mouth.y - mouthHeight / 2 - curveOffset,
+      mouth.x + mouth.width / 4, mouth.y - mouthHeight / 2 - curveOffset,
+      mouth.x + mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset
+    );
+    p.endShape();
+    
+    // Draw bottom line with slight curve for expression
+    p.beginShape();
+    p.vertex(mouth.x - mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset);
+    p.bezierVertex(
+      mouth.x - mouth.width / 4, mouth.y + mouthHeight / 2 + curveOffset,
+      mouth.x + mouth.width / 4, mouth.y + mouthHeight / 2 + curveOffset,
+      mouth.x + mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset
+    );
+    p.endShape();
+    
+    // Draw vertical lines at ends to complete the shape
+    p.line(mouth.x - mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset,
+           mouth.x - mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset);
+    p.line(mouth.x + mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset,
+           mouth.x + mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset);
+    
+    // Fill mouth with semi-transparent color
+    p.fill(color[0], color[1], color[2], 40);
+    p.beginShape();
+    p.vertex(mouth.x - mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset);
+    p.bezierVertex(
+      mouth.x - mouth.width / 4, mouth.y - mouthHeight / 2 - curveOffset,
+      mouth.x + mouth.width / 4, mouth.y - mouthHeight / 2 - curveOffset,
+      mouth.x + mouth.width / 2, mouth.y - mouthHeight / 2 + curveOffset
+    );
+    p.vertex(mouth.x + mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset);
+    p.bezierVertex(
+      mouth.x + mouth.width / 4, mouth.y + mouthHeight / 2 + curveOffset,
+      mouth.x - mouth.width / 4, mouth.y + mouthHeight / 2 + curveOffset,
+      mouth.x - mouth.width / 2, mouth.y + mouthHeight / 2 - curveOffset
+    );
+    p.endShape(p.CLOSE);
+    
+    // Add horizontal lines inside mouth for a more mechanical/computer look
+    p.stroke(color[0], color[1], color[2], 30);
+    p.strokeWeight(1);
+    const lineCount = 5;
+    const lineSpacing = mouthHeight / (lineCount + 1);
+    
+    for (let i = 1; i <= lineCount; i++) {
+      const y = mouth.y - mouthHeight / 2 + i * lineSpacing;
+      p.line(mouth.x - mouth.width / 2 + 2, y, mouth.x + mouth.width / 2 - 2, y);
+    }
+    
+    p.pop();
   }
   
   // Variables for random eye movements
@@ -397,22 +675,57 @@ let sketch = function(p) {
   }
   
   function drawAudioVisualizer() {
-    if (mouth.openAmount < 0.2) return;
+    if (mouth.openAmount < 0.1) return;
     
-    const visualizerWidth = mouth.width * 0.8;
-    const visualizerHeight = mouth.height * mouth.openAmount * 0.8;
-    const barWidth = visualizerWidth / audioData.length;
+    const visualizerWidth = mouth.width * 0.9;
+    const visualizerHeight = mouth.height * mouth.openAmount * 0.7;
     
     p.push();
-    p.noStroke();
-    p.fill(255, 255, 255, 150);
     
-    for (let i = 0; i < audioData.length; i++) {
-      const barHeight = p.map(audioData[i], 0, 5, 2, visualizerHeight);
-      const x = mouth.x - visualizerWidth / 2 + i * barWidth;
-      const y = mouth.y;
+    // Kubrick-inspired symmetrical audio visualizer
+    // Using sharp geometric shapes and stark contrasts
+    
+    // Draw visualizer container
+    p.stroke(palette.white[0], palette.white[1], palette.white[2], 80);
+    p.strokeWeight(1);
+    p.noFill();
+    p.rect(mouth.x - visualizerWidth/2, mouth.y - visualizerHeight/2, 
+           visualizerWidth, visualizerHeight);
+    
+    // Draw audio bars with precise geometric style
+    const barCount = 10; // Fewer, more precise bars
+    const barWidth = visualizerWidth / barCount;
+    const barSpacing = 2;
+    
+    for (let i = 0; i < barCount; i++) {
+      // Calculate height based on audio data
+      // Use symmetrical pattern from center
+      const dataIndex = Math.floor(i * (audioData.length / barCount));
+      const mirroredIndex = audioData.length - dataIndex - 1;
       
-      p.rect(x, y - barHeight / 2, barWidth - 1, barHeight);
+      // Average the mirrored values for perfect symmetry
+      const value = (audioData[dataIndex] + audioData[mirroredIndex]) / 2;
+      
+      // Map to bar height with minimum size
+      const barHeight = p.map(value, 0, 5, visualizerHeight * 0.2, visualizerHeight * 0.9);
+      
+      // Calculate position
+      const x = mouth.x - visualizerWidth/2 + i * barWidth + barSpacing/2;
+      const y = mouth.y - barHeight/2;
+      
+      // Draw bar with HAL-inspired color
+      if (i % 2 === 0) {
+        p.fill(palette.red[0], palette.red[1], palette.red[2], 180);
+      } else {
+        p.fill(palette.blue[0], palette.blue[1], palette.blue[2], 180);
+      }
+      p.noStroke();
+      p.rect(x, y, barWidth - barSpacing, barHeight);
+      
+      // Add horizontal line for computer-like appearance
+      p.stroke(palette.white[0], palette.white[1], palette.white[2], 100);
+      p.strokeWeight(1);
+      p.line(x, mouth.y, x + barWidth - barSpacing, mouth.y);
     }
     
     p.pop();
