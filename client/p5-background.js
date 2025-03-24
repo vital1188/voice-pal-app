@@ -43,17 +43,17 @@ let sketch = function(p) {
     faceWidth = p.min(p.width * 0.8, 1200);
     faceHeight = p.min(p.height * 0.8, 800);
     
-    // Initialize HAL 9000 eye
-    const eyeSize = faceWidth * 0.18;
-    const eyeY = p.height * 0.4;
+    // Initialize HAL 9000 eye - make it larger and more prominent
+    const eyeSize = faceWidth * 0.25; // Increased size
+    const eyeY = p.height * 0.35; // Positioned higher
     
     halEye = {
       x: p.width / 2,
       y: eyeY,
       size: eyeSize,
       innerSize: eyeSize * 0.7,
-      coreSize: eyeSize * 0.4,
-      glowIntensity: 0.8,
+      coreSize: eyeSize * 0.5, // Larger core
+      glowIntensity: 1.0, // Increased glow
       pulsePhase: 0
     };
     
@@ -142,15 +142,16 @@ let sketch = function(p) {
       faceWidth = p.min(p.width * 0.9, 1500);
       faceHeight = p.min(p.height * 0.9, 1000);
       
-      // Update HAL eye position for fullscreen
-      const eyeSize = faceWidth * 0.22;
-      const eyeY = p.height * 0.4;
+      // Update HAL eye position for fullscreen - make it even larger
+      const eyeSize = faceWidth * 0.3; // Increased size
+      const eyeY = p.height * 0.35; // Positioned higher
       
       halEye.x = p.width / 2;
       halEye.y = eyeY;
       halEye.size = eyeSize;
       halEye.innerSize = eyeSize * 0.7;
-      halEye.coreSize = eyeSize * 0.4;
+      halEye.coreSize = eyeSize * 0.5; // Larger core
+      halEye.glowIntensity = 1.2; // Increased glow
       
       // Update monolith size
       monolith.width = p.width * 0.08;
@@ -325,6 +326,31 @@ let sketch = function(p) {
       halEye.coreSize * 0.3
     );
     
+    // Add facial features to make it more recognizable as a face
+    if (expressionState === 'happy') {
+      // Draw a smile below the eye
+      p.stroke(255, 255, 255, 100);
+      p.strokeWeight(2);
+      p.noFill();
+      p.arc(halEye.x, halEye.y + halEye.size * 0.4, halEye.size * 0.6, halEye.size * 0.3, 0, p.PI);
+    } else if (expressionState === 'thinking') {
+      // Draw a thoughtful line
+      p.stroke(255, 255, 255, 100);
+      p.strokeWeight(2);
+      p.line(
+        halEye.x - halEye.size * 0.3, 
+        halEye.y + halEye.size * 0.4, 
+        halEye.x + halEye.size * 0.3, 
+        halEye.y + halEye.size * 0.4
+      );
+    } else if (expressionState === 'surprised') {
+      // Draw a surprised mouth
+      p.stroke(255, 255, 255, 100);
+      p.strokeWeight(2);
+      p.noFill();
+      p.ellipse(halEye.x, halEye.y + halEye.size * 0.4, halEye.size * 0.3, halEye.size * 0.2);
+    }
+    
     p.pop();
   }
   
@@ -395,15 +421,16 @@ let sketch = function(p) {
     faceWidth = p.min(p.width * 0.8, 1200);
     faceHeight = p.min(p.height * 0.8, 800);
     
-    // Update HAL eye position
-    const eyeSize = faceWidth * 0.18;
-    const eyeY = p.height * 0.4;
+    // Update HAL eye position with larger size
+    const eyeSize = faceWidth * 0.25; // Increased size
+    const eyeY = p.height * 0.35; // Positioned higher
     
     halEye.x = p.width / 2;
     halEye.y = eyeY;
     halEye.size = eyeSize;
     halEye.innerSize = eyeSize * 0.7;
-    halEye.coreSize = eyeSize * 0.4;
+    halEye.coreSize = eyeSize * 0.5; // Larger core
+    halEye.glowIntensity = 1.0; // Increased glow
     
     // Update monolith position and size
     monolith.x = p.width / 2;
