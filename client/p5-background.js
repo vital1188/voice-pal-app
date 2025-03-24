@@ -347,170 +347,163 @@ let sketch = function(p) {
   function drawHALInterface() {
     p.push();
     
-    // Draw geometric eyes with stark colors
-    drawGeometricEye(leftEye, palette.red);
-    drawGeometricEye(rightEye, palette.red);
+    // Draw minimalist eyes with elegant style
+    drawMinimalistEye(leftEye, palette.red);
+    drawMinimalistEye(rightEye, palette.red);
     
-    // Draw geometric mouth with blue accent
-    drawGeometricMouth(mouth, palette.blue);
+    // Draw minimalist mouth with blue accent
+    drawMinimalistMouth(mouth, palette.blue);
     
     p.pop();
   }
   
-  // New abstract geometric face elements
-  function drawGeometricEye(eye, color) {
+  // Elegant minimalist face elements
+  function drawMinimalistEye(eye, color) {
     p.push();
     
-    // Create a geometric eye with concentric squares instead of circles
+    // Create a subtle glow effect
     const glowSize = eye.size * (1 + eye.glowIntensity * 0.3);
     
-    // Outer glow - rotated square
-    p.push();
-    p.translate(eye.x, eye.y);
-    p.rotate(p.frameCount * 0.005); // Slow rotation
+    // Outer glow - subtle pulsing circle
     p.noStroke();
+    const pulseAmount = Math.sin(p.frameCount * 0.02) * 0.1 + 0.9; // Subtle pulse
+    p.fill(color[0], color[1], color[2], 20 * eye.glowIntensity * pulseAmount);
+    p.ellipse(eye.x, eye.y, glowSize * 1.6 * pulseAmount);
+    
+    // Middle glow
     p.fill(color[0], color[1], color[2], 30 * eye.glowIntensity);
-    p.rectMode(p.CENTER);
-    p.rect(0, 0, glowSize * 1.5, glowSize * 1.5);
-    p.pop();
+    p.ellipse(eye.x, eye.y, glowSize * 1.3);
     
-    // Middle glow - opposite rotation
-    p.push();
-    p.translate(eye.x, eye.y);
-    p.rotate(-p.frameCount * 0.003); // Opposite rotation
-    p.noStroke();
-    p.fill(color[0], color[1], color[2], 50 * eye.glowIntensity);
-    p.rectMode(p.CENTER);
-    p.rect(0, 0, glowSize * 1.2, glowSize * 1.2);
-    p.pop();
-    
-    // Eye socket - precise square
-    p.push();
-    p.translate(eye.x, eye.y);
-    p.stroke(color[0], color[1], color[2]);
-    p.strokeWeight(2);
+    // Eye outline - thin, elegant circle
+    p.stroke(color[0], color[1], color[2], 180);
+    p.strokeWeight(1.5);
     p.noFill();
-    p.rectMode(p.CENTER);
-    p.rect(0, 0, eye.size, eye.size);
-    p.pop();
+    p.ellipse(eye.x, eye.y, eye.size);
     
     // Account for blinking with vertical scaling
     const eyeHeight = eye.size * (1 - eye.blinkState);
     if (eyeHeight > 1) {
-      // Inner eye - filled square
+      // Inner eye - gradient fill
       p.push();
-      p.translate(eye.x, eye.y);
+      const gradientSteps = 5;
+      for (let i = gradientSteps; i > 0; i--) {
+        const ratio = i / gradientSteps;
+        const alpha = 70 * ratio * eye.glowIntensity;
+        p.noStroke();
+        p.fill(color[0], color[1], color[2], alpha);
+        p.ellipse(eye.x, eye.y, eye.size * ratio, eyeHeight * ratio);
+      }
+      p.pop();
+      
+      // Pupil - elegant circle with subtle movement
       p.noStroke();
-      p.fill(color[0], color[1], color[2], 100);
-      p.rectMode(p.CENTER);
-      p.rect(0, 0, eye.size * 0.8, eyeHeight * 0.8);
-      p.pop();
+      p.fill(255, 255, 255, 220);
       
-      // Pupil - smaller square with offset
-      p.push();
-      p.translate(eye.x + eye.pupilOffset.x, eye.y + eye.pupilOffset.y);
-      p.rotate(p.frameCount * 0.01); // Subtle rotation
-      p.fill(255);
-      p.rectMode(p.CENTER);
-      p.rect(0, 0, eye.pupilSize * 0.8, eye.pupilSize * 0.8);
+      // Add subtle circular motion to pupil
+      const orbitRadius = eye.size * 0.05;
+      const orbitX = Math.sin(p.frameCount * 0.01) * orbitRadius;
+      const orbitY = Math.cos(p.frameCount * 0.01) * orbitRadius;
       
-      // Pupil highlight - even smaller square
-      p.fill(color[0], color[1], color[2], 200);
-      p.rect(eye.pupilSize * -0.1, eye.pupilSize * -0.1, eye.pupilSize * 0.3, eye.pupilSize * 0.3);
-      p.pop();
+      // Combine orbit with mouse/target tracking
+      const finalX = eye.x + eye.pupilOffset.x + orbitX;
+      const finalY = eye.y + eye.pupilOffset.y + orbitY;
       
-      // Add crosshair lines for a technical look
-      p.stroke(color[0], color[1], color[2], 150);
-      p.strokeWeight(1);
-      p.line(eye.x - eye.size/2, eye.y, eye.x + eye.size/2, eye.y);
-      p.line(eye.x, eye.y - eye.size/2, eye.x, eye.y + eye.size/2);
+      p.ellipse(finalX, finalY, eye.pupilSize * 0.7);
+      
+      // Pupil highlight - small offset circle
+      p.fill(255, 255, 255, 255);
+      p.ellipse(
+        finalX - eye.pupilSize * 0.15,
+        finalY - eye.pupilSize * 0.15,
+        eye.pupilSize * 0.2
+      );
+      
+      // Add subtle iris detail
+      p.noFill();
+      p.stroke(color[0], color[1], color[2], 60);
+      p.strokeWeight(0.5);
+      p.ellipse(eye.x, eye.y, eye.size * 0.7);
     }
     
     p.pop();
   }
   
-  function drawGeometricMouth(mouth, color) {
+  function drawMinimalistMouth(mouth, color) {
     p.push();
     
-    // Calculate mouth dimensions based on openAmount
+    // Calculate mouth dimensions
     const mouthHeight = mouth.height * mouth.openAmount;
     const mouthWidth = mouth.width;
     const curveOffset = mouth.width * mouth.curveAmount;
     
-    // Outer glow - rectangle
+    // Subtle glow behind mouth
     p.noStroke();
-    p.fill(color[0], color[1], color[2], 30 * mouth.glowIntensity);
-    p.rectMode(p.CENTER);
-    p.rect(mouth.x, mouth.y, mouthWidth + 10, mouthHeight + 10);
+    const pulseAmount = Math.sin(p.frameCount * 0.03) * 0.1 + 0.9; // Subtle pulse
+    p.fill(color[0], color[1], color[2], 15 * mouth.glowIntensity * pulseAmount);
+    p.ellipse(mouth.x, mouth.y, mouthWidth * 1.4, mouthHeight * 2.5);
     
-    // Inner glow
-    p.fill(color[0], color[1], color[2], 50 * mouth.glowIntensity);
-    p.rect(mouth.x, mouth.y, mouthWidth + 4, mouthHeight + 4);
-    
-    // Mouth outline - precise geometric shape
-    p.stroke(color[0], color[1], color[2]);
-    p.strokeWeight(2);
+    // Draw mouth outline - elegant curves
+    p.stroke(color[0], color[1], color[2], 180);
+    p.strokeWeight(1.5);
     p.noFill();
-    p.rectMode(p.CENTER);
     
-    // Draw mouth as a series of horizontal lines that respond to openAmount
-    const lineCount = Math.max(3, Math.floor(mouthHeight / 4));
-    const lineSpacing = mouthHeight / (lineCount - 1);
+    // Top curve
+    p.beginShape();
+    p.vertex(mouth.x - mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset);
+    p.bezierVertex(
+      mouth.x - mouthWidth / 4, mouth.y - mouthHeight / 2 - curveOffset,
+      mouth.x + mouthWidth / 4, mouth.y - mouthHeight / 2 - curveOffset,
+      mouth.x + mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset
+    );
+    p.endShape();
     
-    for (let i = 0; i < lineCount; i++) {
-      // Calculate y position for each line
-      const y = mouth.y - mouthHeight/2 + i * lineSpacing;
-      
-      // Calculate line width based on expression (curveAmount)
-      // Center lines are longer for positive curveAmount (smile)
-      // Center lines are shorter for negative curveAmount (frown)
-      let lineWidthMultiplier;
-      
-      if (curveOffset > 0) { // Smile
-        lineWidthMultiplier = i === 0 || i === lineCount - 1 ? 
-          0.7 : // First and last lines are shorter
-          1 + (curveOffset / mouthWidth) * Math.sin(Math.PI * i / (lineCount - 1)); // Middle lines are longer
-      } else { // Neutral or frown
-        lineWidthMultiplier = i === 0 || i === lineCount - 1 ? 
-          1 : // First and last lines are full width
-          1 + (curveOffset / mouthWidth) * Math.sin(Math.PI * i / (lineCount - 1)); // Middle lines are shorter
-      }
-      
-      const lineWidth = mouthWidth * lineWidthMultiplier;
-      
-      // Draw the line
-      p.stroke(color[0], color[1], color[2], 150 + 105 * (i / lineCount)); // Varying opacity
-      p.line(mouth.x - lineWidth/2, y, mouth.x + lineWidth/2, y);
-    }
+    // Bottom curve
+    p.beginShape();
+    p.vertex(mouth.x - mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset);
+    p.bezierVertex(
+      mouth.x - mouthWidth / 4, mouth.y + mouthHeight / 2 + curveOffset,
+      mouth.x + mouthWidth / 4, mouth.y + mouthHeight / 2 + curveOffset,
+      mouth.x + mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset
+    );
+    p.endShape();
     
-    // Add vertical lines at the edges for a more structured look
-    if (mouthHeight > 5) {
-      p.stroke(color[0], color[1], color[2], 100);
-      p.line(mouth.x - mouthWidth/2, mouth.y - mouthHeight/2, mouth.x - mouthWidth/2, mouth.y + mouthHeight/2);
-      p.line(mouth.x + mouthWidth/2, mouth.y - mouthHeight/2, mouth.x + mouthWidth/2, mouth.y + mouthHeight/2);
-    }
+    // Connect the ends with subtle lines
+    p.strokeWeight(1);
+    p.line(
+      mouth.x - mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset,
+      mouth.x - mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset
+    );
+    p.line(
+      mouth.x + mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset,
+      mouth.x + mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset
+    );
     
-    // Add audio level visualization as vertical bars
+    // Add elegant audio visualization - wave form
     if (mouth.openAmount > 0.1) {
-      const barCount = 7; // Odd number for symmetry
-      const barWidth = mouthWidth / (barCount * 2);
-      const maxBarHeight = mouthHeight * 0.7;
+      p.noFill();
+      p.stroke(color[0], color[1], color[2], 120);
+      p.strokeWeight(1);
       
-      p.noStroke();
-      p.fill(color[0], color[1], color[2], 180);
-      
-      for (let i = 0; i < barCount; i++) {
-        // Calculate audio level for this bar - center bars are taller
-        const centerFactor = 1 - Math.abs((i - (barCount-1)/2) / ((barCount-1)/2));
-        const barHeight = maxBarHeight * audioLevel * (0.3 + 0.7 * centerFactor);
+      // Draw a smooth wave based on audio data
+      p.beginShape();
+      const wavePoints = 20;
+      for (let i = 0; i < wavePoints; i++) {
+        const x = p.map(i, 0, wavePoints - 1, mouth.x - mouthWidth * 0.4, mouth.x + mouthWidth * 0.4);
         
-        // Position bars symmetrically
-        const x = mouth.x - (barCount-1)/2 * barWidth * 2 + i * barWidth * 2;
+        // Get audio data with wraparound
+        const dataIndex = i % audioData.length;
         
-        // Draw bar
-        p.rectMode(p.CORNER);
-        p.rect(x, mouth.y - barHeight/2, barWidth, barHeight);
+        // Calculate y position based on audio data
+        const amplitude = mouthHeight * 0.3 * audioData[dataIndex] / 5;
+        const y = mouth.y + Math.sin(i * 0.5 + p.frameCount * 0.1) * amplitude;
+        
+        p.vertex(x, y);
       }
+      p.endShape();
+      
+      // Add subtle horizontal center line
+      p.stroke(color[0], color[1], color[2], 60);
+      p.line(mouth.x - mouthWidth * 0.4, mouth.y, mouth.x + mouthWidth * 0.4, mouth.y);
     }
     
     p.pop();
