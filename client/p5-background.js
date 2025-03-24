@@ -347,163 +347,173 @@ let sketch = function(p) {
   function drawHALInterface() {
     p.push();
     
-    // Draw minimalist eyes with elegant style
-    drawMinimalistEye(leftEye, palette.red);
-    drawMinimalistEye(rightEye, palette.red);
+    // Draw Kubrick-inspired HAL 9000 eyes
+    drawKubrickEye(leftEye, palette.red);
+    drawKubrickEye(rightEye, palette.red);
     
-    // Draw minimalist mouth with blue accent
-    drawMinimalistMouth(mouth, palette.blue);
+    // Draw Kubrick-inspired computer terminal mouth
+    drawKubrickMouth(mouth, palette.blue);
     
     p.pop();
   }
   
-  // Elegant minimalist face elements
-  function drawMinimalistEye(eye, color) {
+  // Kubrick-inspired HAL 9000 face elements
+  function drawKubrickEye(eye, color) {
     p.push();
     
-    // Create a subtle glow effect
-    const glowSize = eye.size * (1 + eye.glowIntensity * 0.3);
+    // Create a strong, precise glow effect - Kubrick's stark lighting
+    const glowSize = eye.size * (1 + eye.glowIntensity * 0.5);
     
-    // Outer glow - subtle pulsing circle
+    // Outer glow - perfect circle with mechanical pulsing
     p.noStroke();
-    const pulseAmount = Math.sin(p.frameCount * 0.02) * 0.1 + 0.9; // Subtle pulse
-    p.fill(color[0], color[1], color[2], 20 * eye.glowIntensity * pulseAmount);
-    p.ellipse(eye.x, eye.y, glowSize * 1.6 * pulseAmount);
+    const pulseAmount = Math.sin(p.frameCount * 0.01) * 0.15 + 0.85; // Slow, deliberate pulse
+    p.fill(color[0], color[1], color[2], 30 * eye.glowIntensity * pulseAmount);
+    p.ellipse(eye.x, eye.y, glowSize * 1.8 * pulseAmount);
     
-    // Middle glow
-    p.fill(color[0], color[1], color[2], 30 * eye.glowIntensity);
-    p.ellipse(eye.x, eye.y, glowSize * 1.3);
+    // Middle glow - HAL 9000 lens housing
+    p.fill(color[0], color[1], color[2], 50 * eye.glowIntensity);
+    p.ellipse(eye.x, eye.y, glowSize * 1.4);
     
-    // Eye outline - thin, elegant circle
-    p.stroke(color[0], color[1], color[2], 180);
-    p.strokeWeight(1.5);
+    // Eye housing - precise circle with strong outline
+    p.stroke(255);
+    p.strokeWeight(2);
     p.noFill();
-    p.ellipse(eye.x, eye.y, eye.size);
+    p.ellipse(eye.x, eye.y, eye.size * 1.1);
     
-    // Account for blinking with vertical scaling
+    // Secondary housing ring - Kubrick's attention to detail
+    p.stroke(255, 100);
+    p.strokeWeight(1);
+    p.ellipse(eye.x, eye.y, eye.size * 1.2);
+    
+    // Account for blinking with mechanical iris effect
     const eyeHeight = eye.size * (1 - eye.blinkState);
     if (eyeHeight > 1) {
-      // Inner eye - gradient fill
+      // HAL 9000 red lens - perfect circle with gradient
       p.push();
-      const gradientSteps = 5;
-      for (let i = gradientSteps; i > 0; i--) {
-        const ratio = i / gradientSteps;
-        const alpha = 70 * ratio * eye.glowIntensity;
+      // Create HAL's iconic red lens with concentric circles
+      for (let i = 5; i > 0; i--) {
+        const ratio = i / 5;
         p.noStroke();
-        p.fill(color[0], color[1], color[2], alpha);
+        // Deep red to bright red gradient
+        p.fill(color[0], color[1] * ratio, color[2] * ratio, 90);
         p.ellipse(eye.x, eye.y, eye.size * ratio, eyeHeight * ratio);
       }
       p.pop();
       
-      // Pupil - elegant circle with subtle movement
+      // Central HAL "eye" - perfect white dot
       p.noStroke();
-      p.fill(255, 255, 255, 220);
+      p.fill(255);
       
-      // Add subtle circular motion to pupil
-      const orbitRadius = eye.size * 0.05;
-      const orbitX = Math.sin(p.frameCount * 0.01) * orbitRadius;
-      const orbitY = Math.cos(p.frameCount * 0.01) * orbitRadius;
+      // Add mechanical, precise movement - no organic motion
+      const maxOffset = eye.size * 0.2;
+      // Calculate position with deliberate delay - Kubrick's methodical pacing
+      const targetX = eye.x + eye.pupilOffset.x;
+      const targetY = eye.y + eye.pupilOffset.y;
       
-      // Combine orbit with mouse/target tracking
-      const finalX = eye.x + eye.pupilOffset.x + orbitX;
-      const finalY = eye.y + eye.pupilOffset.y + orbitY;
+      // Draw the central "eye" - HAL's iconic white center
+      p.ellipse(targetX, targetY, eye.pupilSize * 0.5);
       
-      p.ellipse(finalX, finalY, eye.pupilSize * 0.7);
-      
-      // Pupil highlight - small offset circle
-      p.fill(255, 255, 255, 255);
+      // Add lens reflection - Kubrick's attention to lighting
+      p.fill(255, 200);
       p.ellipse(
-        finalX - eye.pupilSize * 0.15,
-        finalY - eye.pupilSize * 0.15,
-        eye.pupilSize * 0.2
+        targetX - eye.pupilSize * 0.1,
+        targetY - eye.pupilSize * 0.1,
+        eye.pupilSize * 0.15
       );
       
-      // Add subtle iris detail
+      // Add concentric rings - HAL 9000 lens detail
       p.noFill();
-      p.stroke(color[0], color[1], color[2], 60);
-      p.strokeWeight(0.5);
-      p.ellipse(eye.x, eye.y, eye.size * 0.7);
+      p.stroke(255, 40);
+      p.strokeWeight(1);
+      p.ellipse(eye.x, eye.y, eye.size * 0.8);
+      p.ellipse(eye.x, eye.y, eye.size * 0.6);
+      p.ellipse(eye.x, eye.y, eye.size * 0.4);
     }
     
     p.pop();
   }
   
-  function drawMinimalistMouth(mouth, color) {
+  function drawKubrickMouth(mouth, color) {
     p.push();
     
-    // Calculate mouth dimensions
+    // Calculate mouth dimensions with Kubrick's precision
     const mouthHeight = mouth.height * mouth.openAmount;
     const mouthWidth = mouth.width;
     const curveOffset = mouth.width * mouth.curveAmount;
     
-    // Subtle glow behind mouth
-    p.noStroke();
-    const pulseAmount = Math.sin(p.frameCount * 0.03) * 0.1 + 0.9; // Subtle pulse
-    p.fill(color[0], color[1], color[2], 15 * mouth.glowIntensity * pulseAmount);
-    p.ellipse(mouth.x, mouth.y, mouthWidth * 1.4, mouthHeight * 2.5);
-    
-    // Draw mouth outline - elegant curves
+    // Draw computer terminal-like interface - inspired by 2001's computer screens
     p.stroke(color[0], color[1], color[2], 180);
-    p.strokeWeight(1.5);
+    p.strokeWeight(2);
     p.noFill();
     
-    // Top curve
-    p.beginShape();
-    p.vertex(mouth.x - mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset);
-    p.bezierVertex(
-      mouth.x - mouthWidth / 4, mouth.y - mouthHeight / 2 - curveOffset,
-      mouth.x + mouthWidth / 4, mouth.y - mouthHeight / 2 - curveOffset,
-      mouth.x + mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset
-    );
-    p.endShape();
+    // Draw rectangular housing - Kubrick's perfect symmetry
+    const terminalWidth = mouthWidth * 1.2;
+    const terminalHeight = Math.max(mouthHeight * 2, mouth.height);
+    p.rect(mouth.x - terminalWidth/2, mouth.y - terminalHeight/2, terminalWidth, terminalHeight);
     
-    // Bottom curve
-    p.beginShape();
-    p.vertex(mouth.x - mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset);
-    p.bezierVertex(
-      mouth.x - mouthWidth / 4, mouth.y + mouthHeight / 2 + curveOffset,
-      mouth.x + mouthWidth / 4, mouth.y + mouthHeight / 2 + curveOffset,
-      mouth.x + mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset
-    );
-    p.endShape();
-    
-    // Connect the ends with subtle lines
+    // Add secondary frame - Kubrick's attention to detail
+    p.stroke(color[0], color[1], color[2], 100);
     p.strokeWeight(1);
-    p.line(
-      mouth.x - mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset,
-      mouth.x - mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset
-    );
-    p.line(
-      mouth.x + mouthWidth / 2, mouth.y - mouthHeight / 2 + curveOffset,
-      mouth.x + mouthWidth / 2, mouth.y + mouthHeight / 2 - curveOffset
-    );
+    p.rect(mouth.x - terminalWidth/2 - 5, mouth.y - terminalHeight/2 - 5, terminalWidth + 10, terminalHeight + 10);
     
-    // Add elegant audio visualization - wave form
+    // Add audio visualization - inspired by computer displays in 2001
     if (mouth.openAmount > 0.1) {
-      p.noFill();
-      p.stroke(color[0], color[1], color[2], 120);
-      p.strokeWeight(1);
+      // Draw audio waveform with perfect symmetry - Kubrick's balanced compositions
+      const barCount = 16; // Even number for perfect symmetry
+      const barWidth = (terminalWidth - 20) / barCount;
+      const maxBarHeight = terminalHeight - 20;
       
-      // Draw a smooth wave based on audio data
-      p.beginShape();
-      const wavePoints = 20;
-      for (let i = 0; i < wavePoints; i++) {
-        const x = p.map(i, 0, wavePoints - 1, mouth.x - mouthWidth * 0.4, mouth.x + mouthWidth * 0.4);
+      for (let i = 0; i < barCount; i++) {
+        // Create perfect symmetry from center
+        const mirroredIndex = Math.abs((i - barCount/2) + 0.5);
+        const dataIndex = Math.floor(mirroredIndex * (audioData.length / (barCount/2)));
         
-        // Get audio data with wraparound
-        const dataIndex = i % audioData.length;
+        // Calculate height with mechanical precision
+        const barHeight = Math.max(2, maxBarHeight * (audioData[dataIndex % audioData.length] / 5) * mouth.openAmount);
         
-        // Calculate y position based on audio data
-        const amplitude = mouthHeight * 0.3 * audioData[dataIndex] / 5;
-        const y = mouth.y + Math.sin(i * 0.5 + p.frameCount * 0.1) * amplitude;
+        // Calculate position with perfect spacing
+        const x = mouth.x - terminalWidth/2 + 10 + i * barWidth;
+        const y = mouth.y + terminalHeight/2 - 10 - barHeight;
         
-        p.vertex(x, y);
+        // Alternate colors - inspired by computer displays in 2001
+        if (i % 2 === 0) {
+          p.fill(color[0], color[1], color[2], 180);
+        } else {
+          p.fill(255, 180);
+        }
+        p.noStroke();
+        p.rect(x, y, barWidth - 2, barHeight);
       }
-      p.endShape();
       
-      // Add subtle horizontal center line
-      p.stroke(color[0], color[1], color[2], 60);
-      p.line(mouth.x - mouthWidth * 0.4, mouth.y, mouth.x + mouthWidth * 0.4, mouth.y);
+      // Add horizontal scan lines - CRT monitor effect from 2001
+      p.stroke(255, 30);
+      p.strokeWeight(1);
+      for (let i = 0; i < terminalHeight; i += 4) {
+        p.line(
+          mouth.x - terminalWidth/2 + 5, 
+          mouth.y - terminalHeight/2 + i,
+          mouth.x + terminalWidth/2 - 5, 
+          mouth.y - terminalHeight/2 + i
+        );
+      }
+      
+      // Add text display - inspired by computer readouts in 2001
+      p.fill(color[0], color[1], color[2], 200);
+      p.noStroke();
+      p.textSize(8);
+      p.textFont('monospace');
+      p.textAlign(p.LEFT, p.TOP);
+      
+      // Display audio level as text readout
+      const audioLevel = Math.floor(mouth.openAmount * 100);
+      p.text(`AUDIO: ${audioLevel}%`, mouth.x - terminalWidth/2 + 10, mouth.y - terminalHeight/2 + 10);
+      
+      // Display expression state
+      p.text(`MODE: ${expressionState.toUpperCase()}`, mouth.x - terminalWidth/2 + 10, mouth.y - terminalHeight/2 + 25);
+      
+      // Add time code - Kubrick's attention to detail
+      const timeCode = Math.floor(p.frameCount / 60).toString().padStart(4, '0');
+      p.text(`TIME: ${timeCode}`, mouth.x + terminalWidth/2 - 80, mouth.y - terminalHeight/2 + 10);
     }
     
     p.pop();
