@@ -720,6 +720,134 @@
       background: var(--primary-color);
     }
     
+    /* App header with theme toggle */
+    .app-header {
+      position: relative;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    /* Theme toggle switch */
+    .theme-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+    
+    .theme-switch {
+      opacity: 0;
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+    
+    .theme-switch-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      width: 50px;
+      height: 26px;
+      background: rgba(88, 101, 242, 0.3);
+      border-radius: 100px;
+      position: relative;
+      transition: background-color 0.2s;
+    }
+    
+    .theme-switch-label:before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 2px;
+      bottom: 2px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .theme-switch:checked + .theme-switch-label {
+      background: rgba(87, 242, 135, 0.3);
+    }
+    
+    .theme-switch:checked + .theme-switch-label:before {
+      transform: translateX(24px);
+      background: var(--voice-color);
+    }
+    
+    .theme-switch-icon {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .theme-switch-icon:before {
+      content: "🌙";
+      position: absolute;
+      font-size: 12px;
+      left: 4px;
+      top: 3px;
+      transition: opacity 0.2s;
+      opacity: 1;
+    }
+    
+    .theme-switch:checked + .theme-switch-label .theme-switch-icon:before {
+      content: "☀️";
+      opacity: 1;
+    }
+    
+    /* Light theme variables */
+    [data-theme="light"] {
+      --primary-color: rgba(88, 101, 242, 0.9);
+      --primary-hover: rgba(120, 130, 255, 0.95);
+      --secondary-color: rgba(240, 240, 245, 0.8);
+      --text-color: rgba(30, 35, 45, 0.95);
+      --card-bg: rgba(240, 240, 245, 0.7);
+      --card-border: rgba(88, 101, 242, 0.3);
+    }
+    
+    [data-theme="light"] body {
+      background-color: rgb(230, 235, 240);
+      color: var(--text-color);
+    }
+    
+    [data-theme="light"] p {
+      color: rgba(30, 35, 45, 0.8);
+    }
+    
+    [data-theme="light"] .selector select {
+      background-color: rgba(255, 255, 255, 0.7);
+      color: rgba(30, 35, 45, 0.9);
+    }
+    
+    [data-theme="light"] .selector select option {
+      background-color: rgb(255, 255, 255);
+      color: rgba(30, 35, 45, 0.9);
+    }
+    
+    [data-theme="light"] .slider-control {
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    [data-theme="light"] .slider-label {
+      color: rgba(30, 35, 45, 0.8);
+    }
+    
+    [data-theme="light"] .language-info,
+    [data-theme="light"] .voice-controls {
+      background: linear-gradient(135deg, rgba(240, 240, 245, 0.7), rgba(230, 235, 240, 0.7));
+    }
+    
+    [data-theme="light"] .supported-languages {
+      color: rgba(30, 35, 45, 0.8);
+    }
+    
     /* Audio visualizer */
     .visualizer-container {
       display: flex;
@@ -742,6 +870,73 @@
       transition: height 0.05s ease;
       border-radius: 1px;
     }
+    
+    /* Conversation history panel */
+    .conversation-panel {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 300px;
+      max-height: 80vh;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: var(--border-width) solid var(--card-border);
+      box-shadow: var(--shadow);
+      overflow-y: auto;
+      z-index: 100;
+      padding: 1rem;
+    }
+    
+    .conversation-panel h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    }
+    
+    .conversation-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .conversation-item {
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      border-radius: 8px;
+      background-color: rgba(88, 101, 242, 0.1);
+      border-left: 3px solid var(--primary-color);
+    }
+    
+    .conversation-item.user {
+      background-color: rgba(87, 242, 135, 0.1);
+      border-left: 3px solid var(--voice-color);
+      text-align: right;
+    }
+    
+    .conversation-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 101;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      border: none;
+      font-size: 1.2rem;
+    }
+    
+    .conversation-toggle:hover {
+      background-color: var(--primary-hover);
+    }
   </style>
 </head>
 <body>
@@ -755,8 +950,16 @@
   </div>
 
   <div class="container">
-    <h1>Nicanor</h1>
-    <p>Your multilingual AI friend is ready to judge... I mean chat with you!</p>
+    <div class="app-header">
+      <h1>Nicanor</h1>
+      <p>Your multilingual AI friend is ready to judge... I mean chat with you!</p>
+      <div class="theme-toggle">
+        <input type="checkbox" id="theme-switch" class="theme-switch">
+        <label for="theme-switch" class="theme-switch-label">
+          <span class="theme-switch-icon"></span>
+        </label>
+      </div>
+    </div>
     
     <div class="btn-container">
       <div class="btn-ring"></div>
@@ -847,7 +1050,19 @@
     </div>
   </div>
 
+  <!-- Conversation history panel -->
+  <div class="conversation-panel" id="conversation-panel">
+    <h3>Conversation History</h3>
+    <ul class="conversation-list" id="conversation-list">
+      <!-- Conversation items will be added here dynamically -->
+    </ul>
+  </div>
+  
+  <!-- Conversation toggle button -->
+  <button class="conversation-toggle" id="conversation-toggle">💬</button>
+
   <script src="config.js"></script>
+  <script src="theme.js"></script>
   <script src="app.js"></script>
   <script src="animations.js"></script>
   <script src="p5-background.js"></script>
