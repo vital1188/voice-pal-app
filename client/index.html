@@ -441,35 +441,42 @@
       border-color: var(--emotion-color);
     }
     
-    /* Language selector specific styles */
-    .language-selector {
-      margin-top: 1.2rem;
+    /* Language info styles */
+    .language-info {
+      margin-top: 1.5rem;
+      position: relative;
+      width: 100%;
+      padding: 1rem;
+      background-color: rgba(30, 50, 70, 0.3);
+      border: 1px solid rgba(150, 230, 180, 0.3);
+      border-radius: var(--border-radius);
+      text-align: center;
     }
     
-    .language-selector {
-      margin-top: 1.2rem;
+    .language-info::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: -10px;
+      width: 40px;
+      height: 1px;
+      background-color: rgba(150, 230, 180, 0.8);
+      transform: translateX(-50%);
+      opacity: 0.5;
     }
     
-    .language-selector select {
-      border-color: rgba(150, 230, 180, 0.5);
-      border-width: 2px;
-      background-color: rgba(30, 50, 70, 0.5);
-    }
-    
-    .language-selector select:focus {
-      border-color: rgba(150, 230, 180, 0.8);
-      box-shadow: 0 0 0 3px rgba(150, 230, 180, 0.3);
-    }
-    
-    .language-selector::after {
-      border-color: rgba(150, 230, 180, 0.8);
-      width: 12px;
-      height: 12px;
-    }
-    
-    .language-selector label {
+    .language-note {
       color: rgba(150, 230, 180, 0.9);
       font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .supported-languages {
+      color: rgba(240, 245, 255, 0.7);
+      font-size: 0.75rem;
+      margin-bottom: 0;
+      line-height: 1.4;
     }
     
     /* Voice controls */
@@ -681,22 +688,9 @@
       </select>
     </div>
     
-    <div class="language-selector selector">
-      <label for="language-select">Language:</label>
-      <select id="language-select">
-        <option value="english">English</option>
-        <option value="spanish">Spanish (Español)</option>
-        <option value="german">German (Deutsch)</option>
-        <option value="french">French (Français)</option>
-        <option value="italian">Italian (Italiano)</option>
-        <option value="romanian">Romanian (Română)</option>
-        <option value="russian">Russian (Русский)</option>
-        <option value="ukrainian">Ukrainian (Українська)</option>
-        <option value="portuguese">Portuguese (Português)</option>
-        <option value="polish">Polish (Polski)</option>
-        <option value="chinese">Chinese (中文)</option>
-        <option value="japanese">Japanese (日本語)</option>
-      </select>
+    <div class="language-info">
+      <p class="language-note">Nicanor will automatically detect and respond in the language you speak!</p>
+      <p class="supported-languages">Supported languages: English, Spanish, German, French, Italian, Romanian, Russian, Ukrainian, Portuguese, Polish, Chinese, Japanese, and more.</p>
     </div>
     
     <div class="voice-controls">

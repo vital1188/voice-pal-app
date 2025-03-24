@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const voiceSelect = document.getElementById('voice-select');
       const moodSelect = document.getElementById('mood-select');
       const emotionSelect = document.getElementById('emotion-select');
-      const languageSelect = document.getElementById('language-select');
       const sociabilitySlider = document.getElementById('sociability-slider');
       const toneSlider = document.getElementById('tone-slider');
       const speedSlider = document.getElementById('speed-slider');
@@ -79,15 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedVoice = voiceSelect.value;
       const selectedMood = moodSelect.value;
       const selectedEmotion = emotionSelect.value;
-      const selectedLanguage = languageSelect.value;
       const sociabilityLevel = sociabilitySlider.value;
       const toneLevel = toneSlider.value;
       const speedLevel = speedSlider.value;
       const memoryLevel = memorySlider.value;
       
       // Update status with more detailed message
-      console.log(`Selected language: ${selectedLanguage}`);
-      updateStatus(`Connecting with ${selectedVoice} voice in ${selectedMood} mood (${selectedLanguage})...`, false);
+      updateStatus(`Connecting with ${selectedVoice} voice in ${selectedMood} mood...`, false);
       
       // Get ephemeral token from our server with all parameters
       const tokenResponse = await fetch(
@@ -95,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `voice=${selectedVoice}&` +
         `mood=${selectedMood}&` +
         `emotion=${selectedEmotion}&` +
-        `language=${selectedLanguage}&` +
         `sociability=${sociabilityLevel}&` +
         `tone=${toneLevel}&` +
         `speed=${speedLevel}&` +

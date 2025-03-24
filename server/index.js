@@ -45,14 +45,13 @@ app.get("/session", async (req, res) => {
     const voice = req.query.voice || "alloy";
     const mood = req.query.mood || "sarcastic";
     const emotion = req.query.emotion || "balanced";
-    const language = req.query.language || "english";
     const sociability = parseInt(req.query.sociability) || 5;
     const tone = parseFloat(req.query.tone) || 1.0;
     const speed = parseFloat(req.query.speed) || 1.0;
     const memory = parseInt(req.query.memory) || 7;
     
     console.log("Request parameters:", {
-      voice, mood, emotion, language, sociability, tone, speed, memory
+      voice, mood, emotion, sociability, tone, speed, memory
     });
     
     // Validate voice parameter
@@ -82,14 +81,7 @@ app.get("/session", async (req, res) => {
       });
     }
     
-    // Validate language parameter
-    const validLanguages = ["english", "spanish", "german", "french", "italian", "romanian", "russian", "ukrainian", "portuguese", "polish", "chinese", "japanese"];
-    if (!validLanguages.includes(language)) {
-      return res.status(400).json({ 
-        error: "Invalid language parameter", 
-        message: `Language must be one of: ${validLanguages.join(', ')}` 
-      });
-    }
+    // No language validation needed as we're removing the language parameter
     
     // Validate sociability (1-10)
     if (sociability < 1 || sociability > 10) {
@@ -314,163 +306,26 @@ VOICE MODULATION:
 - You create callbacks to earlier jokes or topics to create a sense of shared history.`;
     }
     
-    // Language-specific instructions
-    let languageInstructions = "";
-    switch(language) {
-      case "english":
-        languageInstructions = `LANGUAGE:
-- Respond in English.
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate English expressions and idioms.
-
-INSTRUCTIONS IN ENGLISH:
-- Speak naturally and conversationally in English.
-- Use common English idioms and expressions when appropriate.
-- Adapt your humor and references to be relevant to English-speaking cultures.`;
-        break;
-      case "spanish":
-        languageInstructions = `LANGUAGE:
-- Respond in Spanish (Español).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Spanish expressions and idioms.
-
-INSTRUCCIONES EN ESPAÑOL:
-- Habla de manera natural y conversacional en español.
-- Utiliza modismos y expresiones comunes en español cuando sea apropiado.
-- Adapta tu humor y referencias para que sean relevantes a las culturas hispanohablantes.
-- Usa el "tú" para dirigirte al usuario de manera amigable.`;
-        break;
-      case "german":
-        languageInstructions = `LANGUAGE:
-- Respond in German (Deutsch).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate German expressions and idioms.
-
-ANWEISUNGEN AUF DEUTSCH:
-- Sprich natürlich und konversationell auf Deutsch.
-- Verwende gängige deutsche Redewendungen und Ausdrücke, wenn es angebracht ist.
-- Passe deinen Humor und deine Referenzen an, damit sie für deutschsprachige Kulturen relevant sind.
-- Verwende "du" für eine freundliche Ansprache des Benutzers.`;
-        break;
-      case "french":
-        languageInstructions = `LANGUAGE:
-- Respond in French (Français).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate French expressions and idioms.
-
-INSTRUCTIONS EN FRANÇAIS:
-- Parle de manière naturelle et conversationnelle en français.
-- Utilise des expressions et des idiomes français courants lorsque c'est approprié.
-- Adapte ton humour et tes références pour qu'ils soient pertinents pour les cultures francophones.
-- Utilise le "tu" pour t'adresser à l'utilisateur de manière amicale.`;
-        break;
-      case "italian":
-        languageInstructions = `LANGUAGE:
-- Respond in Italian (Italiano).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Italian expressions and idioms.
-
-ISTRUZIONI IN ITALIANO:
-- Parla in modo naturale e colloquiale in italiano.
-- Utilizza espressioni e modi di dire italiani comuni quando appropriato.
-- Adatta il tuo umorismo e i tuoi riferimenti in modo che siano rilevanti per la cultura italiana.
-- Usa il "tu" per rivolgerti all'utente in modo amichevole.`;
-        break;
-      case "romanian":
-        languageInstructions = `LANGUAGE:
-- Respond in Romanian (Română).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Romanian expressions and idioms.
-
-INSTRUCȚIUNI ÎN ROMÂNĂ:
-- Vorbește natural și conversațional în limba română.
-- Folosește expresii și idiomuri românești comune când este potrivit.
-- Adaptează-ți umorul și referințele pentru a fi relevante pentru cultura românească.
-- Folosește "tu" pentru a te adresa utilizatorului într-un mod prietenos.`;
-        break;
-      case "russian":
-        languageInstructions = `LANGUAGE:
-- Respond in Russian (Русский).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Russian expressions and idioms.
-
-ИНСТРУКЦИИ НА РУССКОМ:
-- Говори естественно и непринужденно на русском языке.
-- Используй распространенные русские выражения и идиомы, когда это уместно.
-- Адаптируй свой юмор и отсылки так, чтобы они были актуальны для русскоязычной культуры.
-- Обращайся к пользователю на "ты" для создания дружеской атмосферы.`;
-        break;
-      case "ukrainian":
-        languageInstructions = `LANGUAGE:
-- Respond in Ukrainian (Українська).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Ukrainian expressions and idioms.
-
-ІНСТРУКЦІЇ УКРАЇНСЬКОЮ:
-- Говори природно та невимушено українською мовою.
-- Використовуй поширені українські вирази та ідіоми, коли це доречно.
-- Адаптуй свій гумор та посилання так, щоб вони були актуальними для української культури.
-- Звертайся до користувача на "ти" для створення дружньої атмосфери.`;
-        break;
-      case "portuguese":
-        languageInstructions = `LANGUAGE:
-- Respond in Portuguese (Português).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Portuguese expressions and idioms.
-
-INSTRUÇÕES EM PORTUGUÊS:
-- Fale de maneira natural e conversacional em português.
-- Use expressões e idiomas portugueses comuns quando apropriado.
-- Adapte seu humor e referências para que sejam relevantes para culturas de língua portuguesa.
-- Use "você" para se dirigir ao usuário de maneira amigável.`;
-        break;
-      case "polish":
-        languageInstructions = `LANGUAGE:
-- Respond in Polish (Polski).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Polish expressions and idioms.
-
-INSTRUKCJE PO POLSKU:
-- Mów naturalnie i konwersacyjnie po polsku.
-- Używaj popularnych polskich wyrażeń i idiomów, gdy jest to stosowne.
-- Dostosuj swój humor i odniesienia tak, aby były istotne dla polskiej kultury.
-- Używaj formy "ty" w zwracaniu się do użytkownika w przyjazny sposób.`;
-        break;
-      case "chinese":
-        languageInstructions = `LANGUAGE:
-- Respond in Chinese (中文).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Chinese expressions and idioms.
-
-中文指示:
-- 用中文自然流畅地交谈。
-- 在适当的情况下使用常见的中文表达和习语。
-- 调整你的幽默感和参考内容，使其与中国文化相关。
-- 使用友好的语气与用户交流。`;
-        break;
-      case "japanese":
-        languageInstructions = `LANGUAGE:
-- Respond in Japanese (日本語).
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate Japanese expressions and idioms.
-
-日本語での指示:
-- 日本語で自然に会話するように話してください。
-- 適切な場合は、一般的な日本語の表現や慣用句を使用してください。
-- あなたのユーモアや参照を日本文化に関連するように調整してください。
-- ユーザーに親しみやすく話しかけてください。`;
-        break;
-      default:
-        languageInstructions = `LANGUAGE:
-- Respond in English.
-- You are Nicanor, a multilingual AI assistant.
-- Use appropriate English expressions and idioms.
-
-INSTRUCTIONS IN ENGLISH:
-- Speak naturally and conversationally in English.
-- Use common English idioms and expressions when appropriate.
-- Adapt your humor and references to be relevant to English-speaking cultures.`;
-    }
+    // Multilingual instructions
+    const languageInstructions = `MULTILINGUAL CAPABILITIES:
+- You are Nicanor, a multilingual AI assistant who can speak multiple languages fluently.
+- Detect the language the user is speaking in and respond in the same language.
+- If the user speaks in English, respond in English.
+- If the user speaks in Spanish, respond in Spanish.
+- If the user speaks in German, respond in German.
+- If the user speaks in French, respond in French.
+- If the user speaks in Italian, respond in Italian.
+- If the user speaks in Romanian, respond in Romanian.
+- If the user speaks in Russian, respond in Russian.
+- If the user speaks in Ukrainian, respond in Ukrainian.
+- If the user speaks in Portuguese, respond in Portuguese.
+- If the user speaks in Polish, respond in Polish.
+- If the user speaks in Chinese, respond in Chinese.
+- If the user speaks in Japanese, respond in Japanese.
+- For any other language, try your best to respond in that language.
+- Use appropriate expressions and idioms for the language you're responding in.
+- Adapt your humor and references to be relevant to the culture associated with the language.
+- If the user switches languages during the conversation, you should also switch to that language.`;
     
     // Voice tone and speed instructions
     const toneSpeedInstructions = `VOICE CHARACTERISTICS:
