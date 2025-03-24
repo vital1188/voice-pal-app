@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nicanor Face Demo</title>
+  <title>Nicanor - The Shining AI</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
   <style>
     body {
@@ -23,43 +23,79 @@
       display: flex;
       gap: 20px;
       z-index: 100;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(20, 20, 20, 0.8);
       padding: 15px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0; /* Sharp edges like the hotel corridors */
+      border: 2px solid rgba(153, 0, 0, 0.7); /* Blood red border */
+      box-shadow: 0 0 20px rgba(153, 0, 0, 0.3); /* Eerie glow */
     }
     
     button {
-      background: rgba(220, 20, 60, 0.8);
+      background: rgba(153, 0, 0, 0.8); /* The Shining blood red */
       color: white;
       border: none;
       padding: 10px 20px;
-      border-radius: 5px;
+      border-radius: 0; /* Sharp edges like the hotel corridors */
       cursor: pointer;
-      font-family: 'Space Mono', monospace;
+      font-family: 'Courier New', monospace; /* Typewriter font like Jack's manuscript */
       font-weight: bold;
       transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     
     button:hover {
-      background: rgba(255, 40, 80, 0.9);
+      background: rgba(180, 0, 0, 0.9);
       transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(180, 0, 0, 0.5); /* Eerie glow */
     }
     
     .slider-container {
       display: flex;
       flex-direction: column;
       align-items: center;
+      font-family: 'Courier New', monospace; /* Typewriter font */
+      margin-left: 10px;
     }
     
     .slider-container label {
       margin-bottom: 5px;
       font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(153, 0, 0, 0.9); /* Blood red */
     }
     
     input[type="range"] {
-      width: 100px;
+      width: 120px;
+      height: 5px;
+      -webkit-appearance: none;
+      background: linear-gradient(to right, rgba(153, 0, 0, 0.3), rgba(153, 0, 0, 0.8));
+      outline: none;
+      border-radius: 0; /* Sharp edges */
     }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      background: rgba(153, 0, 0, 0.9); /* Blood red */
+      cursor: pointer;
+      border-radius: 0; /* Square thumb like hotel doors */
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      background: rgba(153, 0, 0, 0.9); /* Blood red */
+      cursor: pointer;
+      border-radius: 0; /* Square thumb */
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
     
     h1 {
       position: fixed;
@@ -67,35 +103,38 @@
       left: 0;
       right: 0;
       text-align: center;
-      font-size: 24px;
+      font-size: 32px;
       z-index: 100;
       margin: 0;
       padding: 0;
       letter-spacing: 4px;
       text-transform: uppercase;
+      font-family: 'Playfair Display', serif; /* More like The Shining title font */
+      color: #990000; /* Blood red */
+      text-shadow: 0 0 10px rgba(153, 0, 0, 0.5); /* Eerie glow */
     }
     
     h1::after {
       content: '';
       display: block;
-      width: 80px;
-      height: 2px;
-      background-color: rgba(220, 20, 60, 1);
+      width: 120px;
+      height: 3px;
+      background-color: rgba(153, 0, 0, 0.8); /* Blood red */
       margin: 10px auto 0;
     }
   </style>
 </head>
 <body>
-  <h1>Nicanor Face Demo</h1>
+  <h1 id="title">Nicanor</h1>
   
   <div class="controls">
-    <button id="happy-btn">Happy</button>
-    <button id="thinking-btn">Thinking</button>
-    <button id="surprised-btn">Surprised</button>
-    <button id="neutral-btn">Neutral</button>
+    <button id="happy-btn">Redrum</button>
+    <button id="thinking-btn">Overlook</button>
+    <button id="surprised-btn">Here's Johnny</button>
+    <button id="neutral-btn">Room 237</button>
     
     <div class="slider-container">
-      <label>Audio Level</label>
+      <label>Blood Level</label>
       <input type="range" id="audio-level" min="0" max="1" step="0.01" value="0.2">
     </div>
   </div>
@@ -106,6 +145,32 @@
     window.updateRobotAudioLevel = null;
     
     document.addEventListener('DOMContentLoaded', () => {
+      // Typewriter effect for title - The Shining style
+      const titleElement = document.getElementById('title');
+      const fullTitle = "Nicanor - All Work And No Play";
+      let currentText = "";
+      let charIndex = 0;
+      
+      function typeWriter() {
+        if (charIndex < fullTitle.length) {
+          currentText += fullTitle.charAt(charIndex);
+          titleElement.textContent = currentText;
+          charIndex++;
+          
+          // Make the text appear to shake slightly
+          if (Math.random() < 0.1) {
+            titleElement.style.transform = `translateX(${Math.random() * 2 - 1}px)`;
+          }
+          
+          // Add random delay to simulate typewriter
+          const randomDelay = Math.random() * 200 + 50;
+          setTimeout(typeWriter, randomDelay);
+        }
+      }
+      
+      // Start the typewriter effect
+      setTimeout(typeWriter, 1000);
+      
       // Set up button event listeners
       document.getElementById('happy-btn').addEventListener('click', () => {
         if (window.setRobotExpression) {

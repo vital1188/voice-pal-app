@@ -1,13 +1,19 @@
 // Kubrick-inspired AI Interface using p5.js
 
 let sketch = function(p) {
-  // Color palette - Kubrick-inspired stark contrasts
+  // Color palette - The Shining inspired colors
   const palette = {
     black: [0, 0, 0],
     white: [240, 240, 240],
     red: [220, 20, 60],
     blue: [0, 149, 237],
-    gold: [212, 175, 55]
+    gold: [212, 175, 55],
+    // The Shining specific colors
+    carpetRed: [153, 0, 0],
+    carpetOrange: [204, 85, 0],
+    carpetBrown: [102, 51, 0],
+    corridorBeige: [245, 222, 179],
+    elevatorRed: [180, 0, 0]
   };
   
   // Robot face parameters
@@ -248,27 +254,176 @@ let sketch = function(p) {
   }
   
   function drawGrid() {
-    // Draw one-point perspective grid lines
-    p.stroke(palette.white[0], palette.white[1], palette.white[2], 20);
+    // Draw The Shining inspired corridor
+    
+    // First draw the basic one-point perspective grid for the corridor walls
+    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 30);
     p.strokeWeight(1);
     
+    // Draw corridor walls
     for (let i = 0; i < grid.length; i++) {
       const line = grid[i];
       p.line(line.x1, line.y1, line.x2, line.y2);
     }
+    
+    // Draw The Shining carpet pattern - hexagonal pattern with alternating colors
+    const hexSize = 40; // Size of each hexagon
+    const hexHeight = hexSize * Math.sqrt(3);
+    const rows = Math.ceil(p.height / hexHeight) + 1;
+    const cols = Math.ceil(p.width / (hexSize * 1.5)) + 1;
+    
+    // Calculate perspective scaling factor based on distance from vanishing point
+    const vanishingPoint = { x: p.width / 2, y: p.height / 2 };
+    
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        // Calculate base position of hexagon
+        let x = col * hexSize * 1.5;
+        let y = row * hexHeight;
+        
+        // Offset every other row
+        if (row % 2 === 1) {
+          x += hexSize * 0.75;
+        }
+        
+        // Calculate distance from vanishing point
+        const distX = x - vanishingPoint.x;
+        const distY = y - vanishingPoint.y;
+        const dist = Math.sqrt(distX * distX + distY * distY);
+        
+        // Scale size based on distance (perspective effect)
+        const perspectiveScale = p.map(dist, 0, p.width, 0.2, 1);
+        const scaledSize = hexSize * perspectiveScale;
+        
+        // Calculate position with perspective (closer to vanishing point)
+        const perspectiveX = vanishingPoint.x + distX * perspectiveScale;
+        const perspectiveY = vanishingPoint.y + distY * perspectiveScale;
+        
+        // Choose color based on pattern (alternating colors like The Shining carpet)
+        let fillColor;
+        if ((row + col) % 3 === 0) {
+          fillColor = palette.carpetRed;
+        } else if ((row + col) % 3 === 1) {
+          fillColor = palette.carpetOrange;
+        } else {
+          fillColor = palette.carpetBrown;
+        }
+        
+        // Draw hexagon
+        p.push();
+        p.translate(perspectiveX, perspectiveY);
+        p.noStroke();
+        p.fill(fillColor[0], fillColor[1], fillColor[2], 15); // Low opacity to blend with background
+        p.beginShape();
+        for (let i = 0; i < 6; i++) {
+          const angle = i * Math.PI / 3;
+          const hx = scaledSize * Math.cos(angle);
+          const hy = scaledSize * Math.sin(angle);
+          p.vertex(hx, hy);
+        }
+        p.endShape(p.CLOSE);
+        p.pop();
+      }
+    }
+    
+    // Add door frames along the corridor for The Shining effect
+    const doorCount = 5;
+    const doorSpacing = p.width / (doorCount + 1);
+    const doorHeight = p.height * 0.4;
+    const doorWidth = p.width * 0.1;
+    
+    for (let i = 1; i <= doorCount; i++) {
+      const x = i * doorSpacing;
+      const distFromCenter = Math.abs(x - p.width / 2);
+      const perspectiveScale = p.map(distFromCenter, 0, p.width / 2, 0.5, 1);
+      
+      // Draw door frame
+      p.noFill();
+      p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 40);
+      p.strokeWeight(2);
+      p.rect(x - doorWidth * perspectiveScale / 2, 
+             p.height / 2 - doorHeight * perspectiveScale / 2,
+             doorWidth * perspectiveScale, 
+             doorHeight * perspectiveScale);
+    }
   }
   
   function drawMonolith() {
-    // Draw monolith with slight rotation based on time
+    // Draw The Shining elevator doors with blood effect
     p.push();
-    p.translate(monolith.x, monolith.y);
-    p.rotate(Math.sin(time * 0.2) * 0.05);
     
-    // Black rectangle with white outline
-    p.fill(0);
-    p.stroke(palette.white[0], palette.white[1], palette.white[2], 100);
-    p.strokeWeight(2);
-    p.rect(-monolith.width / 2, -monolith.height / 2, monolith.width, monolith.height);
+    // Position in center of screen
+    p.translate(p.width / 2, p.height / 2);
+    
+    // Calculate door width and height
+    const doorWidth = p.width * 0.3;
+    const doorHeight = p.height * 0.5;
+    const doorX = -doorWidth / 2;
+    const doorY = -doorHeight / 2;
+    
+    // Draw elevator door frame
+    p.noFill();
+    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 100);
+    p.strokeWeight(3);
+    p.rect(doorX - 10, doorY - 10, doorWidth + 20, doorHeight + 20);
+    
+    // Calculate door opening based on time
+    const doorOpenAmount = (Math.sin(time * 0.2) + 1) / 2 * 0.2; // 0-0.2 range
+    
+    // Left door
+    p.fill(20);
+    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 70);
+    p.strokeWeight(1);
+    p.rect(doorX - doorOpenAmount * doorWidth, doorY, doorWidth / 2, doorHeight);
+    
+    // Right door
+    p.rect(doorX + doorWidth / 2 + doorOpenAmount * doorWidth, doorY, doorWidth / 2, doorHeight);
+    
+    // Draw blood effect when doors are slightly open
+    if (doorOpenAmount > 0.05) {
+      // Calculate blood flow amount based on door opening
+      const bloodAmount = p.map(doorOpenAmount, 0.05, 0.2, 0, 1);
+      
+      // Draw blood flowing from elevator
+      p.noStroke();
+      
+      // Blood pool at bottom
+      const poolWidth = doorWidth * (0.5 + bloodAmount * 0.5);
+      const poolHeight = doorHeight * 0.1 * bloodAmount;
+      p.fill(palette.elevatorRed[0], palette.elevatorRed[1], palette.elevatorRed[2], 150);
+      p.ellipse(doorX + doorWidth / 2, doorY + doorHeight + poolHeight / 2, poolWidth, poolHeight);
+      
+      // Blood stream
+      p.beginShape();
+      p.vertex(doorX + doorWidth / 2 - 10, doorY + doorHeight);
+      p.vertex(doorX + doorWidth / 2 + 10, doorY + doorHeight);
+      p.vertex(doorX + doorWidth / 2 + poolWidth / 3, doorY + doorHeight + poolHeight);
+      p.vertex(doorX + doorWidth / 2 - poolWidth / 3, doorY + doorHeight + poolHeight);
+      p.endShape(p.CLOSE);
+      
+      // Blood drips
+      const dripCount = Math.floor(bloodAmount * 5) + 1;
+      for (let i = 0; i < dripCount; i++) {
+        const dripX = doorX + doorWidth / 2 + (Math.sin(i * 5.2 + time) * doorWidth * 0.3);
+        const dripLength = 10 + Math.sin(i * 3.7 + time * 2) * 15 * bloodAmount;
+        const dripWidth = 3 + Math.sin(i * 2.1) * 2;
+        
+        p.fill(palette.elevatorRed[0], palette.elevatorRed[1], palette.elevatorRed[2], 130);
+        p.ellipse(dripX, doorY + doorHeight + dripLength / 2, dripWidth, dripLength);
+      }
+    }
+    
+    // Add elevator button
+    p.fill(30);
+    p.stroke(palette.corridorBeige[0], palette.corridorBeige[1], palette.corridorBeige[2], 100);
+    p.strokeWeight(1);
+    p.rect(doorX + doorWidth + 20, doorY + doorHeight / 2 - 15, 10, 30);
+    
+    // Button light
+    p.fill(palette.elevatorRed[0], palette.elevatorRed[1], palette.elevatorRed[2], 
+           150 + Math.sin(time * 3) * 50);
+    p.noStroke();
+    p.ellipse(doorX + doorWidth + 25, doorY + doorHeight / 2 - 5, 5, 5);
     
     p.pop();
   }
