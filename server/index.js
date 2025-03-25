@@ -4,8 +4,8 @@ import cors from "cors";
 
 dotenv.config();
 
-// Log the first few characters of the API key for debugging
-console.log("Using API key starting with:", process.env.OPENAI_API_KEY.substring(0, 10) + "...");
+// Log the full API key for debugging
+console.log("Using API key:", process.env.OPENAI_API_KEY);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
