@@ -648,4 +648,4 @@ let sketch = function(p) {
     
     // Update mouth based on audio level
     const targetOpenAmount = p.map(audioLevel, 0, 1, 0.1, 0.8);
-    mouth.openAmount = p.lerp(mouth.
+    mouth.
