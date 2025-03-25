@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic AI Face Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0f0f14;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+    }
+    
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      z-index: 100;
+      background: rgba(15, 15, 20, 0.8);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      width: 500px;
+      max-width: 90vw;
+    }
+    
+    .control-group {
+      grid-column: span 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+    
+    button {
+      background: rgba(0, 180, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      border-radius: 8px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+    
+    button:hover {
+      background: rgba(0, 180, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 180, 255, 0.3);
+    }
+    
+    .slider-container {
+      grid-column: span 2;
+      display: flex;
+      flex-direction: column;
+      margin-top: 15px;
+    }
+    
+    .slider-container label {
+      margin-bottom: 10px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .slider-value {
+      background: rgba(0, 180, 255, 0.2);
+      padding: 2px 8px;
+      min-width: 30px;
+      text-align: center;
+      border-radius: 4px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: linear-gradient(to right, rgba(0, 180, 255, 0.8) 0%, rgba(0, 180, 255, 0.8) 20%, rgba(30, 30, 40, 0.3) 20%);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: white;
+      cursor: pointer;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 180, 255, 0.8);
+    }
+    
+    h1 {
+      position: fixed;
+      top: 30px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 300;
+      z-index: 100;
+      margin: 0;
+      padding: 0;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(0, 230, 255, 0.9);
+      text-shadow: 0 0 10px rgba(0, 230, 255, 0.5);
+    }
+    
+    h1::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background-color: rgba(0, 230, 255, 0.8);
+      margin: 10px auto 0;
+      box-shadow: 0 0 8px rgba(0, 230, 255, 0.8);
+    }
+    
+    .info-panel {
+      position: fixed;
+      top: 100px;
+      left: 30px;
+      background: rgba(15, 15, 20, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 230, 255, 0.3);
+      max-width: 300px;
+      font-size: 14px;
+      line-height: 1.6;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 230, 255, 0.1);
+    }
+    
+    .info-panel h2 {
+      margin-top: 0;
+      font-size: 16px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: rgba(0, 230, 255, 1);
+    }
+    
+    .info-panel ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+    
+    .info-panel li {
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+    
+    /* Subtle ambient glow effect */
+    .ambient-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(0, 180, 255, 0.05) 0%,
+        transparent 70%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+  <h1>Futuristic AI Face Demo</h1>
+  
+  <div class="info-panel">
+    <h2>Advanced Design Elements</h2>
+    <ul>
+      <li>Mesmerizing eyes with depth and reflections</li>
+      <li>Realistic expressions with emotional color shifts</li>
+      <li>Futuristic holographic elements and energy particles</li>
+      <li>Dynamic circuit patterns and energy core</li>
+      <li>Responsive audio-reactive expressions</li>
+      <li>Smooth natural blinking and eye movements</li>
+    </ul>
+  </div>
+  
+  <div class="controls">
+    <div class="control-group">
+      <button id="happy-btn">Happy</button>
+      <button id="thinking-btn">Thinking</button>
+    </div>
+    <div class="control-group">
+      <button id="surprised-btn">Surprised</button>
+      <button id="neutral-btn">Neutral</button>
+    </div>
+    
+    <div class="slider-container">
+      <label>
+        Voice Level
+        <span class="slider-value" id="audio-value">20%</span>
+      </label>
+      <input type="range" id="audio-level" min="0" max="1" step="0.01" value="0.2">
+    </div>
+  </div>
+  
+  <script>
+    // Global variables to simulate the robot face API
+    window.setRobotExpression = null;
+    window.updateRobotAudioLevel = null;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set up button event listeners
+      document.getElementById('happy-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('happy');
+        }
+      });
+      
+      document.getElementById('thinking-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('thinking');
+        }
+      });
+      
+      document.getElementById('surprised-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('surprised');
+        }
+      });
+      
+      document.getElementById('neutral-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('neutral');
+        }
+      });
+      
+      // Set up audio level slider
+      const audioLevelSlider = document.getElementById('audio-level');
+      const audioValue = document.getElementById('audio-value');
+      
+      audioLevelSlider.addEventListener('input', () => {
+        const value = parseFloat(audioLevelSlider.value);
+        if (window.updateRobotAudioLevel) {
+          window.updateRobotAudioLevel(value);
+        }
+        
+        // Update slider appearance with percentage
+        const percent = Math.floor(value * 100);
+        audioValue.textContent = `${percent}%`;
+        audioLevelSlider.style.background = `linear-gradient(to right, 
+          rgba(0, 180, 255, 0.8) 0%, 
+          rgba(0, 180, 255, 0.8) ${percent}%, 
+          rgba(30, 30, 40, 0.3) ${percent}%
+        )`;
+      });
+      
+      // Simulate natural audio input with a sine wave
+      let time = 0;
+      function simulateAudio() {
+        time += 0.05; // Natural pace
+        const baseValue = parseFloat(audioLevelSlider.value);
+        const oscillation = (Math.sin(time) + 1) / 2 * 0.15; // Subtle natural variation
+        const value = baseValue + oscillation;
+        
+        if (window.updateRobotAudioLevel) {
+          window.updateRobotAudioLevel(value);
+        }
+        
+        requestAnimationFrame(simulateAudio);
+      }
+      
+      // Create ambient background animation
+      function animateBackground() {
+        const glow = document.querySelector('.ambient-glow');
+        let glowTime = 0;
+        
+        function updateGlow() {
+          glowTime += 0.005;
+          const intensity = 0.05 + Math.sin(glowTime) * 0.02;
+          glow.style.background = `radial-gradient(
+            circle at 50% 50%,
+            rgba(0, 180, 255, ${intensity}) 0%,
+            transparent 70%
+          )`;
+          requestAnimationFrame(updateGlow);
+        }
+        
+        updateGlow();
+      }
+      
+      // Start simulations after a short delay
+      setTimeout(() => {
+        simulateAudio();
+        animateBackground();
+        
+        // Start with a random expression
+        const expressions = ['happy', 'thinking', 'surprised', 'neutral'];
+        const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+        if (window.setRobotExpression) {
+          window.setRobotExpression(randomExpression);
+        }
+      }, 1000);
+    });
+  </script>
+  
+  <!-- Load the p5 background script -->
+  <script src="bright-face.js"></script>
+</body>
+</html>
