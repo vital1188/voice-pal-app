@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic AI Face Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0f0f14;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+    }
+    
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      z-index: 100;
+      background: rgba(15, 15, 20, 0.8);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      width: 500px;
+      max-width: 90vw;
+    }
+    
+    .control-group {
+      grid-column: span 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+    
+    button {
+      background: rgba(0, 180, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      border-radius: 8px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+    
+    button:hover {
+      background: rgba(0, 180, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 180, 255, 0.3);
+    }
+    
+    .slider-container {
+      grid-column: span 2;
+      display: flex;
+      flex-direction: column;
+      margin-top: 15px;
+    }
+    
+    .slider-container label {
+      margin-bottom: 10px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .slider-value {
+      background: rgba(0, 180, 255, 0.2);
+      padding: 2px 8px;
+      min-width: 30px;
+      text-align: center;
+      border-radius: 4px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: linear-gradient(to right, rgba(0, 180, 255, 0.8) 0%, rgba(0, 180, 255, 0.8) 20%, rgba(30, 30, 40, 0.3) 20%);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: white;
+      cursor: pointer;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 180, 255, 0.8);
+    }
+    
+    h1 {
+      position: fixed;
+      top: 30px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 300;
+      z-index: 100;
+      margin: 0;
+      padding: 0;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(0, 230, 255, 0.9);
+      text-shadow: 0 0 10px rgba(0, 230, 255, 0.5);
+    }
+    
+    h1::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background-color: rgba(0, 230, 255, 0.8);
+      margin: 10px auto 0;
+      box-shadow: 0 0 8px rgba(0, 230, 255, 0.8);
+    }
+    
+    .info-panel {
+      position: fixed;
+      top: 100px;
+      left: 30px;
+      background: rgba(15, 15, 20, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 230, 255, 0.3);
+      max-width: 300px;
+      font-size: 14px;
+      line-height: 1.6;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 230, 255, 0.1);
+    }
+    
+    .info-panel h2 {
+      margin-top: 0;
+      font-size: 16px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: rgba(0, 230, 255, 1);
+    }
+    
+    .info-panel ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+    
+    .info-panel li {
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+    
+    /* Speech input panel */
+    .speech-panel {
+      position: fixed;
+      top: 100px;
+      right: 30px;
+      background: rgba(15, 15, 20, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 230, 255, 0.3);
+      width: 300px;
+      font-size: 14px;
+      line-height: 1.6;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 230, 255, 0.1);
+    }
+    
+    .speech-panel h2 {
+      margin-top: 0;
+      font-size: 16px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: rgba(0, 230, 255, 1);
+    }
+    
+    .speech-panel textarea {
+      width: 100%;
+      height: 100px;
+      background: rgba(30, 30, 40, 0.5);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 8px;
+      color: white;
+      padding: 10px;
+      font-family: 'Roboto', sans-serif;
+      resize: none;
+      margin-bottom: 15px;
+    }
+    
+    .speech-panel textarea:focus {
+      outline: none;
+      border-color: rgba(0, 180, 255, 0.8);
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+    
+    .pattern-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .pattern-buttons button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    
+    /* Subtle ambient glow effect */
+    .ambient-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(0, 180, 255, 0.05) 0%,
+        transparent 70%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+  <h1>Futuristic AI Face Demo</h1>
+  
+  <div class="info-panel">
+    <h2>Advanced Design Elements</h2>
+    <ul>
+      <li>Mesmerizing eyes with depth and reflections</li>
+      <li>Realistic expressions with emotional color shifts</li>
+      <li>Futuristic holographic elements and energy particles</li>
+      <li>Dynamic circuit patterns and energy core</li>
+      <li>Responsive audio-reactive expressions</li>
+      <li>Smooth natural blinking and eye movements</li>
+      <li>Speech-reactive pattern transformations</li>
+    </ul>
+  </div>
+  
+  <div class="speech-panel">
+    <h2>Speech Input</h2>
+    <p>Enter text to simulate AI speech and see the face transform into patterns based on content:</p>
+    <textarea id="speech-input" placeholder="Type something about technology, nature, emotions, or abstract concepts..."></textarea>
+    <button id="speak-btn">Speak This Text</button>
+    
+    <div class="pattern-buttons">
+      <button id="tech-btn">Technology</button>
+      <button id="nature-btn">Nature</button>
+      <button id="emotion-btn">Emotion</button>
+      <button id="abstract-btn">Abstract</button>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <div class="control-group">
+      <button id="happy-btn">Happy</button>
+      <button id="thinking-btn">Thinking</button>
+    </div>
+    <div class="control-group">
+      <button id="surprised-btn">Surprised</button>
+      <button id="neutral-btn">Neutral</button>
+    </div>
+    
+    <div class="slider-container">
+      <label>
+        Voice Level
+        <span class="slider-value" id="audio-value">20%</span>
+      </label>
+      <input type="range" id="audio-level" min="0" max="1" step="0.01" value="0.2">
+    </div>
+  </div>
+  
+  <script>
+    // Global variables to simulate the robot face API
+    window.setRobotExpression = null;
+    window.updateRobotAudioLevel = null;
+    window.speechPatterns = null;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set up button event listeners
+      document.getElementById('happy-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('happy');
+        }
+      });
+      
+      document.getElementById('thinking-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('thinking');
+        }
+      });
+      
+      document.getElementById('surprised-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('surprised');
+        }
+      });
+      
+      document.getElementById('neutral-btn').addEventListener('click', () => {
+        if (window.setRobotExpression) {
+          window.setRobotExpression('neutral');
+        }
+      });
+      
+      // Set up audio level slider
+      const audioLevelSlider = document.getElementById('audio-level');
+      const audioValue = document.getElementById('audio-value');
+      
+      audioLevelSlider.addEventListener('input', () => {
+        const value = parseFloat(audioLevelSlider.value);
+        if (window.updateRobotAudioLevel) {
+          window.updateRobotAudioLevel(value);
+        }
+        
+        // Update slider appearance with percentage
+        const percent = Math.floor(value * 100);
+        audioValue.textContent = `${percent}%`;
+        audioLevelSlider.style.background = `linear-gradient(to right, 
+          rgba(0, 180, 255, 0.8) 0%, 
+          rgba(0, 180, 255, 0.8) ${percent}%, 
+          rgba(30, 30, 40, 0.3) ${percent}%
+        )`;
+      });
+      
+      // Set up speech input
+      const speechInput = document.getElementById('speech-input');
+      const speakBtn = document.getElementById('speak-btn');
+      
+      speakBtn.addEventListener('click', () => {
+        const text = speechInput.value;
+        const audioLevel = parseFloat(audioLevelSlider.value);
+        
+        // Update speech patterns with text
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(text, audioLevel);
+        }
+        
+        // Simulate speaking by increasing audio level temporarily
+        if (window.updateRobotAudioLevel) {
+          // Start with high audio level
+          window.updateRobotAudioLevel(0.8);
+          
+          // Gradually decrease over time
+          let speakTime = 0;
+          const speakInterval = setInterval(() => {
+            speakTime += 100;
+            const newLevel = 0.8 * (1 - speakTime / 3000);
+            
+            if (newLevel <= 0.1 || speakTime >= 3000) {
+              clearInterval(speakInterval);
+              window.updateRobotAudioLevel(parseFloat(audioLevelSlider.value));
+            } else {
+              window.updateRobotAudioLevel(newLevel);
+            }
+          }, 100);
+        }
+      });
+      
+      // Set up pattern theme buttons
+      document.getElementById('tech-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Technology artificial intelligence computers digital algorithms data processing systems", 
+            0.7
+          );
+        }
+      });
+      
+      document.getElementById('nature-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Nature trees forest mountains ocean rivers animals plants green environment ecosystem", 
+            0.7
+          );
+        }
+      });
+      
+      document.getElementById('emotion-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Emotions feelings happy sad love joy anger fear heart emotional expression", 
+            0.7
+          );
+        }
+      });
+      
+      document.getElementById('abstract-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Abstract concepts ideas philosophy theory thought mind consciousness perception reality", 
+            0.7
+          );
+        }
+      });
+      
+      // Simulate natural audio input with a sine wave
+      let time = 0;
+      function simulateAudio() {
+        time += 0.05; // Natural pace
+        const baseValue = parseFloat(audioLevelSlider.value);
+        const oscillation = (Math.sin(time) + 1) / 2 * 0.15; // Subtle natural variation
+        const value = baseValue + oscillation;
+        
+        if (window.updateRobotAudioLevel) {
+          window.updateRobotAudioLevel(value);
+        }
+        
+        requestAnimationFrame(simulateAudio);
+      }
+      
+      // Create ambient background animation
+      function animateBackground() {
+        const glow = document.querySelector('.ambient-glow');
+        let glowTime = 0;
+        
+        function updateGlow() {
+          glowTime += 0.005;
+          const intensity = 0.05 + Math.sin(glowTime) * 0.02;
+          glow.style.background = `radial-gradient(
+            circle at 50% 50%,
+            rgba(0, 180, 255, ${intensity}) 0%,
+            transparent 70%
+          )`;
+          requestAnimationFrame(updateGlow);
+        }
+        
+        updateGlow();
+      }
+      
+      // Start simulations after a short delay
+      setTimeout(() => {
+        simulateAudio();
+        animateBackground();
+        
+        // Start with a random expression
+        const expressions = ['happy', 'thinking', 'surprised', 'neutral'];
+        const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+        if (window.setRobotExpression) {
+          window.setRobotExpression(randomExpression);
+        }
+        
+        // Add some example text to the speech input
+        speechInput.value = "Hello! I'm your AI assistant. I can help you with technology questions, discuss nature, talk about emotions, or explore abstract concepts.";
+      }, 1000);
+    });
+  </script>
+  
+  <!-- Load the speech patterns -->
+  <script src="client/speech-patterns.js"></script>
+  
+  <!-- Inline p5.js sketch for the AI face -->
+  <script>
+    // Create a new p5 instance
+    new p5(function(p) {
+      // Color palette
+      const palette = {
+        black: [5, 5, 10],
+        blue: [0, 150, 255],
+        cyan: [0, 220, 255],
+        white: [240, 240, 245],
+        neonBlue: [0, 170, 255],
+        neonPink: [255, 0, 150],
+        happy: [50, 255, 150],
+        sad: [100, 150, 255],
+        angry: [255, 50, 50],
+        surprised: [255, 200, 0],
+        thinking: [180, 180, 255]
+      };
+      
+      // Face parameters
+      let faceWidth, faceHeight;
+      let leftEye, rightEye, mouth;
+      let audioLevel = 0;
+      let blinkState = 0;
+      let expressionState = 'neutral';
+      let time = 0;
+      
+      // Speech patterns module
+      let speechPatternsModule = null;
+      
+      p.setup = function() {
+        // Create canvas
+        let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
+        canvas.position(0, 0);
+        canvas.style('z-index', '-2');
+        
+        // Initialize speech patterns module
+        if (window.createSpeechPatterns) {
+          speechPatternsModule = window.createSpeechPatterns(p);
+          speechPatternsModule.init();
+          
+          // Make it globally accessible
+          window.speechPatterns = speechPatternsModule;
+        }
+        
+        // Calculate face dimensions
+        faceWidth = p.min(p.width * 0.7, 800);
+        faceHeight = p.min(p.height * 0.7, 600);
+        
+        // Initialize eyes
+        const eyeSize = faceWidth * 0.15;
+        const eyeY = p.height * 0.45;
+        const eyeSpacing = faceWidth * 0.25;
+        
+        leftEye = {
+          x: p.width / 2 - eyeSpacing / 2,
+          y: eyeY,
+          size: eyeSize,
+          color: palette.cyan
+        };
+        
+        rightEye = {
+          x: p.width / 2 + eyeSpacing / 2,
+          y: eyeY,
+          size: eyeSize,
+          color: palette.cyan
+        };
+        
+        mouth = {
+          x: p.width / 2,
+          y: eyeY + eyeSize * 1.7,
+          width: faceWidth * 0.35,
+          height: eyeSize * 0.5,
+          openAmount: 0.2,
+          color: palette.blue
+        };
+        
+        // Set up global functions
+        window.updateRobotAudioLevel = function(level) {
+          audioLevel = level;
+        };
+        
+        window.setRobotExpression = function(expression) {
+          expressionState = expression;
+          
+          // Set colors based on expression
+          switch(expression) {
+            case 'happy':
+              leftEye.color = palette.happy;
+              rightEye.color = palette.happy;
+              mouth.color = palette.happy;
+              break;
+            case 'thinking':
+              leftEye.color = palette.thinking;
+              rightEye.color = palette.thinking;
+              mouth.color = palette.blue;
+              break;
+            case 'surprised':
+              leftEye.color = palette.surprised;
+              rightEye.color = palette.surprised;
+              mouth.color = palette.surprised;
+              break;
+            case 'sad':
+              leftEye.color = palette.sad;
+              rightEye.color = palette.sad;
+              mouth.color = palette.sad;
+              break;
+            case 'angry':
+              leftEye.color = palette.angry;
+              rightEye.color = palette.angry;
+              mouth.color = palette.angry;
+              break;
+            default: // neutral
+              leftEye.color = palette.cyan;
+              rightEye.color = palette.cyan;
+              mouth.color = palette.blue;
+          }
+        };
+      };
+      
+      p.draw = function() {
+        // Update time
+        time += 0.01;
+        
+        // Draw background
+        drawBackground();
+        
+        // Update speech patterns if available
+        if (speechPatternsModule) {
+          speechPatternsModule.update(1);
+        }
+        
+        // Get pattern transition state
+        const patternTransition = speechPatternsModule ? 
+                                 speechPatternsModule.getTransitionState() : 0;
+        
+        // Draw the face with opacity based on pattern transition
+        if (patternTransition < 1) {
+          // Adjust face opacity based on pattern transition
+          const faceOpacity = 1 - patternTransition;
+          drawFace(faceOpacity);
+        }
+        
+        // Draw speech patterns if available
+        if (speechPatternsModule) {
+          speechPatternsModule.draw();
+        }
+        
+        // Update blink state
+        updateBlink();
+      };
+      
+      function drawBackground() {
+        // Create a gradient background
+        p.background(palette.black);
+        
+        // Draw subtle grid
+        p.stroke(palette.blue[0], palette.blue[1], palette.blue[2], 20);
+        p.strokeWeight(0.5);
+        
+        // Horizontal lines
+        for (let y = 0; y < p.height; y += 50) {
+          p.line(0, y, p.width, y);
+        }
+        
+        // Vertical lines
+        for (let x = 0; x < p.width; x += 50) {
+          p.line(x, 0, x, p.height);
+        }
+      }
+      
+      function drawFace(opacity = 1) {
+        // Draw eyes
+        drawEye(leftEye, opacity);
+        drawEye(rightEye, opacity);
+        
+        // Draw mouth
+        drawMouth(opacity);
+      }
+      
+      function drawEye(eye, opacity) {
+        // Eye outer glow
+        p.noStroke();
+        for (let i = 3; i > 0; i--) {
+          const glowOpacity = 100 * (1 / i) * opacity;
+          p.fill(eye.color[0], eye.color[1], eye.color[2], glowOpacity);
+          p.ellipse(eye.x, eye.y, eye.size * (1 + i * 0.2));
+        }
+        
+        // Eye base
+        p.fill(palette.black[0], palette.black[1], palette.black[2], 255 * opacity);
+        p.ellipse(eye.x, eye.y, eye.size);
+        
+        // Pupil
+        const pupilSize = eye.size * 0.6;
+        p.fill(eye.color[0], eye.color[1], eye.color[2], 255 * opacity);
+        
+        // Apply blink effect
+        const blinkScaleY = 1 - blinkState * 0.9;
+        p.ellipse(eye.x, eye.y, pupilSize, pupilSize * blinkScaleY);
+        
+        // Reflection
+        p.fill(255, 255, 255, 150 * opacity);
+        const reflectionSize = pupilSize * 0.3;
+        p.ellipse(eye.x - pupilSize * 0.2, eye.y - pupilSize * 0.2, reflectionSize);
+      }
+      
+      function drawMouth(opacity) {
+        // Calculate mouth height based on audio level
+        const openAmount = p.lerp(0.1, 0.8, audioLevel);
+        const mouthHeight = mouth.height * openAmount;
+        
+        // Mouth glow
+        p.noStroke();
+        for (let i = 3; i > 0; i--) {
+          const glowOpacity = 100 * (1 / i) * opacity;
+          p.fill(mouth.color[0], mouth.color[1], mouth.color[2], glowOpacity);
+          p.ellipse(mouth.x, mouth.y, mouth.width * (1 + i * 0.1), mouthHeight * (1 + i * 0.1));
+        }
+        
+        // Mouth shape
+        p.fill(palette.black[0], palette.black[1], palette.black[2], 255 * opacity);
+        p.ellipse(mouth.x, mouth.y, mouth.width, mouthHeight);
+        
+        // Mouth interior glow
+        p.fill(mouth.color[0], mouth.color[1], mouth.color[2], 100 * opacity);
+        p.ellipse(mouth.x, mouth.y, mouth.width * 0.8, mouthHeight * 0.7);
+      }
+      
+      function updateBlink() {
+        // Random blinking
+        if (Math.random() < 0.005) {
+          // Start blink
+          blinkState = 1;
+        } else if (blinkState > 0) {
+          // Reduce blink state
+          blinkState *= 0.8;
+          if (blinkState < 0.01) blinkState = 0;
+        }
+      }
+      
+      p.windowResized = function() {
+        p.resizeCanvas(p.windowWidth, p.windowHeight);
+        
+        // Recalculate face dimensions
+        faceWidth = p.min(p.width * 0.7, 800);
+        faceHeight = p.min(p.height * 0.7, 600);
+        
+        // Update eye positions
+        const eyeSize = faceWidth * 0.15;
+        const eyeY = p.height * 0.45;
+        const eyeSpacing = faceWidth * 0.25;
+        
+        leftEye.x = p.width / 2 - eyeSpacing / 2;
+        leftEye.y = eyeY;
+        leftEye.size = eyeSize;
+        
+        rightEye.x = p.width / 2 + eyeSpacing / 2;
+        rightEye.y = eyeY;
+        rightEye.size = eyeSize;
+        
+        mouth.x = p.width / 2;
+        mouth.y = eyeY + eyeSize * 1.7;
+        mouth.width = faceWidth * 0.35;
+        mouth.height = eyeSize * 0.5;
+      };
+    });
+  </script>
+</body>
+</html>
