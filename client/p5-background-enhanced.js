@@ -1,4 +1,4 @@
-// Advanced Futuristic AI Face using p5.js - Enhanced for realistic expressions and mesmerizing eyes
+// Advanced Futuristic AI Face using p5.js - Enhanced with speech-reactive patterns
 
 let sketch = function(p) {
   // Enhanced color palette with more vibrant and futuristic tones
@@ -49,6 +49,9 @@ let sketch = function(p) {
   let expressionIntensity = 0; // 0-1 scale for intensity of expression
   let lastExpressionChange = 0;
   
+  // Speech patterns module
+  let speechPatternsModule = null;
+  
   // Audio visualization data - optimized
   let audioData = new Array(16).fill(0);
   
@@ -84,6 +87,15 @@ let sketch = function(p) {
     let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
     canvas.position(0, 0);
     canvas.style('z-index', '-2');
+    
+    // Initialize speech patterns module
+    if (window.createSpeechPatterns) {
+      speechPatternsModule = window.createSpeechPatterns(p);
+      speechPatternsModule.init();
+      
+      // Make it globally accessible
+      window.speechPatterns = speechPatternsModule;
+    }
     
     // Calculate face dimensions based on window size - ensure it's centered and visible
     faceWidth = p.min(p.width * 0.7, 1000); // Slightly smaller for better visibility
@@ -395,11 +407,29 @@ let sketch = function(p) {
     // Update face parameters
     updateFace();
     
+    // Update speech patterns if available
+    if (speechPatternsModule) {
+      speechPatternsModule.update(deltaTime);
+    }
+    
     // Draw futuristic elements
     drawFuturisticElements();
     
-    // Draw the face
-    drawFace();
+    // Get pattern transition state
+    const patternTransition = speechPatternsModule ? 
+                             speechPatternsModule.getTransitionState() : 0;
+    
+    // Draw the face with opacity based on pattern transition
+    if (patternTransition < 1) {
+      // Adjust face opacity based on pattern transition
+      const faceOpacity = 1 - patternTransition;
+      drawFace(faceOpacity);
+    }
+    
+    // Draw speech patterns if available
+    if (speechPatternsModule) {
+      speechPatternsModule.draw();
+    }
     
     // Gradually reduce audio level if not actively listening - smoother decay
     if (!isListening) {
@@ -504,13 +534,20 @@ let sketch = function(p) {
   
   // Draw futuristic elements around the face
   function drawFuturisticElements() {
+    // Get pattern transition state
+    const patternTransition = speechPatternsModule ? 
+                             speechPatternsModule.getTransitionState() : 0;
+    
+    // Adjust element opacity based on pattern transition
+    const elementOpacity = 1 - patternTransition * 0.7; // Keep some elements visible
+    
     // Draw holographic rings
     for (let ring of holoRings) {
       ring.rotation += ring.rotationSpeed * deltaTime;
       
       p.noFill();
       p.stroke(ring.color[0], ring.color[1], ring.color[2], 
-               ring.opacity * 255 * (0.7 + Math.sin(time * 0.5) * 0.3));
+               ring.opacity * 255 * (0.7 + Math.sin(time * 0.5) * 0.3) * elementOpacity);
       p.strokeWeight(ring.thickness);
       
       p.push();
@@ -524,7 +561,7 @@ let sketch = function(p) {
     for (let line of circuitLines) {
       const pulse = Math.sin(time * line.pulseSpeed + line.pulseOffset) * 0.5 + 0.5;
       p.stroke(line.color[0], line.color[1], line.color[2], 
-               line.color[3] * pulse);
+               line.color[3] * pulse * elementOpacity);
       p.strokeWeight(line.thickness * pulse);
       
       let x = line.startX;
@@ -542,7 +579,7 @@ let sketch = function(p) {
         if (i < line.segments - 1) {
           p.noStroke();
           p.fill(line.color[0], line.color[1], line.color[2], 
-                 line.color[3] * pulse * 1.5);
+                 line.color[3] * pulse * 1.5 * elementOpacity);
           p.ellipse(nextX, nextY, line.thickness * 2 * pulse);
         }
         
@@ -571,12 +608,12 @@ let sketch = function(p) {
       // Draw particle
       p.noStroke();
       p.fill(particle.color[0], particle.color[1], particle.color[2], 
-             (particle.color[3] || 200) * pulse);
+             (particle.color[3] || 200) * pulse * elementOpacity);
       p.ellipse(x, y, particle.size * pulse);
       
       // Draw trail
       p.stroke(particle.color[0], particle.color[1], particle.color[2], 
-               (particle.color[3] || 100) * pulse * 0.5);
+               (particle.color[3] || 100) * pulse * 0.5 * elementOpacity);
       p.strokeWeight(particle.size * 0.5 * pulse);
       
       const trailX = p.width / 2 + Math.cos(particle.angle - particle.speed * 10) * particle.distance;
@@ -592,14 +629,14 @@ let sketch = function(p) {
     for (let i = 4; i > 0; i--) {
       p.noStroke();
       p.fill(energyCore.color[0], energyCore.color[1], energyCore.color[2], 
-             (energyCore.color[3] || 150) * corePulse * (1 / i));
+             (energyCore.color[3] || 150) * corePulse * (1 / i) * elementOpacity);
       p.ellipse(energyCore.x, energyCore.y, 
                 energyCore.size * (1 + i * 0.5) * corePulse,
                 energyCore.size * (1 + i * 0.5) * corePulse * 0.6);
     }
     
     // Core center
-    p.fill(255, 255, 255, 200 * corePulse);
+    p.fill(255, 255, 255, 200 * corePulse * elementOpacity);
     p.ellipse(energyCore.x, energyCore.y, 
               energyCore.size * 0.5 * corePulse,
               energyCore.size * 0.3 * corePulse);
@@ -628,27 +665,4 @@ let sketch = function(p) {
     if (currentTime - lastEyeMovementTime > eyeMovementInterval) {
       targetEyeX = Math.random() * p.width;
       targetEyeY = Math.random() * p.height;
-      lastEyeMovementTime = currentTime;
-      eyeMovementInterval = 1000 + Math.random() * 2000; // More natural timing
-    }
-    
-    // Update eye pupil position with natural movement
-    const maxPupilOffset = leftEye.size * 0.2;
-    const targetXOffset = p.map(p.mouseX, 0, p.width, -maxPupilOffset, maxPupilOffset);
-    const targetYOffset = p.map(p.mouseY, 0, p.height, -maxPupilOffset, maxPupilOffset);
-    
-    leftEye.pupilOffset.x = p.lerp(leftEye.pupilOffset.x, targetXOffset, 0.05);
-    leftEye.pupilOffset.y = p.lerp(leftEye.pupilOffset.y, targetYOffset, 0.05);
-    rightEye.pupilOffset.x = p.lerp(rightEye.pupilOffset.x, targetXOffset, 0.05);
-    rightEye.pupilOffset.y = p.lerp(rightEye.pupilOffset.y, targetYOffset, 0.05);
-    
-    // Update iris rotation for mesmerizing effect
-    leftEye.irisRotation += 0.005 * deltaTime;
-    rightEye.irisRotation += 0.005 * deltaTime;
-    
-    // Update mouth based on audio level
-    const targetOpenAmount = p.map(audioLevel, 0, 1, 0.1, 0.8);
-    mouth.openAmount = p.lerp(mouth.openAmount, targetOpenAmount, 0.2);
-    
-    // Update expression with natural transitions
-    switch (expression
+      lastE

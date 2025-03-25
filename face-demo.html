@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realistic AI Face Demo</title>
+  <title>Futuristic AI Face Demo</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
   <style>
@@ -42,9 +42,9 @@
     }
     
     button {
-      background: rgba(70, 130, 180, 0.2);
+      background: rgba(0, 180, 255, 0.2);
       color: white;
-      border: 1px solid rgba(70, 130, 180, 0.5);
+      border: 1px solid rgba(0, 180, 255, 0.5);
       border-radius: 8px;
       padding: 12px 20px;
       cursor: pointer;
@@ -56,9 +56,9 @@
     }
     
     button:hover {
-      background: rgba(70, 130, 180, 0.4);
+      background: rgba(0, 180, 255, 0.4);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(70, 130, 180, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 180, 255, 0.3);
     }
     
     .slider-container {
@@ -78,7 +78,7 @@
     }
     
     .slider-value {
-      background: rgba(70, 130, 180, 0.2);
+      background: rgba(0, 180, 255, 0.2);
       padding: 2px 8px;
       min-width: 30px;
       text-align: center;
@@ -89,7 +89,7 @@
       width: 100%;
       height: 6px;
       -webkit-appearance: none;
-      background: linear-gradient(to right, rgba(70, 130, 180, 0.8) 0%, rgba(70, 130, 180, 0.8) 20%, rgba(30, 30, 40, 0.3) 20%);
+      background: linear-gradient(to right, rgba(0, 180, 255, 0.8) 0%, rgba(0, 180, 255, 0.8) 20%, rgba(30, 30, 40, 0.3) 20%);
       border-radius: 3px;
       outline: none;
     }
@@ -101,7 +101,7 @@
       background: white;
       cursor: pointer;
       border-radius: 50%;
-      border: 2px solid rgba(70, 130, 180, 0.8);
+      border: 2px solid rgba(0, 180, 255, 0.8);
     }
     
     h1 {
@@ -116,6 +116,9 @@
       margin: 0;
       padding: 0;
       letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(0, 230, 255, 0.9);
+      text-shadow: 0 0 10px rgba(0, 230, 255, 0.5);
     }
     
     h1::after {
@@ -123,8 +126,9 @@
       display: block;
       width: 60px;
       height: 2px;
-      background-color: rgba(70, 130, 180, 0.8);
+      background-color: rgba(0, 230, 255, 0.8);
       margin: 10px auto 0;
+      box-shadow: 0 0 8px rgba(0, 230, 255, 0.8);
     }
     
     .info-panel {
@@ -134,12 +138,13 @@
       background: rgba(15, 15, 20, 0.7);
       padding: 20px;
       border-radius: 12px;
-      border: 1px solid rgba(70, 130, 180, 0.3);
+      border: 1px solid rgba(0, 230, 255, 0.3);
       max-width: 300px;
       font-size: 14px;
       line-height: 1.6;
       z-index: 100;
       backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 230, 255, 0.1);
     }
     
     .info-panel h2 {
@@ -147,7 +152,7 @@
       font-size: 16px;
       letter-spacing: 1px;
       font-weight: 500;
-      color: rgba(70, 130, 180, 1);
+      color: rgba(0, 230, 255, 1);
     }
     
     .info-panel ul {
@@ -160,6 +165,62 @@
       opacity: 0.9;
     }
     
+    /* Speech input panel */
+    .speech-panel {
+      position: fixed;
+      top: 100px;
+      right: 30px;
+      background: rgba(15, 15, 20, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 230, 255, 0.3);
+      width: 300px;
+      font-size: 14px;
+      line-height: 1.6;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 230, 255, 0.1);
+    }
+    
+    .speech-panel h2 {
+      margin-top: 0;
+      font-size: 16px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      color: rgba(0, 230, 255, 1);
+    }
+    
+    .speech-panel textarea {
+      width: 100%;
+      height: 100px;
+      background: rgba(30, 30, 40, 0.5);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 8px;
+      color: white;
+      padding: 10px;
+      font-family: 'Roboto', sans-serif;
+      resize: none;
+      margin-bottom: 15px;
+    }
+    
+    .speech-panel textarea:focus {
+      outline: none;
+      border-color: rgba(0, 180, 255, 0.8);
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+    
+    .pattern-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .pattern-buttons button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    
     /* Subtle ambient glow effect */
     .ambient-glow {
       position: fixed;
@@ -169,7 +230,7 @@
       height: 100%;
       background: radial-gradient(
         circle at 50% 50%,
-        rgba(70, 130, 180, 0.05) 0%,
+        rgba(0, 180, 255, 0.05) 0%,
         transparent 70%
       );
       pointer-events: none;
@@ -179,18 +240,33 @@
 </head>
 <body>
   <div class="ambient-glow"></div>
-  <h1>Realistic AI Face Demo</h1>
+  <h1>Futuristic AI Face Demo</h1>
   
   <div class="info-panel">
-    <h2>Realistic Design Elements</h2>
+    <h2>Advanced Design Elements</h2>
     <ul>
-      <li>Detailed facial structure with subtle contours</li>
-      <li>Realistic eyes with iris detail and reflections</li>
-      <li>Natural blinking and eye movement patterns</li>
-      <li>Expressive eyebrows that respond to emotions</li>
-      <li>Detailed mouth with lips, teeth and tongue</li>
-      <li>Audio-reactive expressions and movements</li>
+      <li>Mesmerizing eyes with depth and reflections</li>
+      <li>Realistic expressions with emotional color shifts</li>
+      <li>Futuristic holographic elements and energy particles</li>
+      <li>Dynamic circuit patterns and energy core</li>
+      <li>Responsive audio-reactive expressions</li>
+      <li>Smooth natural blinking and eye movements</li>
+      <li>Speech-reactive pattern transformations</li>
     </ul>
+  </div>
+  
+  <div class="speech-panel">
+    <h2>Speech Input</h2>
+    <p>Enter text to simulate AI speech and see the face transform into patterns based on content:</p>
+    <textarea id="speech-input" placeholder="Type something about technology, nature, emotions, or abstract concepts..."></textarea>
+    <button id="speak-btn">Speak This Text</button>
+    
+    <div class="pattern-buttons">
+      <button id="tech-btn">Technology</button>
+      <button id="nature-btn">Nature</button>
+      <button id="emotion-btn">Emotion</button>
+      <button id="abstract-btn">Abstract</button>
+    </div>
   </div>
   
   <div class="controls">
@@ -216,6 +292,7 @@
     // Global variables to simulate the robot face API
     window.setRobotExpression = null;
     window.updateRobotAudioLevel = null;
+    window.speechPatterns = null;
     
     document.addEventListener('DOMContentLoaded', () => {
       // Set up button event listeners
@@ -257,10 +334,81 @@
         const percent = Math.floor(value * 100);
         audioValue.textContent = `${percent}%`;
         audioLevelSlider.style.background = `linear-gradient(to right, 
-          rgba(70, 130, 180, 0.8) 0%, 
-          rgba(70, 130, 180, 0.8) ${percent}%, 
+          rgba(0, 180, 255, 0.8) 0%, 
+          rgba(0, 180, 255, 0.8) ${percent}%, 
           rgba(30, 30, 40, 0.3) ${percent}%
         )`;
+      });
+      
+      // Set up speech input
+      const speechInput = document.getElementById('speech-input');
+      const speakBtn = document.getElementById('speak-btn');
+      
+      speakBtn.addEventListener('click', () => {
+        const text = speechInput.value;
+        const audioLevel = parseFloat(audioLevelSlider.value);
+        
+        // Update speech patterns with text
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(text, audioLevel);
+        }
+        
+        // Simulate speaking by increasing audio level temporarily
+        if (window.updateRobotAudioLevel) {
+          // Start with high audio level
+          window.updateRobotAudioLevel(0.8);
+          
+          // Gradually decrease over time
+          let speakTime = 0;
+          const speakInterval = setInterval(() => {
+            speakTime += 100;
+            const newLevel = 0.8 * (1 - speakTime / 3000);
+            
+            if (newLevel <= 0.1 || speakTime >= 3000) {
+              clearInterval(speakInterval);
+              window.updateRobotAudioLevel(parseFloat(audioLevelSlider.value));
+            } else {
+              window.updateRobotAudioLevel(newLevel);
+            }
+          }, 100);
+        }
+      });
+      
+      // Set up pattern theme buttons
+      document.getElementById('tech-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Technology artificial intelligence computers digital algorithms data processing systems", 
+            0.7
+          );
+        }
+      });
+      
+      document.getElementById('nature-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Nature trees forest mountains ocean rivers animals plants green environment ecosystem", 
+            0.7
+          );
+        }
+      });
+      
+      document.getElementById('emotion-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Emotions feelings happy sad love joy anger fear heart emotional expression", 
+            0.7
+          );
+        }
+      });
+      
+      document.getElementById('abstract-btn').addEventListener('click', () => {
+        if (window.speechPatterns) {
+          window.speechPatterns.updateWithSpeech(
+            "Abstract concepts ideas philosophy theory thought mind consciousness perception reality", 
+            0.7
+          );
+        }
       });
       
       // Simulate natural audio input with a sine wave
@@ -288,7 +436,7 @@
           const intensity = 0.05 + Math.sin(glowTime) * 0.02;
           glow.style.background = `radial-gradient(
             circle at 50% 50%,
-            rgba(70, 130, 180, ${intensity}) 0%,
+            rgba(0, 180, 255, ${intensity}) 0%,
             transparent 70%
           )`;
           requestAnimationFrame(updateGlow);
@@ -308,11 +456,49 @@
         if (window.setRobotExpression) {
           window.setRobotExpression(randomExpression);
         }
+        
+        // Add some example text to the speech input
+        speechInput.value = "Hello! I'm your AI assistant. I can help you with technology questions, discuss nature, talk about emotions, or explore abstract concepts.";
       }, 1000);
     });
   </script>
   
-  <!-- Load the p5 background script -->
-  <script src="p5-background.js"></script>
+  <!-- Load the p5 background script and speech patterns -->
+  <script src="client/speech-patterns.js"></script>
+  <script src="client/p5-background.js"></script>
+  
+  <script>
+    // Custom integration script to connect p5-background.js with speech-patterns.js
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for both modules to be loaded
+      const checkModulesLoaded = setInterval(() => {
+        if (window.setRobotExpression && window.speechPatterns) {
+          clearInterval(checkModulesLoaded);
+          
+          // Set up integration between face and speech patterns
+          const originalUpdateAudioLevel = window.updateRobotAudioLevel;
+          
+          // Override the audio level function to also update speech patterns
+          window.updateRobotAudioLevel = function(level) {
+            // Call the original function
+            originalUpdateAudioLevel(level);
+            
+            // Also update speech patterns if active
+            if (window.speechPatterns && level > 0.3) {
+              // Get the current speech text
+              const speechText = document.getElementById('speech-input').value;
+              
+              // Only update with text if there's significant audio
+              if (level > 0.4 && speechText.length > 0) {
+                window.speechPatterns.updateWithSpeech(speechText, level);
+              }
+            }
+          };
+          
+          console.log('Speech-reactive face integration complete!');
+        }
+      }, 100);
+    });
+  </script>
 </body>
 </html>

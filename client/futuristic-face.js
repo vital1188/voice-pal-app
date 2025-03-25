@@ -651,4 +651,4 @@ let sketch = function(p) {
     mouth.openAmount = p.lerp(mouth.openAmount, targetOpenAmount, 0.2);
     
     // Update expression with natural transitions
-    switch (expression
+    switch (express

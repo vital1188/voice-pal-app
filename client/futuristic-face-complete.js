@@ -650,5 +650,4 @@ let sketch = function(p) {
     const targetOpenAmount = p.map(audioLevel, 0, 1, 0.1, 0.8);
     mouth.openAmount = p.lerp(mouth.openAmount, targetOpenAmount, 0.2);
     
-    // Update expression with natural transitions
-    switch (expression
+    // Update expression with natural
