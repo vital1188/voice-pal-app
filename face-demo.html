@@ -463,41 +463,275 @@
     });
   </script>
   
-  <!-- Load the p5 background script and speech patterns -->
+  <!-- Load the speech patterns -->
   <script src="client/speech-patterns.js"></script>
-  <script src="client/p5-background.js"></script>
   
+  <!-- Inline p5.js sketch for the AI face -->
   <script>
-    // Custom integration script to connect p5-background.js with speech-patterns.js
-    document.addEventListener('DOMContentLoaded', () => {
-      // Wait for both modules to be loaded
-      const checkModulesLoaded = setInterval(() => {
-        if (window.setRobotExpression && window.speechPatterns) {
-          clearInterval(checkModulesLoaded);
+    // Create a new p5 instance
+    new p5(function(p) {
+      // Color palette
+      const palette = {
+        black: [5, 5, 10],
+        blue: [0, 150, 255],
+        cyan: [0, 220, 255],
+        white: [240, 240, 245],
+        neonBlue: [0, 170, 255],
+        neonPink: [255, 0, 150],
+        happy: [50, 255, 150],
+        sad: [100, 150, 255],
+        angry: [255, 50, 50],
+        surprised: [255, 200, 0],
+        thinking: [180, 180, 255]
+      };
+      
+      // Face parameters
+      let faceWidth, faceHeight;
+      let leftEye, rightEye, mouth;
+      let audioLevel = 0;
+      let blinkState = 0;
+      let expressionState = 'neutral';
+      let time = 0;
+      
+      // Speech patterns module
+      let speechPatternsModule = null;
+      
+      p.setup = function() {
+        // Create canvas
+        let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
+        canvas.position(0, 0);
+        canvas.style('z-index', '-2');
+        
+        // Initialize speech patterns module
+        if (window.createSpeechPatterns) {
+          speechPatternsModule = window.createSpeechPatterns(p);
+          speechPatternsModule.init();
           
-          // Set up integration between face and speech patterns
-          const originalUpdateAudioLevel = window.updateRobotAudioLevel;
-          
-          // Override the audio level function to also update speech patterns
-          window.updateRobotAudioLevel = function(level) {
-            // Call the original function
-            originalUpdateAudioLevel(level);
-            
-            // Also update speech patterns if active
-            if (window.speechPatterns && level > 0.3) {
-              // Get the current speech text
-              const speechText = document.getElementById('speech-input').value;
-              
-              // Only update with text if there's significant audio
-              if (level > 0.4 && speechText.length > 0) {
-                window.speechPatterns.updateWithSpeech(speechText, level);
-              }
-            }
-          };
-          
-          console.log('Speech-reactive face integration complete!');
+          // Make it globally accessible
+          window.speechPatterns = speechPatternsModule;
         }
-      }, 100);
+        
+        // Calculate face dimensions
+        faceWidth = p.min(p.width * 0.7, 800);
+        faceHeight = p.min(p.height * 0.7, 600);
+        
+        // Initialize eyes
+        const eyeSize = faceWidth * 0.15;
+        const eyeY = p.height * 0.45;
+        const eyeSpacing = faceWidth * 0.25;
+        
+        leftEye = {
+          x: p.width / 2 - eyeSpacing / 2,
+          y: eyeY,
+          size: eyeSize,
+          color: palette.cyan
+        };
+        
+        rightEye = {
+          x: p.width / 2 + eyeSpacing / 2,
+          y: eyeY,
+          size: eyeSize,
+          color: palette.cyan
+        };
+        
+        mouth = {
+          x: p.width / 2,
+          y: eyeY + eyeSize * 1.7,
+          width: faceWidth * 0.35,
+          height: eyeSize * 0.5,
+          openAmount: 0.2,
+          color: palette.blue
+        };
+        
+        // Set up global functions
+        window.updateRobotAudioLevel = function(level) {
+          audioLevel = level;
+        };
+        
+        window.setRobotExpression = function(expression) {
+          expressionState = expression;
+          
+          // Set colors based on expression
+          switch(expression) {
+            case 'happy':
+              leftEye.color = palette.happy;
+              rightEye.color = palette.happy;
+              mouth.color = palette.happy;
+              break;
+            case 'thinking':
+              leftEye.color = palette.thinking;
+              rightEye.color = palette.thinking;
+              mouth.color = palette.blue;
+              break;
+            case 'surprised':
+              leftEye.color = palette.surprised;
+              rightEye.color = palette.surprised;
+              mouth.color = palette.surprised;
+              break;
+            case 'sad':
+              leftEye.color = palette.sad;
+              rightEye.color = palette.sad;
+              mouth.color = palette.sad;
+              break;
+            case 'angry':
+              leftEye.color = palette.angry;
+              rightEye.color = palette.angry;
+              mouth.color = palette.angry;
+              break;
+            default: // neutral
+              leftEye.color = palette.cyan;
+              rightEye.color = palette.cyan;
+              mouth.color = palette.blue;
+          }
+        };
+      };
+      
+      p.draw = function() {
+        // Update time
+        time += 0.01;
+        
+        // Draw background
+        drawBackground();
+        
+        // Update speech patterns if available
+        if (speechPatternsModule) {
+          speechPatternsModule.update(1);
+        }
+        
+        // Get pattern transition state
+        const patternTransition = speechPatternsModule ? 
+                                 speechPatternsModule.getTransitionState() : 0;
+        
+        // Draw the face with opacity based on pattern transition
+        if (patternTransition < 1) {
+          // Adjust face opacity based on pattern transition
+          const faceOpacity = 1 - patternTransition;
+          drawFace(faceOpacity);
+        }
+        
+        // Draw speech patterns if available
+        if (speechPatternsModule) {
+          speechPatternsModule.draw();
+        }
+        
+        // Update blink state
+        updateBlink();
+      };
+      
+      function drawBackground() {
+        // Create a gradient background
+        p.background(palette.black);
+        
+        // Draw subtle grid
+        p.stroke(palette.blue[0], palette.blue[1], palette.blue[2], 20);
+        p.strokeWeight(0.5);
+        
+        // Horizontal lines
+        for (let y = 0; y < p.height; y += 50) {
+          p.line(0, y, p.width, y);
+        }
+        
+        // Vertical lines
+        for (let x = 0; x < p.width; x += 50) {
+          p.line(x, 0, x, p.height);
+        }
+      }
+      
+      function drawFace(opacity = 1) {
+        // Draw eyes
+        drawEye(leftEye, opacity);
+        drawEye(rightEye, opacity);
+        
+        // Draw mouth
+        drawMouth(opacity);
+      }
+      
+      function drawEye(eye, opacity) {
+        // Eye outer glow
+        p.noStroke();
+        for (let i = 3; i > 0; i--) {
+          const glowOpacity = 100 * (1 / i) * opacity;
+          p.fill(eye.color[0], eye.color[1], eye.color[2], glowOpacity);
+          p.ellipse(eye.x, eye.y, eye.size * (1 + i * 0.2));
+        }
+        
+        // Eye base
+        p.fill(palette.black[0], palette.black[1], palette.black[2], 255 * opacity);
+        p.ellipse(eye.x, eye.y, eye.size);
+        
+        // Pupil
+        const pupilSize = eye.size * 0.6;
+        p.fill(eye.color[0], eye.color[1], eye.color[2], 255 * opacity);
+        
+        // Apply blink effect
+        const blinkScaleY = 1 - blinkState * 0.9;
+        p.ellipse(eye.x, eye.y, pupilSize, pupilSize * blinkScaleY);
+        
+        // Reflection
+        p.fill(255, 255, 255, 150 * opacity);
+        const reflectionSize = pupilSize * 0.3;
+        p.ellipse(eye.x - pupilSize * 0.2, eye.y - pupilSize * 0.2, reflectionSize);
+      }
+      
+      function drawMouth(opacity) {
+        // Calculate mouth height based on audio level
+        const openAmount = p.lerp(0.1, 0.8, audioLevel);
+        const mouthHeight = mouth.height * openAmount;
+        
+        // Mouth glow
+        p.noStroke();
+        for (let i = 3; i > 0; i--) {
+          const glowOpacity = 100 * (1 / i) * opacity;
+          p.fill(mouth.color[0], mouth.color[1], mouth.color[2], glowOpacity);
+          p.ellipse(mouth.x, mouth.y, mouth.width * (1 + i * 0.1), mouthHeight * (1 + i * 0.1));
+        }
+        
+        // Mouth shape
+        p.fill(palette.black[0], palette.black[1], palette.black[2], 255 * opacity);
+        p.ellipse(mouth.x, mouth.y, mouth.width, mouthHeight);
+        
+        // Mouth interior glow
+        p.fill(mouth.color[0], mouth.color[1], mouth.color[2], 100 * opacity);
+        p.ellipse(mouth.x, mouth.y, mouth.width * 0.8, mouthHeight * 0.7);
+      }
+      
+      function updateBlink() {
+        // Random blinking
+        if (Math.random() < 0.005) {
+          // Start blink
+          blinkState = 1;
+        } else if (blinkState > 0) {
+          // Reduce blink state
+          blinkState *= 0.8;
+          if (blinkState < 0.01) blinkState = 0;
+        }
+      }
+      
+      p.windowResized = function() {
+        p.resizeCanvas(p.windowWidth, p.windowHeight);
+        
+        // Recalculate face dimensions
+        faceWidth = p.min(p.width * 0.7, 800);
+        faceHeight = p.min(p.height * 0.7, 600);
+        
+        // Update eye positions
+        const eyeSize = faceWidth * 0.15;
+        const eyeY = p.height * 0.45;
+        const eyeSpacing = faceWidth * 0.25;
+        
+        leftEye.x = p.width / 2 - eyeSpacing / 2;
+        leftEye.y = eyeY;
+        leftEye.size = eyeSize;
+        
+        rightEye.x = p.width / 2 + eyeSpacing / 2;
+        rightEye.y = eyeY;
+        rightEye.size = eyeSize;
+        
+        mouth.x = p.width / 2;
+        mouth.y = eyeY + eyeSize * 1.7;
+        mouth.width = faceWidth * 0.35;
+        mouth.height = eyeSize * 0.5;
+      };
     });
   </script>
 </body>
