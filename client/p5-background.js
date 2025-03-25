@@ -1,5 +1,12 @@
 // Advanced Futuristic AI Face using p5.js - Enhanced for realistic expressions and mesmerizing eyes
 
+// Store p5 instance globally for speech patterns integration
+window.p5Instance = null;
+
+let sketch = function(p) {
+  // Store p5 instance globally
+  window.p5Instance = p;
+
 let sketch = function(p) {
   // Enhanced color palette with more vibrant and futuristic tones
   const palette = {

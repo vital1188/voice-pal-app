@@ -165,62 +165,6 @@
       opacity: 0.9;
     }
     
-    /* Speech input panel */
-    .speech-panel {
-      position: fixed;
-      top: 100px;
-      right: 30px;
-      background: rgba(15, 15, 20, 0.7);
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid rgba(0, 230, 255, 0.3);
-      width: 300px;
-      font-size: 14px;
-      line-height: 1.6;
-      z-index: 100;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 0 20px rgba(0, 230, 255, 0.1);
-    }
-    
-    .speech-panel h2 {
-      margin-top: 0;
-      font-size: 16px;
-      letter-spacing: 1px;
-      font-weight: 500;
-      color: rgba(0, 230, 255, 1);
-    }
-    
-    .speech-panel textarea {
-      width: 100%;
-      height: 100px;
-      background: rgba(30, 30, 40, 0.5);
-      border: 1px solid rgba(0, 180, 255, 0.3);
-      border-radius: 8px;
-      color: white;
-      padding: 10px;
-      font-family: 'Roboto', sans-serif;
-      resize: none;
-      margin-bottom: 15px;
-    }
-    
-    .speech-panel textarea:focus {
-      outline: none;
-      border-color: rgba(0, 180, 255, 0.8);
-      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
-    }
-    
-    .pattern-buttons {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-    
-    .pattern-buttons button {
-      padding: 8px 12px;
-      font-size: 12px;
-    }
-    
     /* Subtle ambient glow effect */
     .ambient-glow {
       position: fixed;
@@ -255,20 +199,6 @@
     </ul>
   </div>
   
-  <div class="speech-panel">
-    <h2>Speech Input</h2>
-    <p>Enter text to simulate AI speech and see the face transform into patterns based on content:</p>
-    <textarea id="speech-input" placeholder="Type something about technology, nature, emotions, or abstract concepts..."></textarea>
-    <button id="speak-btn">Speak This Text</button>
-    
-    <div class="pattern-buttons">
-      <button id="tech-btn">Technology</button>
-      <button id="nature-btn">Nature</button>
-      <button id="emotion-btn">Emotion</button>
-      <button id="abstract-btn">Abstract</button>
-    </div>
-  </div>
-  
   <div class="controls">
     <div class="control-group">
       <button id="happy-btn">Happy</button>
@@ -286,13 +216,18 @@
       </label>
       <input type="range" id="audio-level" min="0" max="1" step="0.01" value="0.2">
     </div>
+    
+    <div class="speech-input">
+      <input type="text" id="speech-text" placeholder="Enter speech text here..." style="width: 100%; padding: 10px; margin-top: 15px; background: rgba(15, 15, 20, 0.8); color: white; border: 1px solid rgba(0, 180, 255, 0.5); border-radius: 8px;">
+      <button id="speech-btn" style="margin-top: 10px; width: 100%;">Simulate Speech</button>
+    </div>
   </div>
   
   <script>
     // Global variables to simulate the robot face API
     window.setRobotExpression = null;
     window.updateRobotAudioLevel = null;
-    window.speechPatterns = null;
+    window.processSpeech = null; // New function for speech pattern generation
     
     document.addEventListener('DOMContentLoaded', () => {
       // Set up button event listeners
@@ -320,6 +255,16 @@
         }
       });
       
+      // Set up speech simulation button
+      document.getElementById('speech-btn').addEventListener('click', () => {
+        const speechText = document.getElementById('speech-text').value;
+        const audioLevel = parseFloat(document.getElementById('audio-level').value);
+        
+        if (window.processSpeech && speechText) {
+          window.processSpeech(speechText, audioLevel);
+        }
+      });
+      
       // Set up audio level slider
       const audioLevelSlider = document.getElementById('audio-level');
       const audioValue = document.getElementById('audio-value');
@@ -338,77 +283,6 @@
           rgba(0, 180, 255, 0.8) ${percent}%, 
           rgba(30, 30, 40, 0.3) ${percent}%
         )`;
-      });
-      
-      // Set up speech input
-      const speechInput = document.getElementById('speech-input');
-      const speakBtn = document.getElementById('speak-btn');
-      
-      speakBtn.addEventListener('click', () => {
-        const text = speechInput.value;
-        const audioLevel = parseFloat(audioLevelSlider.value);
-        
-        // Update speech patterns with text
-        if (window.speechPatterns) {
-          window.speechPatterns.updateWithSpeech(text, audioLevel);
-        }
-        
-        // Simulate speaking by increasing audio level temporarily
-        if (window.updateRobotAudioLevel) {
-          // Start with high audio level
-          window.updateRobotAudioLevel(0.8);
-          
-          // Gradually decrease over time
-          let speakTime = 0;
-          const speakInterval = setInterval(() => {
-            speakTime += 100;
-            const newLevel = 0.8 * (1 - speakTime / 3000);
-            
-            if (newLevel <= 0.1 || speakTime >= 3000) {
-              clearInterval(speakInterval);
-              window.updateRobotAudioLevel(parseFloat(audioLevelSlider.value));
-            } else {
-              window.updateRobotAudioLevel(newLevel);
-            }
-          }, 100);
-        }
-      });
-      
-      // Set up pattern theme buttons
-      document.getElementById('tech-btn').addEventListener('click', () => {
-        if (window.speechPatterns) {
-          window.speechPatterns.updateWithSpeech(
-            "Technology artificial intelligence computers digital algorithms data processing systems", 
-            0.7
-          );
-        }
-      });
-      
-      document.getElementById('nature-btn').addEventListener('click', () => {
-        if (window.speechPatterns) {
-          window.speechPatterns.updateWithSpeech(
-            "Nature trees forest mountains ocean rivers animals plants green environment ecosystem", 
-            0.7
-          );
-        }
-      });
-      
-      document.getElementById('emotion-btn').addEventListener('click', () => {
-        if (window.speechPatterns) {
-          window.speechPatterns.updateWithSpeech(
-            "Emotions feelings happy sad love joy anger fear heart emotional expression", 
-            0.7
-          );
-        }
-      });
-      
-      document.getElementById('abstract-btn').addEventListener('click', () => {
-        if (window.speechPatterns) {
-          window.speechPatterns.updateWithSpeech(
-            "Abstract concepts ideas philosophy theory thought mind consciousness perception reality", 
-            0.7
-          );
-        }
       });
       
       // Simulate natural audio input with a sine wave
@@ -456,282 +330,78 @@
         if (window.setRobotExpression) {
           window.setRobotExpression(randomExpression);
         }
-        
-        // Add some example text to the speech input
-        speechInput.value = "Hello! I'm your AI assistant. I can help you with technology questions, discuss nature, talk about emotions, or explore abstract concepts.";
       }, 1000);
     });
   </script>
   
-  <!-- Load the speech patterns -->
+  <!-- Load the p5 scripts -->
   <script src="client/speech-patterns.js"></script>
+  <script src="client/p5-background-fixed.js"></script>
   
-  <!-- Inline p5.js sketch for the AI face -->
   <script>
-    // Create a new p5 instance
-    new p5(function(p) {
-      // Color palette
-      const palette = {
-        black: [5, 5, 10],
-        blue: [0, 150, 255],
-        cyan: [0, 220, 255],
-        white: [240, 240, 245],
-        neonBlue: [0, 170, 255],
-        neonPink: [255, 0, 150],
-        happy: [50, 255, 150],
-        sad: [100, 150, 255],
-        angry: [255, 50, 50],
-        surprised: [255, 200, 0],
-        thinking: [180, 180, 255]
-      };
+    // Initialize speech patterns integration
+    document.addEventListener('DOMContentLoaded', () => {
+      // Create a global variable to store the speech patterns instance
+      window.speechPatterns = null;
       
-      // Face parameters
-      let faceWidth, faceHeight;
-      let leftEye, rightEye, mouth;
-      let audioLevel = 0;
-      let blinkState = 0;
-      let expressionState = 'neutral';
-      let time = 0;
-      
-      // Speech patterns module
-      let speechPatternsModule = null;
-      
-      p.setup = function() {
-        // Create canvas
-        let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
-        canvas.position(0, 0);
-        canvas.style('z-index', '-2');
+      // Override the p5.js sketch to expose the p5 instance
+      const originalSketch = window.sketch;
+      window.sketch = function(p) {
+        // Store p5 instance globally
+        window.p5Instance = p;
         
-        // Initialize speech patterns module
-        if (window.createSpeechPatterns) {
-          speechPatternsModule = window.createSpeechPatterns(p);
-          speechPatternsModule.init();
+        // Call the original sketch
+        originalSketch(p);
+        
+        // Override the draw function to integrate speech patterns
+        const originalDraw = p.draw;
+        p.draw = function() {
+          // Call the original draw function
+          originalDraw();
           
-          // Make it globally accessible
-          window.speechPatterns = speechPatternsModule;
-        }
-        
-        // Calculate face dimensions
-        faceWidth = p.min(p.width * 0.7, 800);
-        faceHeight = p.min(p.height * 0.7, 600);
-        
-        // Initialize eyes
-        const eyeSize = faceWidth * 0.15;
-        const eyeY = p.height * 0.45;
-        const eyeSpacing = faceWidth * 0.25;
-        
-        leftEye = {
-          x: p.width / 2 - eyeSpacing / 2,
-          y: eyeY,
-          size: eyeSize,
-          color: palette.cyan
-        };
-        
-        rightEye = {
-          x: p.width / 2 + eyeSpacing / 2,
-          y: eyeY,
-          size: eyeSize,
-          color: palette.cyan
-        };
-        
-        mouth = {
-          x: p.width / 2,
-          y: eyeY + eyeSize * 1.7,
-          width: faceWidth * 0.35,
-          height: eyeSize * 0.5,
-          openAmount: 0.2,
-          color: palette.blue
-        };
-        
-        // Set up global functions
-        window.updateRobotAudioLevel = function(level) {
-          audioLevel = level;
-        };
-        
-        window.setRobotExpression = function(expression) {
-          expressionState = expression;
-          
-          // Set colors based on expression
-          switch(expression) {
-            case 'happy':
-              leftEye.color = palette.happy;
-              rightEye.color = palette.happy;
-              mouth.color = palette.happy;
-              break;
-            case 'thinking':
-              leftEye.color = palette.thinking;
-              rightEye.color = palette.thinking;
-              mouth.color = palette.blue;
-              break;
-            case 'surprised':
-              leftEye.color = palette.surprised;
-              rightEye.color = palette.surprised;
-              mouth.color = palette.surprised;
-              break;
-            case 'sad':
-              leftEye.color = palette.sad;
-              rightEye.color = palette.sad;
-              mouth.color = palette.sad;
-              break;
-            case 'angry':
-              leftEye.color = palette.angry;
-              rightEye.color = palette.angry;
-              mouth.color = palette.angry;
-              break;
-            default: // neutral
-              leftEye.color = palette.cyan;
-              rightEye.color = palette.cyan;
-              mouth.color = palette.blue;
+          // Draw speech patterns if available
+          if (window.speechPatterns) {
+            window.speechPatterns.draw();
           }
         };
       };
       
-      p.draw = function() {
-        // Update time
-        time += 0.01;
-        
-        // Draw background
-        drawBackground();
-        
-        // Update speech patterns if available
-        if (speechPatternsModule) {
-          speechPatternsModule.update(1);
+      // Wait for p5 sketch to initialize
+      setTimeout(() => {
+        // Initialize speech patterns
+        if (window.createSpeechPatterns && window.p5Instance) {
+          window.speechPatterns = window.createSpeechPatterns(window.p5Instance);
+          window.speechPatterns.init();
+          
+          // Override processSpeech function
+          window.processSpeech = function(text, level) {
+            // Update speech patterns with text and audio level
+            if (window.speechPatterns) {
+              window.speechPatterns.updateWithSpeech(text, level);
+            }
+            
+            // Set audio level
+            if (window.updateRobotAudioLevel) {
+              window.updateRobotAudioLevel(level);
+            }
+            
+            // Set expression based on text content
+            if (window.setRobotExpression) {
+              if (text.toLowerCase().includes('happy') || text.toLowerCase().includes('good') || text.toLowerCase().includes('great')) {
+                window.setRobotExpression('happy');
+              } else if (text.toLowerCase().includes('think') || text.toLowerCase().includes('wonder') || text.toLowerCase().includes('curious')) {
+                window.setRobotExpression('thinking');
+              } else if (text.toLowerCase().includes('surprise') || text.toLowerCase().includes('wow') || text.toLowerCase().includes('amazing')) {
+                window.setRobotExpression('surprised');
+              } else if (text.toLowerCase().includes('sad') || text.toLowerCase().includes('sorry') || text.toLowerCase().includes('unfortunate')) {
+                window.setRobotExpression('sad');
+              } else if (text.toLowerCase().includes('angry') || text.toLowerCase().includes('mad') || text.toLowerCase().includes('frustrat')) {
+                window.setRobotExpression('angry');
+              }
+            }
+          };
         }
-        
-        // Get pattern transition state
-        const patternTransition = speechPatternsModule ? 
-                                 speechPatternsModule.getTransitionState() : 0;
-        
-        // Draw the face with opacity based on pattern transition
-        if (patternTransition < 1) {
-          // Adjust face opacity based on pattern transition
-          const faceOpacity = 1 - patternTransition;
-          drawFace(faceOpacity);
-        }
-        
-        // Draw speech patterns if available
-        if (speechPatternsModule) {
-          speechPatternsModule.draw();
-        }
-        
-        // Update blink state
-        updateBlink();
-      };
-      
-      function drawBackground() {
-        // Create a gradient background
-        p.background(palette.black);
-        
-        // Draw subtle grid
-        p.stroke(palette.blue[0], palette.blue[1], palette.blue[2], 20);
-        p.strokeWeight(0.5);
-        
-        // Horizontal lines
-        for (let y = 0; y < p.height; y += 50) {
-          p.line(0, y, p.width, y);
-        }
-        
-        // Vertical lines
-        for (let x = 0; x < p.width; x += 50) {
-          p.line(x, 0, x, p.height);
-        }
-      }
-      
-      function drawFace(opacity = 1) {
-        // Draw eyes
-        drawEye(leftEye, opacity);
-        drawEye(rightEye, opacity);
-        
-        // Draw mouth
-        drawMouth(opacity);
-      }
-      
-      function drawEye(eye, opacity) {
-        // Eye outer glow
-        p.noStroke();
-        for (let i = 3; i > 0; i--) {
-          const glowOpacity = 100 * (1 / i) * opacity;
-          p.fill(eye.color[0], eye.color[1], eye.color[2], glowOpacity);
-          p.ellipse(eye.x, eye.y, eye.size * (1 + i * 0.2));
-        }
-        
-        // Eye base
-        p.fill(palette.black[0], palette.black[1], palette.black[2], 255 * opacity);
-        p.ellipse(eye.x, eye.y, eye.size);
-        
-        // Pupil
-        const pupilSize = eye.size * 0.6;
-        p.fill(eye.color[0], eye.color[1], eye.color[2], 255 * opacity);
-        
-        // Apply blink effect
-        const blinkScaleY = 1 - blinkState * 0.9;
-        p.ellipse(eye.x, eye.y, pupilSize, pupilSize * blinkScaleY);
-        
-        // Reflection
-        p.fill(255, 255, 255, 150 * opacity);
-        const reflectionSize = pupilSize * 0.3;
-        p.ellipse(eye.x - pupilSize * 0.2, eye.y - pupilSize * 0.2, reflectionSize);
-      }
-      
-      function drawMouth(opacity) {
-        // Calculate mouth height based on audio level
-        const openAmount = p.lerp(0.1, 0.8, audioLevel);
-        const mouthHeight = mouth.height * openAmount;
-        
-        // Mouth glow
-        p.noStroke();
-        for (let i = 3; i > 0; i--) {
-          const glowOpacity = 100 * (1 / i) * opacity;
-          p.fill(mouth.color[0], mouth.color[1], mouth.color[2], glowOpacity);
-          p.ellipse(mouth.x, mouth.y, mouth.width * (1 + i * 0.1), mouthHeight * (1 + i * 0.1));
-        }
-        
-        // Mouth shape
-        p.fill(palette.black[0], palette.black[1], palette.black[2], 255 * opacity);
-        p.ellipse(mouth.x, mouth.y, mouth.width, mouthHeight);
-        
-        // Mouth interior glow
-        p.fill(mouth.color[0], mouth.color[1], mouth.color[2], 100 * opacity);
-        p.ellipse(mouth.x, mouth.y, mouth.width * 0.8, mouthHeight * 0.7);
-      }
-      
-      function updateBlink() {
-        // Random blinking
-        if (Math.random() < 0.005) {
-          // Start blink
-          blinkState = 1;
-        } else if (blinkState > 0) {
-          // Reduce blink state
-          blinkState *= 0.8;
-          if (blinkState < 0.01) blinkState = 0;
-        }
-      }
-      
-      p.windowResized = function() {
-        p.resizeCanvas(p.windowWidth, p.windowHeight);
-        
-        // Recalculate face dimensions
-        faceWidth = p.min(p.width * 0.7, 800);
-        faceHeight = p.min(p.height * 0.7, 600);
-        
-        // Update eye positions
-        const eyeSize = faceWidth * 0.15;
-        const eyeY = p.height * 0.45;
-        const eyeSpacing = faceWidth * 0.25;
-        
-        leftEye.x = p.width / 2 - eyeSpacing / 2;
-        leftEye.y = eyeY;
-        leftEye.size = eyeSize;
-        
-        rightEye.x = p.width / 2 + eyeSpacing / 2;
-        rightEye.y = eyeY;
-        rightEye.size = eyeSize;
-        
-        mouth.x = p.width / 2;
-        mouth.y = eyeY + eyeSize * 1.7;
-        mouth.width = faceWidth * 0.35;
-        mouth.height = eyeSize * 0.5;
-      };
+      }, 1000); // Wait for p5 to initialize
     });
   </script>
 </body>

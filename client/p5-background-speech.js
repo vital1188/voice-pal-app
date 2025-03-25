@@ -1,12 +1,6 @@
-// Advanced Futuristic AI Face using p5.js - Enhanced for realistic expressions and mesmerizing eyes
-
-// Store p5 instance globally for speech patterns integration
-window.p5Instance = null;
+// Advanced Futuristic AI Face using p5.js - Enhanced with speech pattern transformations
 
 let sketch = function(p) {
-  // Store p5 instance globally
-  window.p5Instance = p;
-  
   // Enhanced color palette with more vibrant and futuristic tones
   const palette = {
     black: [5, 5, 10],
@@ -85,11 +79,18 @@ let sketch = function(p) {
   let deltaTime = 0;
   const FRAME_RATE = 60; // Target frame rate
   
+  // Speech pattern variables
+  let speechPatterns;
+  
   p.setup = function() {
     // Create canvas that covers the entire window
     let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
     canvas.position(0, 0);
     canvas.style('z-index', '-2');
+    
+    // Initialize speech patterns module
+    speechPatterns = window.createSpeechPatterns(p);
+    speechPatterns.init();
     
     // Calculate face dimensions based on window size - ensure it's centered and visible
     faceWidth = p.min(p.width * 0.7, 1000); // Slightly smaller for better visibility
@@ -329,6 +330,28 @@ let sketch = function(p) {
       }
     };
     
+    // Make global function to process speech - new function for speech pattern generation
+    window.processSpeech = function(text, level) {
+      // Update speech patterns with text and audio level
+      speechPatterns.updateWithSpeech(text, level);
+      
+      // Set audio level
+      window.updateRobotAudioLevel(level);
+      
+      // Set expression based on text content
+      if (text.toLowerCase().includes('happy') || text.toLowerCase().includes('good') || text.toLowerCase().includes('great')) {
+        window.setRobotExpression('happy');
+      } else if (text.toLowerCase().includes('think') || text.toLowerCase().includes('wonder') || text.toLowerCase().includes('curious')) {
+        window.setRobotExpression('thinking');
+      } else if (text.toLowerCase().includes('surprise') || text.toLowerCase().includes('wow') || text.toLowerCase().includes('amazing')) {
+        window.setRobotExpression('surprised');
+      } else if (text.toLowerCase().includes('sad') || text.toLowerCase().includes('sorry') || text.toLowerCase().includes('unfortunate')) {
+        window.setRobotExpression('sad');
+      } else if (text.toLowerCase().includes('angry') || text.toLowerCase().includes('mad') || text.toLowerCase().includes('frustrat')) {
+        window.setRobotExpression('angry');
+      }
+    };
+    
     // Make global function to make robot fullscreen - enhanced for better centering
     window.makeRobotFullscreen = function() {
       isFullscreen = true;
@@ -401,11 +424,24 @@ let sketch = function(p) {
     // Update face parameters
     updateFace();
     
+    // Update speech patterns
+    speechPatterns.update(deltaTime);
+    
     // Draw futuristic elements
     drawFuturisticElements();
     
-    // Draw the face
-    drawFace();
+    // Draw the face with speech pattern transition
+    const patternTransition = speechPatterns.getTransitionState();
+    
+    // Only draw face if not fully transitioned to patterns
+    if (patternTransition < 1) {
+      // Apply opacity based on transition
+      const faceOpacity = 1 - patternTransition;
+      drawFace(faceOpacity);
+    }
+    
+    // Draw speech patterns
+    speechPatterns.draw();
     
     // Gradually reduce audio level if not actively listening - smoother decay
     if (!isListening) {
@@ -624,235 +660,3 @@ let sketch = function(p) {
           leftEye.blinkState = p.map(blinkTimer, blinkThreshold + 5, blinkThreshold + 10, 1, 0);
         }
         rightEye.blinkState = leftEye.blinkState;
-      } else if (blinkTimer > blinkThreshold + 120) {
-        blinkTimer = 0;
-      }
-    }
-    
-    // Natural eye movements
-    const currentTime = Date.now();
-    if (currentTime - lastEyeMovementTime > eyeMovementInterval) {
-      targetEyeX = Math.random() * p.width;
-      targetEyeY = Math.random() * p.height;
-      lastEyeMovementTime = currentTime;
-      eyeMovementInterval = 1000 + Math.random() * 2000; // More natural timing
-    }
-    
-    // Update eye pupil position with natural movement
-    const maxPupilOffset = leftEye.size * 0.2;
-    const targetXOffset = p.map(p.mouseX, 0, p.width, -maxPupilOffset, maxPupilOffset);
-    const targetYOffset = p.map(p.mouseY, 0, p.height, -maxPupilOffset, maxPupilOffset);
-    
-    leftEye.pupilOffset.x = p.lerp(leftEye.pupilOffset.x, targetXOffset, 0.05);
-    leftEye.pupilOffset.y = p.lerp(leftEye.pupilOffset.y, targetYOffset, 0.05);
-    rightEye.pupilOffset.x = p.lerp(rightEye.pupilOffset.x, targetXOffset, 0.05);
-    rightEye.pupilOffset.y = p.lerp(rightEye.pupilOffset.y, targetYOffset, 0.05);
-    
-    // Update iris rotation for mesmerizing effect
-    leftEye.irisRotation += 0.005 * deltaTime;
-    rightEye.irisRotation += 0.005 * deltaTime;
-    
-    // Update mouth based on audio level
-    const targetOpenAmount = p.map(audioLevel, 0, 1, 0.1, 0.8);
-    mouth.openAmount = p.lerp(mouth.openAmount, targetOpenAmount, 0.2);
-    
-    // Update expression-based mouth curve
-    let targetCurveAmount = 0;
-    if (expressionState === 'happy') {
-      targetCurveAmount = 0.3 * expressionIntensity;
-    } else if (expressionState === 'sad') {
-      targetCurveAmount = -0.3 * expressionIntensity;
-    } else if (expressionState === 'surprised') {
-      targetCurveAmount = 0;
-      mouth.openAmount = p.lerp(mouth.openAmount, 0.7 * expressionIntensity, 0.3);
-    } else if (expressionState === 'angry') {
-      targetCurveAmount = -0.15 * expressionIntensity;
-    }
-    
-    mouth.curveAmount = p.lerp(mouth.curveAmount, targetCurveAmount, 0.1);
-  }
-  
-  // Draw the robot face with enhanced details
-  function drawFace(opacity = 1.0) {
-    // Draw eyes with depth and reflections
-    drawEnhancedEye(leftEye, opacity);
-    drawEnhancedEye(rightEye, opacity);
-    
-    // Draw mouth with enhanced details
-    drawEnhancedMouth(mouth, opacity);
-  }
-  
-  // Draw enhanced eye with depth and reflections
-  function drawEnhancedEye(eye, opacity = 1.0) {
-    // Skip if eye is fully closed
-    if (eye.blinkState >= 0.99) return;
-    
-    // Calculate eye opening based on blink state
-    const eyeOpening = 1 - eye.blinkState;
-    const eyeHeight = eye.size * eyeOpening;
-    
-    // Draw eye socket glow
-    p.noStroke();
-    for (let i = 3; i > 0; i--) {
-      const glowSize = eye.size * (1 + i * 0.15);
-      const glowOpacity = eye.glowIntensity * (1 / i) * 0.3 * opacity;
-      p.fill(eye.color[0], eye.color[1], eye.color[2], glowOpacity * 255);
-      p.ellipse(eye.x, eye.y, glowSize, glowSize * eyeOpening);
-    }
-    
-    // Draw eye socket
-    p.fill(palette.black[0], palette.black[1], palette.black[2], 200 * opacity);
-    p.ellipse(eye.x, eye.y, eye.size * 1.1, eye.size * 1.1 * eyeOpening);
-    
-    // Draw iris with depth layers
-    for (let i = eye.irisLayers; i > 0; i--) {
-      const layerSize = eye.pupilSize * (1 - (i / eye.irisLayers) * eye.depthEffect);
-      const layerOpacity = (1 - (i / eye.irisLayers) * 0.3) * opacity;
-      
-      p.push();
-      p.translate(eye.x + eye.pupilOffset.x, eye.y + eye.pupilOffset.y);
-      p.rotate(eye.irisRotation * i * 0.2);
-      
-      // Draw iris layer
-      p.fill(eye.color[0], eye.color[1], eye.color[2], layerOpacity * 255);
-      p.ellipse(0, 0, layerSize, layerSize * eyeOpening);
-      
-      // Draw iris details
-      p.noFill();
-      p.stroke(palette.irisHighlight[0], palette.irisHighlight[1], palette.irisHighlight[2], 100 * layerOpacity);
-      p.strokeWeight(1);
-      p.ellipse(0, 0, layerSize * 0.8, layerSize * 0.8 * eyeOpening);
-      
-      p.pop();
-    }
-    
-    // Draw pupil
-    p.fill(palette.black[0], palette.black[1], palette.black[2], 230 * opacity);
-    p.ellipse(
-      eye.x + eye.pupilOffset.x, 
-      eye.y + eye.pupilOffset.y, 
-      eye.pupilSize * 0.5, 
-      eye.pupilSize * 0.5 * eyeOpening
-    );
-    
-    // Draw eye reflections
-    p.fill(palette.highlight[0], palette.highlight[1], palette.highlight[2], 180 * opacity);
-    
-    // Dynamic reflection based on time
-    const reflX = Math.cos(reflectionAngle) * eye.pupilSize * 0.2;
-    const reflY = Math.sin(reflectionAngle) * eye.pupilSize * 0.2 * eyeOpening;
-    p.ellipse(
-      eye.x + eye.pupilOffset.x + reflX, 
-      eye.y + eye.pupilOffset.y + reflY, 
-      eye.pupilSize * 0.15, 
-      eye.pupilSize * 0.15 * eyeOpening
-    );
-    
-    // Additional reflections
-    for (const refl of eye.reflections) {
-      p.fill(palette.highlight[0], palette.highlight[1], palette.highlight[2], 
-             refl.opacity * 255 * opacity);
-      p.ellipse(
-        eye.x + eye.pupilOffset.x + refl.x * eye.pupilSize, 
-        eye.y + eye.pupilOffset.y + refl.y * eye.pupilSize * eyeOpening, 
-        eye.pupilSize * refl.size, 
-        eye.pupilSize * refl.size * eyeOpening
-      );
-    }
-  }
-  
-  // Draw enhanced mouth with better expressions
-  function drawEnhancedMouth(mouth, opacity = 1.0) {
-    // Calculate mouth parameters based on expression and audio
-    const mouthWidth = mouth.width;
-    const mouthHeight = mouth.height * mouth.openAmount;
-    const curveOffset = mouth.curveAmount * mouth.width * 0.5;
-    
-    // Draw mouth glow
-    p.noStroke();
-    for (let i = 3; i > 0; i--) {
-      const glowSize = 1 + i * 0.15;
-      const glowOpacity = mouth.glowIntensity * (1 / i) * 0.3 * opacity;
-      
-      p.fill(mouth.color[0], mouth.color[1], mouth.color[2], glowOpacity * 255);
-      
-      // Draw curved mouth with bezier
-      p.beginShape();
-      p.vertex(mouth.x - mouthWidth / 2, mouth.y);
-      p.bezierVertex(
-        mouth.x - mouthWidth / 4, mouth.y - curveOffset,
-        mouth.x + mouthWidth / 4, mouth.y - curveOffset,
-        mouth.x + mouthWidth / 2, mouth.y
-      );
-      p.bezierVertex(
-        mouth.x + mouthWidth / 4, mouth.y + mouthHeight + curveOffset,
-        mouth.x - mouthWidth / 4, mouth.y + mouthHeight + curveOffset,
-        mouth.x - mouthWidth / 2, mouth.y
-      );
-      p.endShape(p.CLOSE);
-    }
-    
-    // Draw mouth interior
-    p.fill(palette.black[0], palette.black[1], palette.black[2], 200 * opacity);
-    p.beginShape();
-    p.vertex(mouth.x - mouthWidth / 2, mouth.y);
-    p.bezierVertex(
-      mouth.x - mouthWidth / 4, mouth.y - curveOffset,
-      mouth.x + mouthWidth / 4, mouth.y - curveOffset,
-      mouth.x + mouthWidth / 2, mouth.y
-    );
-    p.bezierVertex(
-      mouth.x + mouthWidth / 4, mouth.y + mouthHeight + curveOffset,
-      mouth.x - mouthWidth / 4, mouth.y + mouthHeight + curveOffset,
-      mouth.x - mouthWidth / 2, mouth.y
-    );
-    p.endShape(p.CLOSE);
-    
-    // Draw teeth if mouth is open enough and expression allows
-    if (mouth.openAmount > 0.3 && expressionState !== 'angry') {
-      const teethWidth = mouthWidth * 0.8;
-      const teethHeight = mouthHeight * 0.3;
-      
-      // Upper teeth
-      p.fill(palette.white[0], palette.white[1], palette.white[2], 
-             150 * mouth.teethBrightness * opacity);
-      p.rect(mouth.x - teethWidth / 2, mouth.y + 2, teethWidth, teethHeight, 3);
-      
-      // Lower teeth if mouth is open wide enough
-      if (mouth.openAmount > 0.5) {
-        p.rect(mouth.x - teethWidth / 2, 
-               mouth.y + mouthHeight - teethHeight - 2, 
-               teethWidth, teethHeight, 3);
-      }
-    }
-    
-    // Draw lips with enhanced definition
-    p.noFill();
-    p.stroke(mouth.color[0], mouth.color[1], mouth.color[2], 
-             200 * mouth.lipDefinition * opacity);
-    p.strokeWeight(mouth.lipThickness);
-    
-    // Upper lip
-    p.beginShape();
-    p.vertex(mouth.x - mouthWidth / 2, mouth.y);
-    p.bezierVertex(
-      mouth.x - mouthWidth / 4, mouth.y - curveOffset,
-      mouth.x + mouthWidth / 4, mouth.y - curveOffset,
-      mouth.x + mouthWidth / 2, mouth.y
-    );
-    p.endShape();
-    
-    // Lower lip
-    p.beginShape();
-    p.vertex(mouth.x - mouthWidth / 2, mouth.y);
-    p.bezierVertex(
-      mouth.x - mouthWidth / 4, mouth.y + mouthHeight + curveOffset,
-      mouth.x + mouthWidth / 4, mouth.y + mouthHeight + curveOffset,
-      mouth.x + mouthWidth / 2, mouth.y
-    );
-    p.endShape();
-  }
-};
-
-// Initialize the p5 sketch
-new p5(sketch);

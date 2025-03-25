@@ -1,4 +1,4 @@
-// Advanced Futuristic AI Face using p5.js - Enhanced with speech-reactive patterns
+// Advanced Futuristic AI Face using p5.js - Enhanced with speech pattern transformations
 
 let sketch = function(p) {
   // Enhanced color palette with more vibrant and futuristic tones
@@ -49,9 +49,6 @@ let sketch = function(p) {
   let expressionIntensity = 0; // 0-1 scale for intensity of expression
   let lastExpressionChange = 0;
   
-  // Speech patterns module
-  let speechPatternsModule = null;
-  
   // Audio visualization data - optimized
   let audioData = new Array(16).fill(0);
   
@@ -82,6 +79,9 @@ let sketch = function(p) {
   let deltaTime = 0;
   const FRAME_RATE = 60; // Target frame rate
   
+  // Speech pattern variables
+  let speechPatterns;
+  
   p.setup = function() {
     // Create canvas that covers the entire window
     let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
@@ -89,13 +89,8 @@ let sketch = function(p) {
     canvas.style('z-index', '-2');
     
     // Initialize speech patterns module
-    if (window.createSpeechPatterns) {
-      speechPatternsModule = window.createSpeechPatterns(p);
-      speechPatternsModule.init();
-      
-      // Make it globally accessible
-      window.speechPatterns = speechPatternsModule;
-    }
+    speechPatterns = window.createSpeechPatterns(p);
+    speechPatterns.init();
     
     // Calculate face dimensions based on window size - ensure it's centered and visible
     faceWidth = p.min(p.width * 0.7, 1000); // Slightly smaller for better visibility
@@ -335,6 +330,28 @@ let sketch = function(p) {
       }
     };
     
+    // Make global function to process speech - new function for speech pattern generation
+    window.processSpeech = function(text, level) {
+      // Update speech patterns with text and audio level
+      speechPatterns.updateWithSpeech(text, level);
+      
+      // Set audio level
+      window.updateRobotAudioLevel(level);
+      
+      // Set expression based on text content
+      if (text.toLowerCase().includes('happy') || text.toLowerCase().includes('good') || text.toLowerCase().includes('great')) {
+        window.setRobotExpression('happy');
+      } else if (text.toLowerCase().includes('think') || text.toLowerCase().includes('wonder') || text.toLowerCase().includes('curious')) {
+        window.setRobotExpression('thinking');
+      } else if (text.toLowerCase().includes('surprise') || text.toLowerCase().includes('wow') || text.toLowerCase().includes('amazing')) {
+        window.setRobotExpression('surprised');
+      } else if (text.toLowerCase().includes('sad') || text.toLowerCase().includes('sorry') || text.toLowerCase().includes('unfortunate')) {
+        window.setRobotExpression('sad');
+      } else if (text.toLowerCase().includes('angry') || text.toLowerCase().includes('mad') || text.toLowerCase().includes('frustrat')) {
+        window.setRobotExpression('angry');
+      }
+    };
+    
     // Make global function to make robot fullscreen - enhanced for better centering
     window.makeRobotFullscreen = function() {
       isFullscreen = true;
@@ -407,29 +424,24 @@ let sketch = function(p) {
     // Update face parameters
     updateFace();
     
-    // Update speech patterns if available
-    if (speechPatternsModule) {
-      speechPatternsModule.update(deltaTime);
-    }
+    // Update speech patterns
+    speechPatterns.update(deltaTime);
     
     // Draw futuristic elements
     drawFuturisticElements();
     
-    // Get pattern transition state
-    const patternTransition = speechPatternsModule ? 
-                             speechPatternsModule.getTransitionState() : 0;
+    // Draw the face with speech pattern transition
+    const patternTransition = speechPatterns.getTransitionState();
     
-    // Draw the face with opacity based on pattern transition
+    // Only draw face if not fully transitioned to patterns
     if (patternTransition < 1) {
-      // Adjust face opacity based on pattern transition
+      // Apply opacity based on transition
       const faceOpacity = 1 - patternTransition;
       drawFace(faceOpacity);
     }
     
-    // Draw speech patterns if available
-    if (speechPatternsModule) {
-      speechPatternsModule.draw();
-    }
+    // Draw speech patterns
+    speechPatterns.draw();
     
     // Gradually reduce audio level if not actively listening - smoother decay
     if (!isListening) {
@@ -534,20 +546,13 @@ let sketch = function(p) {
   
   // Draw futuristic elements around the face
   function drawFuturisticElements() {
-    // Get pattern transition state
-    const patternTransition = speechPatternsModule ? 
-                             speechPatternsModule.getTransitionState() : 0;
-    
-    // Adjust element opacity based on pattern transition
-    const elementOpacity = 1 - patternTransition * 0.7; // Keep some elements visible
-    
     // Draw holographic rings
     for (let ring of holoRings) {
       ring.rotation += ring.rotationSpeed * deltaTime;
       
       p.noFill();
       p.stroke(ring.color[0], ring.color[1], ring.color[2], 
-               ring.opacity * 255 * (0.7 + Math.sin(time * 0.5) * 0.3) * elementOpacity);
+               ring.opacity * 255 * (0.7 + Math.sin(time * 0.5) * 0.3));
       p.strokeWeight(ring.thickness);
       
       p.push();
@@ -561,7 +566,7 @@ let sketch = function(p) {
     for (let line of circuitLines) {
       const pulse = Math.sin(time * line.pulseSpeed + line.pulseOffset) * 0.5 + 0.5;
       p.stroke(line.color[0], line.color[1], line.color[2], 
-               line.color[3] * pulse * elementOpacity);
+               line.color[3] * pulse);
       p.strokeWeight(line.thickness * pulse);
       
       let x = line.startX;
@@ -579,7 +584,7 @@ let sketch = function(p) {
         if (i < line.segments - 1) {
           p.noStroke();
           p.fill(line.color[0], line.color[1], line.color[2], 
-                 line.color[3] * pulse * 1.5 * elementOpacity);
+                 line.color[3] * pulse * 1.5);
           p.ellipse(nextX, nextY, line.thickness * 2 * pulse);
         }
         
@@ -608,12 +613,12 @@ let sketch = function(p) {
       // Draw particle
       p.noStroke();
       p.fill(particle.color[0], particle.color[1], particle.color[2], 
-             (particle.color[3] || 200) * pulse * elementOpacity);
+             (particle.color[3] || 200) * pulse);
       p.ellipse(x, y, particle.size * pulse);
       
       // Draw trail
       p.stroke(particle.color[0], particle.color[1], particle.color[2], 
-               (particle.color[3] || 100) * pulse * 0.5 * elementOpacity);
+               (particle.color[3] || 100) * pulse * 0.5);
       p.strokeWeight(particle.size * 0.5 * pulse);
       
       const trailX = p.width / 2 + Math.cos(particle.angle - particle.speed * 10) * particle.distance;
@@ -629,14 +634,14 @@ let sketch = function(p) {
     for (let i = 4; i > 0; i--) {
       p.noStroke();
       p.fill(energyCore.color[0], energyCore.color[1], energyCore.color[2], 
-             (energyCore.color[3] || 150) * corePulse * (1 / i) * elementOpacity);
+             (energyCore.color[3] || 150) * corePulse * (1 / i));
       p.ellipse(energyCore.x, energyCore.y, 
                 energyCore.size * (1 + i * 0.5) * corePulse,
                 energyCore.size * (1 + i * 0.5) * corePulse * 0.6);
     }
     
     // Core center
-    p.fill(255, 255, 255, 200 * corePulse * elementOpacity);
+    p.fill(255, 255, 255, 200 * corePulse);
     p.ellipse(energyCore.x, energyCore.y, 
               energyCore.size * 0.5 * corePulse,
               energyCore.size * 0.3 * corePulse);
@@ -660,9 +665,4 @@ let sketch = function(p) {
       }
     }
     
-    // Natural eye movements
-    const currentTime = Date.now();
-    if (currentTime - lastEyeMovementTime > eyeMovementInterval) {
-      targetEyeX = Math.random() * p.width;
-      targetEyeY = Math.random() * p.height;
-      lastE
+    // Update
