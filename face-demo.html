@@ -195,7 +195,6 @@
       <li>Dynamic circuit patterns and energy core</li>
       <li>Responsive audio-reactive expressions</li>
       <li>Smooth natural blinking and eye movements</li>
-      <li>Speech-reactive pattern transformations</li>
     </ul>
   </div>
   
@@ -216,18 +215,12 @@
       </label>
       <input type="range" id="audio-level" min="0" max="1" step="0.01" value="0.2">
     </div>
-    
-    <div class="speech-input">
-      <input type="text" id="speech-text" placeholder="Enter speech text here..." style="width: 100%; padding: 10px; margin-top: 15px; background: rgba(15, 15, 20, 0.8); color: white; border: 1px solid rgba(0, 180, 255, 0.5); border-radius: 8px;">
-      <button id="speech-btn" style="margin-top: 10px; width: 100%;">Simulate Speech</button>
-    </div>
   </div>
   
   <script>
     // Global variables to simulate the robot face API
     window.setRobotExpression = null;
     window.updateRobotAudioLevel = null;
-    window.processSpeech = null; // New function for speech pattern generation
     
     document.addEventListener('DOMContentLoaded', () => {
       // Set up button event listeners
@@ -252,16 +245,6 @@
       document.getElementById('neutral-btn').addEventListener('click', () => {
         if (window.setRobotExpression) {
           window.setRobotExpression('neutral');
-        }
-      });
-      
-      // Set up speech simulation button
-      document.getElementById('speech-btn').addEventListener('click', () => {
-        const speechText = document.getElementById('speech-text').value;
-        const audioLevel = parseFloat(document.getElementById('audio-level').value);
-        
-        if (window.processSpeech && speechText) {
-          window.processSpeech(speechText, audioLevel);
         }
       });
       
@@ -334,75 +317,7 @@
     });
   </script>
   
-  <!-- Load the p5 scripts -->
-  <script src="client/speech-patterns.js"></script>
-  <script src="client/p5-background-fixed.js"></script>
-  
-  <script>
-    // Initialize speech patterns integration
-    document.addEventListener('DOMContentLoaded', () => {
-      // Create a global variable to store the speech patterns instance
-      window.speechPatterns = null;
-      
-      // Override the p5.js sketch to expose the p5 instance
-      const originalSketch = window.sketch;
-      window.sketch = function(p) {
-        // Store p5 instance globally
-        window.p5Instance = p;
-        
-        // Call the original sketch
-        originalSketch(p);
-        
-        // Override the draw function to integrate speech patterns
-        const originalDraw = p.draw;
-        p.draw = function() {
-          // Call the original draw function
-          originalDraw();
-          
-          // Draw speech patterns if available
-          if (window.speechPatterns) {
-            window.speechPatterns.draw();
-          }
-        };
-      };
-      
-      // Wait for p5 sketch to initialize
-      setTimeout(() => {
-        // Initialize speech patterns
-        if (window.createSpeechPatterns && window.p5Instance) {
-          window.speechPatterns = window.createSpeechPatterns(window.p5Instance);
-          window.speechPatterns.init();
-          
-          // Override processSpeech function
-          window.processSpeech = function(text, level) {
-            // Update speech patterns with text and audio level
-            if (window.speechPatterns) {
-              window.speechPatterns.updateWithSpeech(text, level);
-            }
-            
-            // Set audio level
-            if (window.updateRobotAudioLevel) {
-              window.updateRobotAudioLevel(level);
-            }
-            
-            // Set expression based on text content
-            if (window.setRobotExpression) {
-              if (text.toLowerCase().includes('happy') || text.toLowerCase().includes('good') || text.toLowerCase().includes('great')) {
-                window.setRobotExpression('happy');
-              } else if (text.toLowerCase().includes('think') || text.toLowerCase().includes('wonder') || text.toLowerCase().includes('curious')) {
-                window.setRobotExpression('thinking');
-              } else if (text.toLowerCase().includes('surprise') || text.toLowerCase().includes('wow') || text.toLowerCase().includes('amazing')) {
-                window.setRobotExpression('surprised');
-              } else if (text.toLowerCase().includes('sad') || text.toLowerCase().includes('sorry') || text.toLowerCase().includes('unfortunate')) {
-                window.setRobotExpression('sad');
-              } else if (text.toLowerCase().includes('angry') || text.toLowerCase().includes('mad') || text.toLowerCase().includes('frustrat')) {
-                window.setRobotExpression('angry');
-              }
-            }
-          };
-        }
-      }, 1000); // Wait for p5 to initialize
-    });
-  </script>
+  <!-- Load the p5 background script -->
+  <script src="client/simple-face.js"></script>
 </body>
 </html>
