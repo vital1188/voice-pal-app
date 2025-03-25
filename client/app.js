@@ -483,4 +483,3 @@ document.addEventListener('DOMContentLoaded', () => {
       originalSetRobotExpression(expression, intensity);
     };
   }
-});
